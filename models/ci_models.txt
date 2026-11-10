@@ -1,0 +1,4 @@
+# Models run by CI on every pull request (small ones; the large ones are run by maintainers before a release).
+# One folder name per line, as under models/. A verified model (expected.json) must reproduce its GAMS result;
+# a contributed one must come out SOLVED or UNSUPPORTED.
+DemoS_012

@@ -1,0 +1,153 @@
+{
+ "case": "DemoS_012",
+ "made": "2026-10-30",
+ "from_verdict": "SAME: the same linear program as GAMS, every coefficient, right-hand side and bound; HiGHS finds the GAMS objective",
+ "objective": 25271809.42808876,
+ "environment": {
+  "gams": "54.1.0",
+  "times": "4.9.7",
+  "solver": "CPLEX"
+ },
+ "gams": {
+  "rows": 6034,
+  "columns": 8456,
+  "nonzeros": 37064,
+  "objective": 25271809.42808876,
+  "REDUCE": "YES",
+  "gams_version": "54.1.0",
+  "times_version": "4.9.7",
+  "solver": "CPLEX",
+  "solver_status": "1 Normal Completion",
+  "model_status": "1 Optimal"
+ },
+ "julia": {
+  "rows": 6034,
+  "columns": 8456,
+  "nonzeros": 37064,
+  "objective": 25271809.428088833
+ },
+ "row_counts": {
+  "EQ_OBJVAR": 2,
+  "EQ_OBJSALV": 2,
+  "EQ_OBJFIX": 2,
+  "EQG_COMBAL": 1606,
+  "EQL_CAPACT": 2353,
+  "EQL_ACTBND": 44,
+  "EQ_IRE": 99,
+  "EQE_COMPRD": 88,
+  "EQ_OBJ": 1,
+  "EQE_CPT": 30,
+  "EQ_PEAK": 44,
+  "EQG_INSHR": 632,
+  "EQE_INSHR": 403,
+  "EQE_COMBAL": 220,
+  "EQG_OUTSHR": 140,
+  "EQ_OBJINV": 2,
+  "EQE_ACTEFF": 242,
+  "EQE_UCRT": 16,
+  "EQE_UCRTS": 14,
+  "EQ_CUMFLO": 16,
+  "EQ_ACTFLO": 66,
+  "EQE_OUTSHR": 12
+ },
+ "port_follows_TIMES": "4.9.7",
+ "switches": {
+  "BOTIME": "1960",
+  "CTST": "",
+  "DAMAGE": "NO",
+  "DATAGDX": "YES",
+  "DEBUG": "NO",
+  "DFLBL": "0",
+  "DSCAUTO": "YES",
+  "DUMPSOL": "NO",
+  "EOTIME": "2200",
+  "ERR_ABORT": "YES",
+  "EXTEND": "%1 %2 %3 %4 %5 %6",
+  "GAMS_CGI": "NO",
+  "GDXPATH": "",
+  "MACRO": "N",
+  "MAXSOW": "96",
+  "MID_YEAR": "YES",
+  "MODEL_NAME": "TIMES",
+  "MX": ",SEASON, WEEKLY, DAYNITE",
+  "OBJ": "AUTO",
+  "OBLONG": "YES",
+  "PGPRIM": "'ACT'",
+  "PRF": "FILE=1",
+  "REDUCE": "YES",
+  "RPOINT": "NO",
+  "RUN_NAME": "demos_012",
+  "SCENARIO_NAME": "bounds-uc_wsets",
+  "SOLANS": "NO",
+  "SOLVEDA": "YES",
+  "SOLVE_NOW": "YES",
+  "STAGES": "NO",
+  "SYSPREFIX": "",
+  "TMP": "0",
+  "VALIDATE": "NO",
+  "VAR": "VARIABLE OBJZ",
+  "VARCOST": "LIN",
+  "VAR_UC": "YES",
+  "VDA": "YES",
+  "VEDAVDD": "YES",
+  "XTQA": "YES"
+ },
+ "dd_files": [
+  {
+   "name": "demos_012_ts.dd",
+   "bytes": 51,
+   "sha256_16": "7c847f67ed096fa7"
+  },
+  {
+   "name": "base.dd",
+   "bytes": 132049,
+   "sha256_16": "4b7159dfd1c05125"
+  },
+  {
+   "name": "newtechs.dd",
+   "bytes": 43788,
+   "sha256_16": "e013070e9201a021"
+  },
+  {
+   "name": "trade_param.dd",
+   "bytes": 228,
+   "sha256_16": "fc0b3b575406d640"
+  },
+  {
+   "name": "dem_ref.dd",
+   "bytes": 28556,
+   "sha256_16": "61663e860d1fb045"
+  },
+  {
+   "name": "syssettings.dd",
+   "bytes": 7446,
+   "sha256_16": "0c387b697e79ce4a"
+  },
+  {
+   "name": "peak_rsv.dd",
+   "bytes": 215,
+   "sha256_16": "05897bbc6db717c0"
+  },
+  {
+   "name": "refinery.dd",
+   "bytes": 1122,
+   "sha256_16": "fb24a4a85a1fdef5"
+  },
+  {
+   "name": "demproj_dtcar.dd",
+   "bytes": 435,
+   "sha256_16": "7c433cee53a27fd5"
+  },
+  {
+   "name": "uc_nuc_maxcap.dd",
+   "bytes": 2295,
+   "sha256_16": "c1676f420d5f5062"
+  },
+  {
+   "name": "bounds-uc_wsets.dd",
+   "bytes": 3694,
+   "sha256_16": "be8ba666871b4a5e"
+  }
+ ],
+ "files": []
+}

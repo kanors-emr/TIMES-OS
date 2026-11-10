@@ -1,0 +1,7 @@
+# JuliaFormatter settings for times_eq. Not yet enforced in CI; run `using JuliaFormatter; format(".")`
+# from times_eq/ before a pull request. Margin kept wide because equation lines quote TIMES algebra.
+margin = 120
+always_for_in = true
+whitespace_typedefs = true
+whitespace_ops_in_indices = true
+remove_extra_newlines = true

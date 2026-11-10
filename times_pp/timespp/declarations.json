@@ -1,0 +1,7765 @@
+{
+"ACL": {
+"domain": [],
+"kind": "par"
+},
+"ACTCG": {
+"domain": [
+"CG"
+],
+"kind": "set"
+},
+"ACT_BND": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"TS",
+"BD"
+],
+"kind": "par"
+},
+"ACT_COST": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CUR"
+],
+"kind": "par"
+},
+"ACT_CSTPL": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "par"
+},
+"ACT_CSTRMP": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"L",
+"CUR"
+],
+"kind": "par"
+},
+"ACT_CSTSD": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"UPT",
+"BD",
+"CUR"
+],
+"kind": "par"
+},
+"ACT_CSTUP": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"TSLVL",
+"CUR"
+],
+"kind": "par"
+},
+"ACT_CUM": {
+"domain": [
+"REG",
+"PRC",
+"ITEM",
+"ITEM",
+"LIM"
+],
+"kind": "par"
+},
+"ACT_EFF": {
+"domain": [
+"REG",
+"YEAR",
+"PRC",
+"CG",
+"TS"
+],
+"kind": "par"
+},
+"ACT_FLO": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG",
+"S"
+],
+"kind": "par"
+},
+"ACT_LOSPL": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"L"
+],
+"kind": "par"
+},
+"ACT_LOSSD": {
+"domain": [
+"R",
+"LL",
+"P",
+"UPT",
+"BD"
+],
+"kind": "par"
+},
+"ACT_MAXNON": {
+"domain": [
+"R",
+"LL",
+"P",
+"UPT"
+],
+"kind": "par"
+},
+"ACT_MINLD": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "par"
+},
+"ACT_SDTIME": {
+"domain": [
+"R",
+"LL",
+"P",
+"UPT",
+"BD"
+],
+"kind": "par"
+},
+"ACT_TIME": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"L"
+],
+"kind": "par"
+},
+"ACT_UPS": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"S",
+"L"
+],
+"kind": "par"
+},
+"ADESC": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"AFS": {
+"domain": [
+"R",
+"T",
+"P",
+"S",
+"BD"
+],
+"kind": "set"
+},
+"AFUPS": {
+"domain": [
+"R",
+"T",
+"P",
+"S"
+],
+"kind": "set"
+},
+"AGE": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"AGEFIL": {
+"domain": [
+"AGE"
+],
+"kind": "set"
+},
+"AGEJ": {
+"domain": [
+"J",
+"AGE"
+],
+"kind": "set"
+},
+"AGG_OUT": {
+"domain": [
+"R",
+"T",
+"C",
+"TS"
+],
+"kind": "par"
+},
+"AGR": {
+"domain": [
+"REG",
+"COM"
+],
+"kind": "set"
+},
+"ALLSOW": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"ALLYEAR": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"ALL_REG": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"ALL_TS": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"ALTOBJ": {
+"domain": [],
+"kind": "par"
+},
+"ANNUAL": {
+"domain": [
+"ALL_TS"
+],
+"kind": "set"
+},
+"B": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "par"
+},
+"BACKWARD": {
+"domain": [
+"YEAR"
+],
+"kind": "set"
+},
+"BC_INVACT": {
+"domain": [
+"R",
+"ALLYEAR",
+"LL",
+"PRC",
+"S"
+],
+"kind": "par"
+},
+"BC_INVTOT": {
+"domain": [
+"R",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"BDLOX": {
+"domain": [
+"BD"
+],
+"kind": "set"
+},
+"BDNEQ": {
+"domain": [
+"BD"
+],
+"kind": "set"
+},
+"BDSIG": {
+"domain": [
+"LIM"
+],
+"kind": "par"
+},
+"BDUPX": {
+"domain": [
+"BD"
+],
+"kind": "set"
+},
+"BDVAL": {
+"domain": [
+"BD"
+],
+"kind": "set"
+},
+"BEOH": {
+"domain": [
+"*"
+],
+"kind": "par"
+},
+"BLE": {
+"domain": [
+"COM"
+],
+"kind": "set"
+},
+"BLE_BAL": {
+"domain": [
+"R",
+"YEAR",
+"C",
+"C"
+],
+"kind": "par"
+},
+"BLE_ENV": {
+"domain": [
+"R",
+"COM",
+"COM",
+"OPR"
+],
+"kind": "set"
+},
+"BLE_INP": {
+"domain": [
+"R",
+"COM",
+"COM"
+],
+"kind": "set"
+},
+"BLE_OPR": {
+"domain": [
+"R",
+"COM",
+"COM"
+],
+"kind": "set"
+},
+"BLE_SPE": {
+"domain": [
+"R",
+"COM",
+"SPE"
+],
+"kind": "set"
+},
+"BLE_SPEINP": {
+"domain": [
+"R",
+"COM",
+"SPE",
+"COM"
+],
+"kind": "set"
+},
+"BLE_SPEOPR": {
+"domain": [
+"R",
+"COM",
+"SPE",
+"OPR"
+],
+"kind": "set"
+},
+"BLE_TP": {
+"domain": [
+"R",
+"ALLYEAR",
+"*"
+],
+"kind": "set"
+},
+"BL_COM": {
+"domain": [
+"R",
+"COM",
+"OPR",
+"SPE"
+],
+"kind": "par"
+},
+"BL_DELIVC": {
+"domain": [
+"R",
+"COM",
+"COM",
+"CUR"
+],
+"kind": "par"
+},
+"BL_INP": {
+"domain": [
+"R",
+"COM",
+"COM"
+],
+"kind": "par"
+},
+"BL_SPEC": {
+"domain": [
+"R",
+"COM",
+"SPE"
+],
+"kind": "par"
+},
+"BL_START": {
+"domain": [
+"R",
+"COM",
+"SPE"
+],
+"kind": "par"
+},
+"BL_TYPE": {
+"domain": [
+"R",
+"COM",
+"SPE"
+],
+"kind": "par"
+},
+"BL_UNIT": {
+"domain": [
+"R",
+"COM",
+"SPE"
+],
+"kind": "par"
+},
+"BL_VAROMC": {
+"domain": [
+"R",
+"COM",
+"CUR"
+],
+"kind": "par"
+},
+"BND_TYPE": {
+"domain": [
+"LIM"
+],
+"kind": "set"
+},
+"BOHYEAR": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"CAP_BND": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"BD"
+],
+"kind": "par"
+},
+"CAP_NEW": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"T",
+"SYSUC"
+],
+"kind": "par"
+},
+"CGTES2": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG",
+"C",
+"CG"
+],
+"kind": "set"
+},
+"CGTEST": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG",
+"C",
+"CG"
+],
+"kind": "set"
+},
+"CG_GRP": {
+"domain": [
+"REG",
+"PRC",
+"CG",
+"CG"
+],
+"kind": "set"
+},
+"CHP": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"CHP_ELC": {
+"domain": [
+"R",
+"P",
+"C"
+],
+"kind": "set"
+},
+"CM_MAXC_M": {
+"domain": [
+"ITEM",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"CM_RESULT": {
+"domain": [
+"ITEM",
+"ITEM",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"CNT": {
+"domain": [],
+"kind": "par"
+},
+"COEF_AF": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"PRC",
+"S",
+"BD"
+],
+"kind": "par"
+},
+"COEF_AFUPS": {
+"domain": [
+"R",
+"YEAR",
+"P",
+"S"
+],
+"kind": "par"
+},
+"COEF_CAP": {
+"domain": [
+"R",
+"ALLYEAR",
+"LL",
+"P"
+],
+"kind": "par"
+},
+"COEF_CIO": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P",
+"C",
+"IO"
+],
+"kind": "par"
+},
+"COEF_CPT": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"PRC"
+],
+"kind": "par"
+},
+"COEF_CRF": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "par"
+},
+"COEF_ICOM": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"PRC",
+"C"
+],
+"kind": "par"
+},
+"COEF_ILED": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "par"
+},
+"COEF_OBFIX": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "par"
+},
+"COEF_OBINV": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "par"
+},
+"COEF_OBJINV": {
+"domain": [
+"R",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"COEF_OCOM": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"PRC",
+"C"
+],
+"kind": "par"
+},
+"COEF_PTRAN": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG",
+"C",
+"CG",
+"TS"
+],
+"kind": "par"
+},
+"COEF_PVT": {
+"domain": [
+"R",
+"T"
+],
+"kind": "par"
+},
+"COEF_RCOM": {
+"domain": [
+"R",
+"LL",
+"LL",
+"P",
+"C"
+],
+"kind": "par"
+},
+"COEF_RPTI": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "par"
+},
+"COEF_RTP": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "par"
+},
+"COEF_RVPT": {
+"domain": [
+"R",
+"ALLYEAR",
+"PRC",
+"T"
+],
+"kind": "par"
+},
+"COEF_VNT": {
+"domain": [
+"R",
+"T",
+"PRC",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"COM": {
+"domain": [
+"COM_GRP"
+],
+"kind": "set"
+},
+"COMM": {
+"domain": [
+"R",
+"COM"
+],
+"kind": "set"
+},
+"COM_AGG": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"COM"
+],
+"kind": "par"
+},
+"COM_BNDNET": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"TS",
+"LIM"
+],
+"kind": "par"
+},
+"COM_BNDPRD": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"TS",
+"LIM"
+],
+"kind": "par"
+},
+"COM_BPRICE": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"TS",
+"CUR"
+],
+"kind": "par"
+},
+"COM_BQTY": {
+"domain": [
+"REG",
+"COM",
+"TS"
+],
+"kind": "par"
+},
+"COM_CSTBAL": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"S",
+"ITEM",
+"CUR"
+],
+"kind": "par"
+},
+"COM_CSTNET": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"TS",
+"CUR"
+],
+"kind": "par"
+},
+"COM_CSTPRD": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"TS",
+"CUR"
+],
+"kind": "par"
+},
+"COM_CUM": {
+"domain": [
+"REG",
+"COM_VAR",
+"ALLYEAR",
+"ALLYEAR",
+"COM",
+"LIM"
+],
+"kind": "par"
+},
+"COM_CUMNET": {
+"domain": [
+"REG",
+"BOHYEAR",
+"EOHYEAR",
+"COM",
+"LIM"
+],
+"kind": "par"
+},
+"COM_CUMPRD": {
+"domain": [
+"REG",
+"BOHYEAR",
+"EOHYEAR",
+"COM",
+"LIM"
+],
+"kind": "par"
+},
+"COM_DESC": {
+"domain": [
+"REG",
+"COM"
+],
+"kind": "set"
+},
+"COM_ELAST": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"TS",
+"LIM"
+],
+"kind": "par"
+},
+"COM_ELASTX": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"BD"
+],
+"kind": "par"
+},
+"COM_FR": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"TS"
+],
+"kind": "par"
+},
+"COM_GMAP": {
+"domain": [
+"REG",
+"COM_GRP",
+"COM"
+],
+"kind": "set"
+},
+"COM_GRP": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"COM_IE": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"TS"
+],
+"kind": "par"
+},
+"COM_LIM": {
+"domain": [
+"REG",
+"COM",
+"LIM"
+],
+"kind": "set"
+},
+"COM_MSHGV": {
+"domain": [
+"R",
+"YEAR",
+"C"
+],
+"kind": "par"
+},
+"COM_OFF": {
+"domain": [
+"REG",
+"COM",
+"*",
+"*"
+],
+"kind": "set"
+},
+"COM_PEAK": {
+"domain": [
+"REG",
+"COM_GRP"
+],
+"kind": "set"
+},
+"COM_PKFLX": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"TS"
+],
+"kind": "par"
+},
+"COM_PKRSV": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM"
+],
+"kind": "par"
+},
+"COM_PKTS": {
+"domain": [
+"REG",
+"COM_GRP",
+"TS"
+],
+"kind": "set"
+},
+"COM_PROJ": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM"
+],
+"kind": "par"
+},
+"COM_STEP": {
+"domain": [
+"REG",
+"COM",
+"LIM"
+],
+"kind": "par"
+},
+"COM_SUBNET": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"TS",
+"CUR"
+],
+"kind": "par"
+},
+"COM_SUBPRD": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"TS",
+"CUR"
+],
+"kind": "par"
+},
+"COM_TAXNET": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"TS",
+"CUR"
+],
+"kind": "par"
+},
+"COM_TAXPRD": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"TS",
+"CUR"
+],
+"kind": "par"
+},
+"COM_TMAP": {
+"domain": [
+"REG",
+"COM_TYPE",
+"COM"
+],
+"kind": "set"
+},
+"COM_TS": {
+"domain": [
+"REG",
+"COM",
+"ALL_TS"
+],
+"kind": "set"
+},
+"COM_TSL": {
+"domain": [
+"REG",
+"COM",
+"TSLVL"
+],
+"kind": "set"
+},
+"COM_TYPE": {
+"domain": [
+"COM_GRP"
+],
+"kind": "set"
+},
+"COM_UNIT": {
+"domain": [
+"REG",
+"COM",
+"UNITS_COM"
+],
+"kind": "set"
+},
+"COM_VAR": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"COM_VOC": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"BD"
+],
+"kind": "par"
+},
+"CONVERT": {
+"domain": [
+"OPR",
+"CVT"
+],
+"kind": "par"
+},
+"COR_SALVD": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CUR"
+],
+"kind": "par"
+},
+"COR_SALVI": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CUR"
+],
+"kind": "par"
+},
+"COSTAGG": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"COST_GMAP": {
+"domain": [
+"COSTAGG",
+"COSTAGG",
+"COSTYPE"
+],
+"kind": "set"
+},
+"COV_MAP": {
+"domain": [
+"*",
+"*"
+],
+"kind": "set"
+},
+"CSTVNT": {
+"domain": [
+"J",
+"R",
+"LL",
+"YEAR",
+"P",
+"SYSUC"
+],
+"kind": "par"
+},
+"CSTVPJ": {
+"domain": [
+"R",
+"LL",
+"P",
+"J",
+"SYSUC",
+"YEAR"
+],
+"kind": "par"
+},
+"CST_ACTC": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P",
+"RPM"
+],
+"kind": "par"
+},
+"CST_ANNC": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"ALLYEAR",
+"UC_NAME",
+"CUR"
+],
+"kind": "par"
+},
+"CST_COMC": {
+"domain": [
+"R",
+"ALLYEAR",
+"C"
+],
+"kind": "par"
+},
+"CST_COME": {
+"domain": [
+"R",
+"ALLYEAR",
+"C"
+],
+"kind": "par"
+},
+"CST_COMX": {
+"domain": [
+"R",
+"ALLYEAR",
+"C"
+],
+"kind": "par"
+},
+"CST_DAM": {
+"domain": [
+"REG",
+"T",
+"COM"
+],
+"kind": "par"
+},
+"CST_DECC": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P"
+],
+"kind": "par"
+},
+"CST_FIXC": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P"
+],
+"kind": "par"
+},
+"CST_FIXX": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P"
+],
+"kind": "par"
+},
+"CST_FLOC": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P",
+"C"
+],
+"kind": "par"
+},
+"CST_FLOX": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P",
+"C"
+],
+"kind": "par"
+},
+"CST_INVC": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P",
+"SYSUC"
+],
+"kind": "par"
+},
+"CST_INVX": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P",
+"SYSUC"
+],
+"kind": "par"
+},
+"CST_IREC": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P",
+"C"
+],
+"kind": "par"
+},
+"CST_PVC": {
+"domain": [
+"SYSUC",
+"R",
+"C"
+],
+"kind": "par"
+},
+"CST_PVP": {
+"domain": [
+"SYSUC",
+"R",
+"P"
+],
+"kind": "par"
+},
+"CST_SALV": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "par"
+},
+"CST_TIME": {
+"domain": [
+"R",
+"ALLYEAR",
+"S",
+"SYSUC"
+],
+"kind": "par"
+},
+"CUR": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"CUR_GRP": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"CUR_MAP": {
+"domain": [
+"REG",
+"CUR_GRP",
+"CUR"
+],
+"kind": "set"
+},
+"CVT": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"D": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "par"
+},
+"DAM_BQTY": {
+"domain": [
+"REG",
+"COM"
+],
+"kind": "par"
+},
+"DAM_COEF": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"S"
+],
+"kind": "par"
+},
+"DAM_COST": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"CUR"
+],
+"kind": "par"
+},
+"DAM_ELAST": {
+"domain": [
+"REG",
+"COM",
+"LIM"
+],
+"kind": "par"
+},
+"DAM_OBJ": {
+"domain": [
+"R",
+"T",
+"C",
+"CUR"
+],
+"kind": "par"
+},
+"DAM_STEP": {
+"domain": [
+"REG",
+"COM",
+"LIM"
+],
+"kind": "par"
+},
+"DAM_TQTY": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM"
+],
+"kind": "par"
+},
+"DAM_TVOC": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"LIM"
+],
+"kind": "par"
+},
+"DAM_VOC": {
+"domain": [
+"REG",
+"COM",
+"LIM"
+],
+"kind": "par"
+},
+"DATAYEAR": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"DEM": {
+"domain": [
+"REG",
+"COM"
+],
+"kind": "set"
+},
+"DEM_SECT": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"DEM_SMAP": {
+"domain": [
+"REG",
+"DEM_SECT",
+"COM"
+],
+"kind": "set"
+},
+"DFUNC": {
+"domain": [],
+"kind": "par"
+},
+"DISTR": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"DMD": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"DM_YEAR": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"DONE": {
+"domain": [],
+"kind": "par"
+},
+"DP_LOSD": {
+"domain": [
+"R",
+"LL",
+"P"
+],
+"kind": "set"
+},
+"DP_NON": {
+"domain": [
+"R",
+"LL",
+"P",
+"UPT",
+"TSL",
+"BD"
+],
+"kind": "par"
+},
+"DP_PSUD": {
+"domain": [
+"R",
+"LL",
+"P",
+"UPT",
+"BD"
+],
+"kind": "par"
+},
+"DP_UNS": {
+"domain": [
+"R",
+"LL",
+"T",
+"P",
+"TSL",
+"IPS",
+"L"
+],
+"kind": "par"
+},
+"DUMIMP": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"DUMP0": {
+"domain": [],
+"kind": "par"
+},
+"DUR_MAX": {
+"domain": [],
+"kind": "par"
+},
+"E": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "par"
+},
+"EACHYEAR": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"ELE": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"ENDOFF": {
+"domain": [],
+"kind": "par"
+},
+"ENV": {
+"domain": [
+"REG",
+"COM"
+],
+"kind": "set"
+},
+"ENV_BL": {
+"domain": [
+"R",
+"COM",
+"COM",
+"OPR",
+"YEAR"
+],
+"kind": "par"
+},
+"ENV_GRP": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"ENV_MAP": {
+"domain": [
+"REG",
+"ENV_GRP",
+"COM"
+],
+"kind": "set"
+},
+"EOHYEAR": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"EOHYEARS": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"ERRLEV": {
+"domain": [],
+"kind": "par"
+},
+"F": {
+"domain": [],
+"kind": "par"
+},
+"FFCKS": {
+"domain": [
+"REG",
+"PRC",
+"CG",
+"CG",
+"TS"
+],
+"kind": "set"
+},
+"FIL": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"FIL2": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "par"
+},
+"FIN": {
+"domain": [
+"REG",
+"COM"
+],
+"kind": "set"
+},
+"FINEST": {
+"domain": [
+"R",
+"ALL_TS"
+],
+"kind": "set"
+},
+"FIN_GRP": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"FIN_MAP": {
+"domain": [
+"REG",
+"FIN_GRP",
+"COM"
+],
+"kind": "set"
+},
+"FIRST_VAL": {
+"domain": [],
+"kind": "par"
+},
+"FLO_ASHAR": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG",
+"CG",
+"S",
+"BD"
+],
+"kind": "par"
+},
+"FLO_BDLVL": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG",
+"S",
+"BD"
+],
+"kind": "par"
+},
+"FLO_BND": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG",
+"TS",
+"BD"
+],
+"kind": "par"
+},
+"FLO_COST": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"COM",
+"TS",
+"CUR"
+],
+"kind": "par"
+},
+"FLO_CUM": {
+"domain": [
+"REG",
+"PRC",
+"COM",
+"ITEM",
+"ITEM",
+"LIM"
+],
+"kind": "par"
+},
+"FLO_DELIV": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"COM",
+"TS",
+"CUR"
+],
+"kind": "par"
+},
+"FLO_EFF": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG",
+"COM",
+"S"
+],
+"kind": "par"
+},
+"FLO_EMIS": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG",
+"COM",
+"S"
+],
+"kind": "par"
+},
+"FLO_FEQ": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"COM"
+],
+"kind": "par"
+},
+"FLO_FR": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"COM",
+"TS",
+"LIM"
+],
+"kind": "par"
+},
+"FLO_FUNC": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG",
+"CG",
+"TS"
+],
+"kind": "par"
+},
+"FLO_FUNCX": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG",
+"CG"
+],
+"kind": "par"
+},
+"FLO_MARK": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"COM",
+"BD"
+],
+"kind": "par"
+},
+"FLO_PKCOI": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"COM",
+"ALL_TS"
+],
+"kind": "par"
+},
+"FLO_SHAR": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"C",
+"CG",
+"TS",
+"BD"
+],
+"kind": "par"
+},
+"FLO_SUB": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"COM",
+"TS",
+"CUR"
+],
+"kind": "par"
+},
+"FLO_SUM": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG",
+"C",
+"CG",
+"TS"
+],
+"kind": "par"
+},
+"FLO_TAX": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"COM",
+"TS",
+"CUR"
+],
+"kind": "par"
+},
+"FORWARD": {
+"domain": [
+"YEAR"
+],
+"kind": "set"
+},
+"FPD": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "par"
+},
+"FSCK": {
+"domain": [
+"REG",
+"PRC",
+"CG",
+"C",
+"CG"
+],
+"kind": "set"
+},
+"FSCKS": {
+"domain": [
+"REG",
+"PRC",
+"CG",
+"C",
+"CG",
+"TS"
+],
+"kind": "set"
+},
+"FSTSL": {
+"domain": [
+"TSLVL",
+"R",
+"P",
+"CG",
+"CG",
+"CG",
+"S"
+],
+"kind": "set"
+},
+"FS_EMCB": {
+"domain": [
+"R",
+"P",
+"C",
+"C"
+],
+"kind": "set"
+},
+"FS_EMIS": {
+"domain": [
+"R",
+"P",
+"COM_GRP",
+"C",
+"COM"
+],
+"kind": "set"
+},
+"FS_EMIT": {
+"domain": [
+"R",
+"P",
+"COM",
+"COM_GRP",
+"C"
+],
+"kind": "set"
+},
+"F_IN": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P",
+"C",
+"S"
+],
+"kind": "par"
+},
+"F_INOUT": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P",
+"C",
+"IO"
+],
+"kind": "par"
+},
+"F_INOUTS": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P",
+"C",
+"S",
+"IO"
+],
+"kind": "par"
+},
+"F_IOS": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P",
+"C",
+"S"
+],
+"kind": "par"
+},
+"F_IOSET": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P",
+"C",
+"S",
+"IO"
+],
+"kind": "set"
+},
+"F_OUT": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P",
+"C",
+"S"
+],
+"kind": "par"
+},
+"F_VIO": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P",
+"IO"
+],
+"kind": "par"
+},
+"GG_DENS": {
+"domain": [
+"R",
+"C"
+],
+"kind": "par"
+},
+"GG_GAMMA": {
+"domain": [
+"R",
+"YEAR",
+"P",
+"C"
+],
+"kind": "par"
+},
+"GG_KGF": {
+"domain": [
+"R",
+"YEAR",
+"P",
+"C"
+],
+"kind": "par"
+},
+"GG_KLP": {
+"domain": [
+"R",
+"YEAR",
+"P",
+"C"
+],
+"kind": "par"
+},
+"GG_PP": {
+"domain": [
+"R",
+"YEAR",
+"P",
+"C",
+"L",
+"J"
+],
+"kind": "par"
+},
+"GG_PRBD": {
+"domain": [
+"R",
+"YEAR",
+"C",
+"LIM"
+],
+"kind": "par"
+},
+"GR_DEMFR": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"S"
+],
+"kind": "par"
+},
+"GR_ENDFR": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"CG"
+],
+"kind": "par"
+},
+"GR_GENFR": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"ITEM"
+],
+"kind": "par"
+},
+"GR_GENLEV": {
+"domain": [
+"R",
+"C"
+],
+"kind": "par"
+},
+"GR_GENMAP": {
+"domain": [
+"R",
+"P",
+"ITEM"
+],
+"kind": "par"
+},
+"GR_PTDF": {
+"domain": [
+"R",
+"YEAR",
+"P",
+"C",
+"ALL_R",
+"C"
+],
+"kind": "par"
+},
+"GR_THMIN": {
+"domain": [
+"R",
+"LL",
+"P"
+],
+"kind": "par"
+},
+"GR_VARGEN": {
+"domain": [
+"R",
+"S",
+"ITEM",
+"BD"
+],
+"kind": "par"
+},
+"GR_XBND": {
+"domain": [
+"R",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"G_CHNGMONY": {
+"domain": [
+"REG",
+"ALLYEAR",
+"CUR"
+],
+"kind": "par"
+},
+"G_CUREX": {
+"domain": [
+"CUR",
+"CUR"
+],
+"kind": "par"
+},
+"G_CYCLE": {
+"domain": [
+"TSLVL"
+],
+"kind": "par"
+},
+"G_DRATE": {
+"domain": [
+"REG",
+"ALLYEAR",
+"CUR"
+],
+"kind": "par"
+},
+"G_DYEAR": {
+"domain": [],
+"kind": "par"
+},
+"G_ILEDNO": {
+"domain": [],
+"kind": "par"
+},
+"G_NOINTERP": {
+"domain": [],
+"kind": "par"
+},
+"G_OFFTHD": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "par"
+},
+"G_OVERLAP": {
+"domain": [],
+"kind": "par"
+},
+"G_RCUR": {
+"domain": [
+"REG",
+"CUR"
+],
+"kind": "set"
+},
+"G_RFRIR": {
+"domain": [
+"REG",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"G_TLIFE": {
+"domain": [],
+"kind": "par"
+},
+"G_UAMAT": {
+"domain": [
+"U"
+],
+"kind": "set"
+},
+"G_UANRG": {
+"domain": [
+"U"
+],
+"kind": "set"
+},
+"G_UCMAT": {
+"domain": [
+"U"
+],
+"kind": "set"
+},
+"G_UCNRG": {
+"domain": [
+"U"
+],
+"kind": "set"
+},
+"G_UDS": {
+"domain": [
+"S",
+"SIDE",
+"S"
+],
+"kind": "set"
+},
+"G_UNCA": {
+"domain": [
+"UNITS",
+"UNITS_ACT"
+],
+"kind": "par"
+},
+"G_VINT": {
+"domain": [],
+"kind": "par"
+},
+"G_YRFR": {
+"domain": [
+"ALL_REG",
+"TS"
+],
+"kind": "par"
+},
+"HPL": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"IE_DEFAULT": {
+"domain": [
+"*"
+],
+"kind": "par"
+},
+"IFQ": {
+"domain": [],
+"kind": "par"
+},
+"IMP": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"IMPEXP": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"IND": {
+"domain": [
+"REG",
+"COM"
+],
+"kind": "set"
+},
+"INT_DEFAULT": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"INVSPRED": {
+"domain": [
+"ALLYEAR",
+"AGE",
+"ALLYEAR",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"INVSTEP": {
+"domain": [
+"ALLYEAR",
+"AGE",
+"ALLYEAR",
+"AGE"
+],
+"kind": "set"
+},
+"IN_OUT": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"IPD": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "par"
+},
+"IPS": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"IRE": {
+"domain": [
+"IRE"
+],
+"kind": "set"
+},
+"IRELX": {
+"domain": [
+"IRE"
+],
+"kind": "set"
+},
+"IRENX": {
+"domain": [
+"IRE"
+],
+"kind": "set"
+},
+"IRE_BND": {
+"domain": [
+"ALL_R",
+"ALLYEAR",
+"COM",
+"TS",
+"ALL_REG",
+"IE",
+"BD"
+],
+"kind": "par"
+},
+"IRE_CCVT": {
+"domain": [
+"ALL_REG",
+"COM",
+"ALL_REG",
+"COM"
+],
+"kind": "par"
+},
+"IRE_DIST": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"IRE_FLO": {
+"domain": [
+"ALL_R",
+"ALLYEAR",
+"PRC",
+"COM",
+"ALL_R",
+"COM",
+"TS"
+],
+"kind": "par"
+},
+"IRE_FLOSUM": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"COM",
+"TS",
+"IE",
+"COM",
+"IO"
+],
+"kind": "par"
+},
+"IRE_PRICE": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"COM",
+"TS",
+"ALL_R",
+"IE",
+"CUR"
+],
+"kind": "par"
+},
+"IRE_TSCVT": {
+"domain": [
+"ALL_REG",
+"ALL_TS",
+"ALL_REG",
+"ALL_TS"
+],
+"kind": "par"
+},
+"IRE_XBND": {
+"domain": [
+"ALL_REG",
+"ALLYEAR",
+"COM",
+"TS",
+"IE",
+"BD"
+],
+"kind": "par"
+},
+"J": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"JS": {
+"domain": [
+"J",
+"TS"
+],
+"kind": "set"
+},
+"JS_CCL": {
+"domain": [
+"R",
+"J",
+"S"
+],
+"kind": "par"
+},
+"KAGE": {
+"domain": [
+"ALLYEAR",
+"AGE"
+],
+"kind": "set"
+},
+"KEEP_FLOF": {
+"domain": [
+"R",
+"P",
+"C"
+],
+"kind": "set"
+},
+"KTYAGE": {
+"domain": [
+"LL",
+"YEAR",
+"LL",
+"AGE"
+],
+"kind": "set"
+},
+"K_EOH": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"LAGT": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "par"
+},
+"LASTLL": {
+"domain": [
+"LL"
+],
+"kind": "set"
+},
+"LAST_VAL": {
+"domain": [],
+"kind": "par"
+},
+"LEAD": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "par"
+},
+"LIM": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"LNX": {
+"domain": [
+"L"
+],
+"kind": "set"
+},
+"M": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "par"
+},
+"MAT": {
+"domain": [
+"REG",
+"COM"
+],
+"kind": "set"
+},
+"MATPRC": {
+"domain": [
+"PRC_GRP"
+],
+"kind": "set"
+},
+"MAT_GMAP": {
+"domain": [
+"REG",
+"MAT_GRP",
+"COM"
+],
+"kind": "set"
+},
+"MAT_GRP": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"MAT_TMAP": {
+"domain": [
+"REG",
+"MAT_TYPE",
+"COM"
+],
+"kind": "set"
+},
+"MAT_TYPE": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"MAT_VOL": {
+"domain": [
+"REG",
+"COM"
+],
+"kind": "set"
+},
+"MAT_WT": {
+"domain": [
+"REG",
+"COM"
+],
+"kind": "set"
+},
+"MAXLIFE": {
+"domain": [],
+"kind": "par"
+},
+"MICRO": {
+"domain": [],
+"kind": "par"
+},
+"MILESTONYR": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"MINYR": {
+"domain": [],
+"kind": "par"
+},
+"MIYR_1": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"MIYR_BOH": {
+"domain": [],
+"kind": "par"
+},
+"MIYR_L": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"MIYR_V1": {
+"domain": [],
+"kind": "par"
+},
+"MIYR_VL": {
+"domain": [],
+"kind": "par"
+},
+"MI_DMAS": {
+"domain": [
+"REG",
+"COM",
+"COM"
+],
+"kind": "set"
+},
+"MODLYEAR": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"MREG": {
+"domain": [
+"ALL_R"
+],
+"kind": "set"
+},
+"MULTI": {
+"domain": [
+"J",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"MY_ARRAY": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "par"
+},
+"MY_F": {
+"domain": [],
+"kind": "par"
+},
+"MY_FIL": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"MY_FIL2": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "par"
+},
+"MY_FYEAR": {
+"domain": [],
+"kind": "par"
+},
+"MY_SUM": {
+"domain": [],
+"kind": "par"
+},
+"MY_TS": {
+"domain": [
+"ALL_TS"
+],
+"kind": "set"
+},
+"NCAP_AF": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"TS",
+"BD"
+],
+"kind": "par"
+},
+"NCAP_AFA": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"BD"
+],
+"kind": "par"
+},
+"NCAP_AFAC": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG"
+],
+"kind": "par"
+},
+"NCAP_AFBX": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"BD"
+],
+"kind": "par"
+},
+"NCAP_AFC": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG",
+"STL"
+],
+"kind": "par"
+},
+"NCAP_AFCS": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG",
+"TS"
+],
+"kind": "par"
+},
+"NCAP_AFM": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "par"
+},
+"NCAP_AFS": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"TS",
+"BD"
+],
+"kind": "par"
+},
+"NCAP_AFSM": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "par"
+},
+"NCAP_AFSX": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"BD"
+],
+"kind": "par"
+},
+"NCAP_AFX": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "par"
+},
+"NCAP_BND": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"LIM"
+],
+"kind": "par"
+},
+"NCAP_BPME": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_CDME": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_CEH": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_CHPR": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"LIM"
+],
+"kind": "par"
+},
+"NCAP_CLAG": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"COM",
+"IO"
+],
+"kind": "par"
+},
+"NCAP_CLED": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"COM"
+],
+"kind": "par"
+},
+"NCAP_COM": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"COM",
+"IO"
+],
+"kind": "par"
+},
+"NCAP_COST": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CUR"
+],
+"kind": "par"
+},
+"NCAP_CPX": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_DCOST": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CUR"
+],
+"kind": "par"
+},
+"NCAP_DELIF": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_DISC": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"UNIT"
+],
+"kind": "par"
+},
+"NCAP_DLAG": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_DLAGC": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CUR"
+],
+"kind": "par"
+},
+"NCAP_DLIFE": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_DRATE": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_ELIFE": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_FDR": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_FOM": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CUR"
+],
+"kind": "par"
+},
+"NCAP_FOMM": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_FOMX": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_FSUB": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CUR"
+],
+"kind": "par"
+},
+"NCAP_FSUBM": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_FSUBX": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_FTAX": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CUR"
+],
+"kind": "par"
+},
+"NCAP_FTAXM": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_FTAXX": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_ICOM": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"COM"
+],
+"kind": "par"
+},
+"NCAP_ILED": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_ISPCT": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_ISUB": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CUR"
+],
+"kind": "par"
+},
+"NCAP_ITAX": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CUR"
+],
+"kind": "par"
+},
+"NCAP_LCOST": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_LFOM": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_MSPRF": {
+"domain": [
+"R",
+"YEAR",
+"C",
+"P",
+"LIM"
+],
+"kind": "par"
+},
+"NCAP_OCOM": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"COM"
+],
+"kind": "par"
+},
+"NCAP_OLIFE": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_PASTI": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_PASTY": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_PKCNT": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"ALL_TS"
+],
+"kind": "par"
+},
+"NCAP_SEMI": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "par"
+},
+"NCAP_START": {
+"domain": [
+"REG",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_TLIFE": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"NCAP_VALU": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"COM",
+"CUR"
+],
+"kind": "par"
+},
+"NCAP_YES": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "set"
+},
+"NE": {
+"domain": [
+"ALL_R",
+"COM"
+],
+"kind": "set"
+},
+"NONSET": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"NORTS": {
+"domain": [
+"R",
+"YEAR",
+"S"
+],
+"kind": "par"
+},
+"NO_ACT": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"NO_RT": {
+"domain": [
+"ALL_R",
+"T"
+],
+"kind": "par"
+},
+"NO_RVP": {
+"domain": [
+"R",
+"T",
+"P"
+],
+"kind": "set"
+},
+"NRG": {
+"domain": [
+"REG",
+"COM"
+],
+"kind": "set"
+},
+"NRGELC": {
+"domain": [
+"ALL_R",
+"C"
+],
+"kind": "set"
+},
+"NRGFOS": {
+"domain": [
+"R",
+"C"
+],
+"kind": "set"
+},
+"NRGHET": {
+"domain": [
+"ALL_R",
+"C"
+],
+"kind": "set"
+},
+"NRGREN": {
+"domain": [
+"R",
+"C"
+],
+"kind": "set"
+},
+"NRGSYN": {
+"domain": [
+"R",
+"C"
+],
+"kind": "set"
+},
+"NRG_FMAP": {
+"domain": [
+"REG",
+"NRG_FORM",
+"COM"
+],
+"kind": "set"
+},
+"NRG_FORM": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"NRG_GMAP": {
+"domain": [
+"REG",
+"NRG_GRID",
+"COM"
+],
+"kind": "set"
+},
+"NRG_GRID": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"NRG_TMAP": {
+"domain": [
+"REG",
+"NRG_TYPE",
+"COM"
+],
+"kind": "set"
+},
+"NRG_TYPE": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"NST": {
+"domain": [
+"IRE"
+],
+"kind": "set"
+},
+"OBJSCC": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CUR"
+],
+"kind": "par"
+},
+"OBJSIC": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"OBJVAL_1": {
+"domain": [],
+"kind": "par"
+},
+"OBJVAL_2": {
+"domain": [],
+"kind": "par"
+},
+"OBJ_1A": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "set"
+},
+"OBJ_1B": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "set"
+},
+"OBJ_2A": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "set"
+},
+"OBJ_2B": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "set"
+},
+"OBJ_ALTV": {
+"domain": [
+"R",
+"T"
+],
+"kind": "par"
+},
+"OBJ_BLNDV": {
+"domain": [
+"R",
+"YEAR",
+"C",
+"C",
+"CUR"
+],
+"kind": "par"
+},
+"OBJ_C": {
+"domain": [],
+"kind": "par"
+},
+"OBJ_COMNT": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"S",
+"COSTYPE",
+"CUR"
+],
+"kind": "par"
+},
+"OBJ_COMPD": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"S",
+"COSTYPE",
+"CUR"
+],
+"kind": "par"
+},
+"OBJ_CRF": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "par"
+},
+"OBJ_CRFD": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "par"
+},
+"OBJ_D": {
+"domain": [],
+"kind": "par"
+},
+"OBJ_DCEOH": {
+"domain": [
+"REG",
+"CUR"
+],
+"kind": "par"
+},
+"OBJ_DISC": {
+"domain": [
+"R",
+"ALLYEAR",
+"CUR"
+],
+"kind": "par"
+},
+"OBJ_DIVI": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"OBJ_DIVIII": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"OBJ_DIVIV": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"OBJ_FCUR": {
+"domain": [
+"REG",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "set"
+},
+"OBJ_FSUB": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"C",
+"S",
+"CUR"
+],
+"kind": "par"
+},
+"OBJ_I2": {
+"domain": [
+"REG",
+"ALLYEAR",
+"P"
+],
+"kind": "set"
+},
+"OBJ_IAD": {
+"domain": [
+"R",
+"CUR"
+],
+"kind": "par"
+},
+"OBJ_ICUR": {
+"domain": [
+"REG",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "set"
+},
+"OBJ_IDC": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"LIFE",
+"ALLYEAR",
+"AGE"
+],
+"kind": "set"
+},
+"OBJ_IPRIC": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"C",
+"S",
+"IE",
+"CUR"
+],
+"kind": "par"
+},
+"OBJ_JD": {
+"domain": [
+"REG",
+"CUR",
+"ALLYEAR",
+"AGE"
+],
+"kind": "par"
+},
+"OBJ_LIFE": {
+"domain": [
+"ALLYEAR",
+"REG",
+"AGE",
+"AGE",
+"CUR"
+],
+"kind": "par"
+},
+"OBJ_LINT": {
+"domain": [
+"R",
+"T",
+"ALLYEAR",
+"CUR"
+],
+"kind": "par"
+},
+"OBJ_PASTI": {
+"domain": [
+"REG",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "par"
+},
+"OBJ_PVT": {
+"domain": [
+"R",
+"YEAR",
+"CUR"
+],
+"kind": "par"
+},
+"OBJ_RFR": {
+"domain": [
+"R",
+"YEAR",
+"CUR"
+],
+"kind": "par"
+},
+"OBJ_SALI": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"AGE",
+"YEAR",
+"AGE",
+"ALLYEAR",
+"YEAR"
+],
+"kind": "set"
+},
+"OBJ_SPRED": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"AGE"
+],
+"kind": "set"
+},
+"OBJ_SUMII": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"AGE",
+"ALLYEAR",
+"AGE"
+],
+"kind": "set"
+},
+"OBJ_SUMIII": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"ALLYEAR",
+"YEAR",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"OBJ_SUMIV": {
+"domain": [
+"ALLYEAR",
+"R",
+"ALLYEAR",
+"P",
+"AGE",
+"AGE"
+],
+"kind": "set"
+},
+"OBJ_SUMIVS": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"ALLYEAR",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"OBJ_SUMS": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "set"
+},
+"OBJ_SUMS3": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "set"
+},
+"OBJ_SUMSI": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"OBJ_VFLO": {
+"domain": [
+"R",
+"P",
+"C",
+"CUR",
+"UC_COST"
+],
+"kind": "set"
+},
+"OBJ_WD": {
+"domain": [
+"REG",
+"CUR",
+"ALLYEAR",
+"AGE",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"OBJ_YES": {
+"domain": [
+"REG",
+"ALLYEAR",
+"P"
+],
+"kind": "set"
+},
+"OBV": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"OB_ACT": {
+"domain": [
+"R",
+"P",
+"CUR",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"OB_COM": {
+"domain": [
+"R",
+"C",
+"S",
+"COSTYPE",
+"CUR",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"OB_DCC": {
+"domain": [
+"R",
+"P",
+"CUR",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"OB_DLC": {
+"domain": [
+"R",
+"P",
+"CUR",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"OB_FCOS": {
+"domain": [
+"R",
+"P",
+"C",
+"S",
+"CUR",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"OB_FDEL": {
+"domain": [
+"R",
+"P",
+"C",
+"S",
+"CUR",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"OB_FOM": {
+"domain": [
+"R",
+"P",
+"CUR",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"OB_FSB": {
+"domain": [
+"R",
+"P",
+"CUR",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"OB_FTAX": {
+"domain": [
+"R",
+"P",
+"C",
+"S",
+"CUR",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"OB_FTX": {
+"domain": [
+"R",
+"P",
+"CUR",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"OB_ICOST": {
+"domain": [
+"R",
+"P",
+"CUR",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"OB_IRE": {
+"domain": [
+"R",
+"P",
+"C",
+"S",
+"IE",
+"CUR",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"OB_ISUB": {
+"domain": [
+"R",
+"P",
+"CUR",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"OB_ITAX": {
+"domain": [
+"R",
+"P",
+"CUR",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"OPR": {
+"domain": [
+"COM"
+],
+"kind": "set"
+},
+"OPTFILEID": {
+"domain": [],
+"kind": "par"
+},
+"OPYEAR": {
+"domain": [
+"AGE",
+"LIFE"
+],
+"kind": "set"
+},
+"OTHCOM": {
+"domain": [
+"ITEM"
+],
+"kind": "set"
+},
+"OTHD": {
+"domain": [
+"R",
+"COM"
+],
+"kind": "set"
+},
+"PAR_ACTC": {
+"domain": [
+"J",
+"R",
+"LL",
+"T",
+"P",
+"C",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_ACTL": {
+"domain": [
+"R",
+"LL",
+"LL",
+"P",
+"S"
+],
+"kind": "par"
+},
+"PAR_ACTM": {
+"domain": [
+"R",
+"LL",
+"LL",
+"P",
+"S"
+],
+"kind": "par"
+},
+"PAR_CAPBD": {
+"domain": [
+"R",
+"YEAR",
+"P",
+"BD"
+],
+"kind": "par"
+},
+"PAR_CAPL": {
+"domain": [
+"R",
+"YEAR",
+"P"
+],
+"kind": "par"
+},
+"PAR_CAPM": {
+"domain": [
+"R",
+"YEAR",
+"P"
+],
+"kind": "par"
+},
+"PAR_COMBALEM": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"S"
+],
+"kind": "par"
+},
+"PAR_COMBALGM": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"S"
+],
+"kind": "par"
+},
+"PAR_COMC": {
+"domain": [
+"J",
+"R",
+"T",
+"C",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_COMNETL": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"S"
+],
+"kind": "par"
+},
+"PAR_COMNETM": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"S"
+],
+"kind": "par"
+},
+"PAR_COMPRDL": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"S"
+],
+"kind": "par"
+},
+"PAR_COMPRDM": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"S"
+],
+"kind": "par"
+},
+"PAR_CUMCST": {
+"domain": [
+"R",
+"LL",
+"LL",
+"COSTAGG",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_CUMFLOL": {
+"domain": [
+"R",
+"P",
+"C",
+"LL",
+"LL"
+],
+"kind": "par"
+},
+"PAR_CUMFLOM": {
+"domain": [
+"R",
+"P",
+"C",
+"LL",
+"LL"
+],
+"kind": "par"
+},
+"PAR_CUMRET": {
+"domain": [
+"R",
+"YEAR",
+"YEAR",
+"P"
+],
+"kind": "par"
+},
+"PAR_EOUT": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P",
+"C"
+],
+"kind": "par"
+},
+"PAR_FLO": {
+"domain": [
+"R",
+"ALLYEAR",
+"ALLYEAR",
+"P",
+"C",
+"S"
+],
+"kind": "par"
+},
+"PAR_FLOC": {
+"domain": [
+"J",
+"R",
+"LL",
+"T",
+"P",
+"C",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_FLOM": {
+"domain": [
+"R",
+"ALLYEAR",
+"ALLYEAR",
+"P",
+"C",
+"S"
+],
+"kind": "par"
+},
+"PAR_IPRIC": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"C",
+"TS",
+"IE"
+],
+"kind": "par"
+},
+"PAR_IRE": {
+"domain": [
+"R",
+"ALLYEAR",
+"ALLYEAR",
+"P",
+"C",
+"S",
+"IMPEXP"
+],
+"kind": "par"
+},
+"PAR_IREM": {
+"domain": [
+"R",
+"ALLYEAR",
+"ALLYEAR",
+"P",
+"C",
+"S",
+"IMPEXP"
+],
+"kind": "par"
+},
+"PAR_NCAPL": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "par"
+},
+"PAR_NCAPM": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "par"
+},
+"PAR_NCAPR": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"ITEM"
+],
+"kind": "par"
+},
+"PAR_OBJACT": {
+"domain": [
+"R",
+"ALLYEAR",
+"ALLYEAR",
+"P",
+"TS",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_OBJBLE": {
+"domain": [
+"R",
+"ALLYEAR",
+"COM",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_OBJCAP": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_OBJCOM": {
+"domain": [
+"R",
+"ALLYEAR",
+"COM",
+"TS",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_OBJDEC": {
+"domain": [
+"R",
+"ALLYEAR",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_OBJELS": {
+"domain": [
+"R",
+"ALLYEAR",
+"COM",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_OBJFIX": {
+"domain": [
+"R",
+"ALLYEAR",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_OBJFLO": {
+"domain": [
+"R",
+"ALLYEAR",
+"ALLYEAR",
+"P",
+"C",
+"TS",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_OBJINV": {
+"domain": [
+"R",
+"ALLYEAR",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_OBJLAT": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_OBJSAL": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_PASTI": {
+"domain": [
+"R",
+"T",
+"P",
+"ITEM"
+],
+"kind": "par"
+},
+"PAR_PEAKM": {
+"domain": [
+"R",
+"ALLYEAR",
+"CG",
+"S"
+],
+"kind": "par"
+},
+"PAR_RCMX": {
+"domain": [
+"R",
+"C",
+"J",
+"T",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_RPMX": {
+"domain": [
+"R",
+"P",
+"J",
+"LL",
+"T",
+"C",
+"CUR"
+],
+"kind": "par"
+},
+"PAR_RTCS": {
+"domain": [
+"R",
+"T",
+"C",
+"S"
+],
+"kind": "par"
+},
+"PAR_TOP": {
+"domain": [
+"R",
+"T",
+"P",
+"C",
+"IO"
+],
+"kind": "par"
+},
+"PAR_UCMAX": {
+"domain": [
+"UC_N",
+"ALL_R",
+"ITEM",
+"C"
+],
+"kind": "par"
+},
+"PAR_UCMRK": {
+"domain": [
+"R",
+"T",
+"ITEM",
+"C",
+"S"
+],
+"kind": "par"
+},
+"PAR_UCRTP": {
+"domain": [
+"UC_N",
+"R",
+"T",
+"P",
+"UC_GRPTYPE"
+],
+"kind": "par"
+},
+"PAR_UCSL": {
+"domain": [
+"UC_N",
+"*",
+"*",
+"*"
+],
+"kind": "par"
+},
+"PAR_UCSM": {
+"domain": [
+"UC_N",
+"*",
+"*",
+"*"
+],
+"kind": "par"
+},
+"PAR_XPRI": {
+"domain": [
+"R",
+"T",
+"P",
+"C",
+"TS",
+"REG",
+"COM"
+],
+"kind": "par"
+},
+"PASTCV": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"PASTMILE": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"PASTSUM": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "par"
+},
+"PASTYEAR": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"PEAKDA_BL": {
+"domain": [
+"R",
+"COM",
+"YEAR"
+],
+"kind": "par"
+},
+"PERDINV": {
+"domain": [
+"ALLYEAR",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"PERIODYR": {
+"domain": [
+"ALLYEAR",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"PG_SMAP": {
+"domain": [
+"CG",
+"J",
+"CG"
+],
+"kind": "set"
+},
+"PHYR": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"PLUSET": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"PRC": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"PRC_ACT": {
+"domain": [
+"REG",
+"PRC"
+],
+"kind": "set"
+},
+"PRC_ACTFLO": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG"
+],
+"kind": "par"
+},
+"PRC_ACTUNT": {
+"domain": [
+"REG",
+"PRC",
+"CG",
+"UNITS_ACT"
+],
+"kind": "set"
+},
+"PRC_AOFF": {
+"domain": [
+"REG",
+"PRC",
+"*",
+"*"
+],
+"kind": "set"
+},
+"PRC_CAP": {
+"domain": [
+"REG",
+"PRC"
+],
+"kind": "set"
+},
+"PRC_CAPACT": {
+"domain": [
+"REG",
+"PRC"
+],
+"kind": "par"
+},
+"PRC_CAPUNT": {
+"domain": [
+"REG",
+"PRC",
+"CG",
+"UNITS_CAP"
+],
+"kind": "set"
+},
+"PRC_CG": {
+"domain": [
+"R",
+"PRC",
+"COM_GRP"
+],
+"kind": "set"
+},
+"PRC_DESC": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"PRC_DSCNCAP": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"PRC_DYNUC": {
+"domain": [
+"UC_N",
+"SIDE",
+"R",
+"ALLYEAR",
+"P",
+"UC_GRPTYPE",
+"BD"
+],
+"kind": "par"
+},
+"PRC_FOFF": {
+"domain": [
+"REG",
+"PRC",
+"COM",
+"ALL_TS",
+"*",
+"*"
+],
+"kind": "set"
+},
+"PRC_GMAP": {
+"domain": [
+"REG",
+"PRC",
+"ITEM"
+],
+"kind": "par"
+},
+"PRC_GRP": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"PRC_MAP": {
+"domain": [
+"REG",
+"PRC_GRP",
+"PRC"
+],
+"kind": "set"
+},
+"PRC_MARK": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"ITEM",
+"C",
+"LIM"
+],
+"kind": "par"
+},
+"PRC_NOFF": {
+"domain": [
+"REG",
+"PRC",
+"*",
+"*"
+],
+"kind": "set"
+},
+"PRC_NSTTS": {
+"domain": [
+"REG",
+"PRC",
+"ALL_TS"
+],
+"kind": "set"
+},
+"PRC_PKAF": {
+"domain": [
+"ALL_REG",
+"PRC"
+],
+"kind": "set"
+},
+"PRC_PKNO": {
+"domain": [
+"ALL_REG",
+"PRC"
+],
+"kind": "set"
+},
+"PRC_RCAP": {
+"domain": [
+"REG",
+"PRC"
+],
+"kind": "set"
+},
+"PRC_REACT": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "par"
+},
+"PRC_REFIT": {
+"domain": [
+"REG",
+"PRC",
+"PRC"
+],
+"kind": "par"
+},
+"PRC_RESID": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"PRC_RMAP": {
+"domain": [
+"REG",
+"PRC_RSOURC",
+"PRC"
+],
+"kind": "set"
+},
+"PRC_RSOURC": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"PRC_SC": {
+"domain": [
+"REG",
+"PRC"
+],
+"kind": "par"
+},
+"PRC_SEMI": {
+"domain": [
+"R",
+"P"
+],
+"kind": "par"
+},
+"PRC_SGL": {
+"domain": [
+"REG",
+"PRC"
+],
+"kind": "par"
+},
+"PRC_SIMV": {
+"domain": [
+"REG",
+"PRC"
+],
+"kind": "set"
+},
+"PRC_SPG": {
+"domain": [
+"REG",
+"PRC",
+"COM_GRP"
+],
+"kind": "set"
+},
+"PRC_STGIPS": {
+"domain": [
+"REG",
+"PRC",
+"COM"
+],
+"kind": "set"
+},
+"PRC_STGTSS": {
+"domain": [
+"REG",
+"PRC",
+"COM"
+],
+"kind": "set"
+},
+"PRC_TS": {
+"domain": [
+"ALL_REG",
+"PRC",
+"ALL_TS"
+],
+"kind": "set"
+},
+"PRC_TS2": {
+"domain": [
+"REG",
+"PRC",
+"TS"
+],
+"kind": "set"
+},
+"PRC_TSL": {
+"domain": [
+"REG",
+"PRC",
+"TSLVL"
+],
+"kind": "set"
+},
+"PRC_VINT": {
+"domain": [
+"REG",
+"PRC"
+],
+"kind": "set"
+},
+"PRC_YMAX": {
+"domain": [
+"REG",
+"PRC"
+],
+"kind": "par"
+},
+"PRC_YMIN": {
+"domain": [
+"REG",
+"PRC"
+],
+"kind": "par"
+},
+"PRE": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"PREMILE": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"PRV": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"PRW": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"PUTGRP": {
+"domain": [],
+"kind": "par"
+},
+"PUTOUT": {
+"domain": [],
+"kind": "par"
+},
+"PYR_S": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"PYR_V1": {
+"domain": [],
+"kind": "par"
+},
+"P_OUT": {
+"domain": [
+"R",
+"T",
+"P",
+"C",
+"S"
+],
+"kind": "par"
+},
+"QASTAT": {
+"domain": [
+"J"
+],
+"kind": "set"
+},
+"RB": {
+"domain": [
+"R",
+"T"
+],
+"kind": "par"
+},
+"RC": {
+"domain": [
+"R",
+"C"
+],
+"kind": "set"
+},
+"RCAP": {
+"domain": [
+"IRE"
+],
+"kind": "set"
+},
+"RCAP_BLK": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"RCAP_BND": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"LIM"
+],
+"kind": "par"
+},
+"RCAP_OCAP": {
+"domain": [
+"R",
+"YEAR",
+"P",
+"C"
+],
+"kind": "par"
+},
+"RCJ": {
+"domain": [
+"R",
+"C",
+"J",
+"BD"
+],
+"kind": "set"
+},
+"RCS": {
+"domain": [
+"REG",
+"COM",
+"TS"
+],
+"kind": "set"
+},
+"RCS_COMBAL": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"S",
+"LIM"
+],
+"kind": "set"
+},
+"RCS_COMPRD": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"S",
+"LIM"
+],
+"kind": "set"
+},
+"RCS_COMTS": {
+"domain": [
+"R",
+"C",
+"ALL_TS"
+],
+"kind": "set"
+},
+"RC_AGP": {
+"domain": [
+"REG",
+"COM",
+"LIM"
+],
+"kind": "set"
+},
+"RC_CUMCOM": {
+"domain": [
+"REG",
+"COM_VAR",
+"ALLYEAR",
+"ALLYEAR",
+"COM"
+],
+"kind": "set"
+},
+"RC_IOP": {
+"domain": [
+"R",
+"C",
+"IO",
+"P"
+],
+"kind": "set"
+},
+"RC_RC": {
+"domain": [
+"ALL_REG",
+"COM",
+"ALL_REG",
+"COM"
+],
+"kind": "set"
+},
+"RDCUR": {
+"domain": [
+"REG",
+"CUR"
+],
+"kind": "set"
+},
+"RD_AGG": {
+"domain": [
+"REG",
+"COM"
+],
+"kind": "set"
+},
+"RD_NLP": {
+"domain": [
+"R",
+"C"
+],
+"kind": "par"
+},
+"RD_SHAR": {
+"domain": [
+"R",
+"T",
+"C",
+"C"
+],
+"kind": "par"
+},
+"REF": {
+"domain": [
+"R",
+"PRC"
+],
+"kind": "set"
+},
+"REFUNIT": {
+"domain": [
+"R"
+],
+"kind": "par"
+},
+"REG": {
+"domain": [
+"ALL_REG"
+],
+"kind": "set"
+},
+"REG_ACOST": {
+"domain": [
+"R",
+"ALLYEAR",
+"ITEM"
+],
+"kind": "par"
+},
+"REG_ACT": {
+"domain": [
+"ITEM",
+"C"
+],
+"kind": "set"
+},
+"REG_BDNCAP": {
+"domain": [
+"ALL_R",
+"L"
+],
+"kind": "par"
+},
+"REG_BNDCST": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COSTAGG",
+"CUR",
+"BD"
+],
+"kind": "par"
+},
+"REG_CUMCST": {
+"domain": [
+"REG",
+"ALLYEAR",
+"ALLYEAR",
+"COSTAGG",
+"CUR",
+"BD"
+],
+"kind": "par"
+},
+"REG_FIXT": {
+"domain": [
+"ALL_R"
+],
+"kind": "par"
+},
+"REG_GRP": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"REG_IREC": {
+"domain": [
+"REG"
+],
+"kind": "par"
+},
+"REG_OBJ": {
+"domain": [
+"REG"
+],
+"kind": "par"
+},
+"REG_RMAP": {
+"domain": [
+"REG_GRP",
+"ALL_REG"
+],
+"kind": "set"
+},
+"REG_WOBJ": {
+"domain": [
+"REG",
+"ITEM",
+"CUR"
+],
+"kind": "par"
+},
+"RENEW": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"RES": {
+"domain": [
+"R",
+"COM"
+],
+"kind": "set"
+},
+"RHS": {
+"domain": [
+"SIDE"
+],
+"kind": "set"
+},
+"RHS_COMBAL": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"S"
+],
+"kind": "set"
+},
+"RHS_COMPRD": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"S"
+],
+"kind": "set"
+},
+"RJLVL": {
+"domain": [
+"J",
+"R",
+"TSLVL"
+],
+"kind": "set"
+},
+"RJ_SL": {
+"domain": [
+"R",
+"J",
+"TS",
+"TS"
+],
+"kind": "set"
+},
+"RLUP": {
+"domain": [
+"R",
+"TSL",
+"TSL"
+],
+"kind": "set"
+},
+"RMKC": {
+"domain": [
+"REG",
+"ITEM",
+"COM"
+],
+"kind": "set"
+},
+"RNGLIM": {
+"domain": [
+"SYSUC"
+],
+"kind": "set"
+},
+"RNGMAP": {
+"domain": [
+"SYSUC",
+"BD"
+],
+"kind": "set"
+},
+"RP": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"RPC": {
+"domain": [
+"R",
+"P",
+"C"
+],
+"kind": "set"
+},
+"RPCC_FFUNC": {
+"domain": [
+"REG",
+"PRC",
+"CG",
+"CG"
+],
+"kind": "set"
+},
+"RPCG_ASHAR": {
+"domain": [
+"R",
+"P",
+"CG",
+"CG",
+"S"
+],
+"kind": "par"
+},
+"RPCG_PTRAN": {
+"domain": [
+"R",
+"P",
+"COM",
+"C",
+"CG",
+"CG"
+],
+"kind": "set"
+},
+"RPCS_VAR": {
+"domain": [
+"R",
+"P",
+"C",
+"ALL_TS"
+],
+"kind": "set"
+},
+"RPC_ACE": {
+"domain": [
+"REG",
+"PRC",
+"CG"
+],
+"kind": "set"
+},
+"RPC_ACT": {
+"domain": [
+"REG",
+"PRC",
+"CG"
+],
+"kind": "set"
+},
+"RPC_AFLO": {
+"domain": [
+"REG",
+"PRC",
+"CG"
+],
+"kind": "set"
+},
+"RPC_AIRE": {
+"domain": [
+"ALL_REG",
+"PRC",
+"COM"
+],
+"kind": "set"
+},
+"RPC_CAPFLO": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"C"
+],
+"kind": "set"
+},
+"RPC_CONLY": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"C"
+],
+"kind": "set"
+},
+"RPC_CUMFLO": {
+"domain": [
+"REG",
+"PRC",
+"COM",
+"ALLYEAR",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"RPC_CUR": {
+"domain": [
+"REG",
+"PRC",
+"COM",
+"CUR"
+],
+"kind": "set"
+},
+"RPC_EMIS": {
+"domain": [
+"R",
+"P",
+"COM_GRP"
+],
+"kind": "set"
+},
+"RPC_EQIRE": {
+"domain": [
+"R",
+"P",
+"C",
+"IE"
+],
+"kind": "set"
+},
+"RPC_FFUNC": {
+"domain": [
+"R",
+"P",
+"C"
+],
+"kind": "set"
+},
+"RPC_IRE": {
+"domain": [
+"ALL_REG",
+"P",
+"C",
+"IE"
+],
+"kind": "set"
+},
+"RPC_IREIN": {
+"domain": [
+"R",
+"P",
+"C",
+"IE",
+"IO"
+],
+"kind": "set"
+},
+"RPC_IREIO": {
+"domain": [
+"R",
+"P",
+"C",
+"IE",
+"IO"
+],
+"kind": "set"
+},
+"RPC_LS": {
+"domain": [
+"R",
+"P",
+"C"
+],
+"kind": "set"
+},
+"RPC_MARKET": {
+"domain": [
+"R",
+"P",
+"C",
+"IE"
+],
+"kind": "set"
+},
+"RPC_NOFLO": {
+"domain": [
+"R",
+"P",
+"C"
+],
+"kind": "set"
+},
+"RPC_PG": {
+"domain": [
+"R",
+"P",
+"C"
+],
+"kind": "set"
+},
+"RPC_PKC": {
+"domain": [
+"R",
+"P",
+"C"
+],
+"kind": "set"
+},
+"RPC_PKF": {
+"domain": [
+"R",
+"P",
+"C"
+],
+"kind": "par"
+},
+"RPC_SPG": {
+"domain": [
+"R",
+"P",
+"C"
+],
+"kind": "set"
+},
+"RPC_STG": {
+"domain": [
+"R",
+"P",
+"C"
+],
+"kind": "set"
+},
+"RPC_STGN": {
+"domain": [
+"R",
+"P",
+"C",
+"IO"
+],
+"kind": "set"
+},
+"RPG_1ACE": {
+"domain": [
+"R",
+"P",
+"CG",
+"C"
+],
+"kind": "set"
+},
+"RPG_ACE": {
+"domain": [
+"R",
+"P",
+"CG",
+"IO"
+],
+"kind": "set"
+},
+"RPG_AFCX": {
+"domain": [
+"R",
+"P",
+"C",
+"IE"
+],
+"kind": "set"
+},
+"RPG_PACE": {
+"domain": [
+"R",
+"P",
+"CG"
+],
+"kind": "set"
+},
+"RPG_RED": {
+"domain": [
+"R",
+"P",
+"CG",
+"IO"
+],
+"kind": "set"
+},
+"RPM": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"RPS_CAFLAC": {
+"domain": [
+"R",
+"P",
+"S",
+"BD"
+],
+"kind": "set"
+},
+"RPS_PRCTS": {
+"domain": [
+"R",
+"P",
+"ALL_TS"
+],
+"kind": "set"
+},
+"RPS_S1": {
+"domain": [
+"R",
+"P",
+"ALL_TS"
+],
+"kind": "set"
+},
+"RPS_S2": {
+"domain": [
+"R",
+"P",
+"ALL_TS"
+],
+"kind": "set"
+},
+"RPS_STG": {
+"domain": [
+"R",
+"P",
+"S"
+],
+"kind": "set"
+},
+"RPS_UPS": {
+"domain": [
+"R",
+"P",
+"S"
+],
+"kind": "set"
+},
+"RPT_OPT": {
+"domain": [
+"ITEM",
+"J"
+],
+"kind": "par"
+},
+"RP_AFB": {
+"domain": [
+"REG",
+"PRC",
+"BD"
+],
+"kind": "par"
+},
+"RP_AIRE": {
+"domain": [
+"R",
+"P",
+"IE"
+],
+"kind": "set"
+},
+"RP_CCG": {
+"domain": [
+"REG",
+"PRC",
+"C",
+"CG"
+],
+"kind": "set"
+},
+"RP_CGC": {
+"domain": [
+"REG",
+"PRC",
+"CG",
+"COM"
+],
+"kind": "set"
+},
+"RP_CGG": {
+"domain": [
+"REG",
+"PRC",
+"C",
+"CG",
+"CG"
+],
+"kind": "set"
+},
+"RP_DCGG": {
+"domain": [
+"R",
+"P",
+"C",
+"CG",
+"CG",
+"L"
+],
+"kind": "set"
+},
+"RP_DP": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"RP_DPL": {
+"domain": [
+"R",
+"P",
+"TSLVL"
+],
+"kind": "set"
+},
+"RP_FLO": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"RP_GIC": {
+"domain": [
+"R",
+"P",
+"CG",
+"IO",
+"C"
+],
+"kind": "set"
+},
+"RP_GRP": {
+"domain": [
+"REG",
+"PRC",
+"CG"
+],
+"kind": "set"
+},
+"RP_INOUT": {
+"domain": [
+"R",
+"P",
+"IO"
+],
+"kind": "set"
+},
+"RP_IRE": {
+"domain": [
+"ALL_REG",
+"P"
+],
+"kind": "set"
+},
+"RP_NRG": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"RP_PG": {
+"domain": [
+"REG",
+"PRC",
+"CG"
+],
+"kind": "set"
+},
+"RP_PGACT": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"RP_PGFLO": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"RP_PGTYPE": {
+"domain": [
+"R",
+"P",
+"CG"
+],
+"kind": "set"
+},
+"RP_PL": {
+"domain": [
+"R",
+"P",
+"L"
+],
+"kind": "set"
+},
+"RP_PRC": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"RP_SGS": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"RP_STD": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"RP_STG": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"RP_STL": {
+"domain": [
+"R",
+"P",
+"TSL",
+"L"
+],
+"kind": "set"
+},
+"RP_STS": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"RP_UPC": {
+"domain": [
+"R",
+"P",
+"TSL",
+"L"
+],
+"kind": "set"
+},
+"RP_UPL": {
+"domain": [
+"R",
+"P",
+"L"
+],
+"kind": "set"
+},
+"RP_UPR": {
+"domain": [
+"R",
+"P",
+"L"
+],
+"kind": "set"
+},
+"RP_UPS": {
+"domain": [
+"R",
+"P",
+"TSLVL",
+"L"
+],
+"kind": "set"
+},
+"RP_UPT": {
+"domain": [
+"R",
+"P",
+"UPT",
+"BD"
+],
+"kind": "set"
+},
+"RP_UX": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"RP_XRED": {
+"domain": [
+"REG",
+"PRC"
+],
+"kind": "set"
+},
+"RREG": {
+"domain": [
+"ALL_REG",
+"ALL_REG"
+],
+"kind": "set"
+},
+"RS": {
+"domain": [
+"R",
+"ALL_TS"
+],
+"kind": "set"
+},
+"RS_BELOW": {
+"domain": [
+"ALL_REG",
+"TS",
+"TS"
+],
+"kind": "set"
+},
+"RS_BELOW1": {
+"domain": [
+"ALL_REG",
+"TS",
+"TS"
+],
+"kind": "set"
+},
+"RS_FR": {
+"domain": [
+"R",
+"S",
+"S"
+],
+"kind": "par"
+},
+"RS_HR": {
+"domain": [
+"R",
+"S"
+],
+"kind": "par"
+},
+"RS_MODUS": {
+"domain": [
+"R",
+"S",
+"J",
+"TS",
+"S"
+],
+"kind": "par"
+},
+"RS_PREV": {
+"domain": [
+"R",
+"S",
+"S"
+],
+"kind": "set"
+},
+"RS_STG": {
+"domain": [
+"R",
+"ALL_TS"
+],
+"kind": "par"
+},
+"RS_STGAV": {
+"domain": [
+"R",
+"ALL_TS"
+],
+"kind": "par"
+},
+"RS_STGPRD": {
+"domain": [
+"R",
+"ALL_TS"
+],
+"kind": "par"
+},
+"RS_TREE": {
+"domain": [
+"ALL_REG",
+"TS",
+"TS"
+],
+"kind": "set"
+},
+"RS_TSLVL": {
+"domain": [
+"R",
+"ALL_TS"
+],
+"kind": "par"
+},
+"RS_UP": {
+"domain": [
+"R",
+"TS",
+"J",
+"TS"
+],
+"kind": "set"
+},
+"RTC": {
+"domain": [
+"R",
+"ALLYEAR",
+"C"
+],
+"kind": "set"
+},
+"RTCS_FR": {
+"domain": [
+"R",
+"T",
+"C",
+"S",
+"S"
+],
+"kind": "par"
+},
+"RTCS_SING": {
+"domain": [
+"R",
+"T",
+"C",
+"S",
+"IO"
+],
+"kind": "set"
+},
+"RTCS_VARC": {
+"domain": [
+"R",
+"ALLYEAR",
+"C",
+"ALL_TS"
+],
+"kind": "set"
+},
+"RTC_NET": {
+"domain": [
+"R",
+"ALLYEAR",
+"C"
+],
+"kind": "set"
+},
+"RTC_PRD": {
+"domain": [
+"R",
+"ALLYEAR",
+"C"
+],
+"kind": "set"
+},
+"RTC_SHED": {
+"domain": [
+"R",
+"YEAR",
+"C",
+"BD",
+"J"
+],
+"kind": "set"
+},
+"RTFORC": {
+"domain": [
+"R",
+"LL",
+"LL",
+"P"
+],
+"kind": "par"
+},
+"RTP": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "set"
+},
+"RTPC": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"C"
+],
+"kind": "set"
+},
+"RTPCS_OUT": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"C",
+"S"
+],
+"kind": "set"
+},
+"RTPCS_VARF": {
+"domain": [
+"ALL_REG",
+"ALLYEAR",
+"P",
+"C",
+"ALL_TS"
+],
+"kind": "set"
+},
+"RTPGIG": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"CG",
+"IO",
+"CG"
+],
+"kind": "set"
+},
+"RTPS_BD": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"S",
+"BD"
+],
+"kind": "set"
+},
+"RTPS_OFF": {
+"domain": [
+"R",
+"T",
+"P",
+"S"
+],
+"kind": "set"
+},
+"RTPX": {
+"domain": [
+"R",
+"T",
+"P"
+],
+"kind": "set"
+},
+"RTP_CAPVL": {
+"domain": [
+"R",
+"YEAR",
+"P"
+],
+"kind": "par"
+},
+"RTP_CAPYR": {
+"domain": [
+"R",
+"YEAR",
+"YEAR",
+"P"
+],
+"kind": "set"
+},
+"RTP_CG": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"CG",
+"IO"
+],
+"kind": "set"
+},
+"RTP_CGC": {
+"domain": [
+"R",
+"YEAR",
+"P",
+"CG",
+"CG"
+],
+"kind": "set"
+},
+"RTP_CPTYR": {
+"domain": [
+"R",
+"ALLYEAR",
+"ALLYEAR",
+"P"
+],
+"kind": "set"
+},
+"RTP_CPX": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"LL"
+],
+"kind": "par"
+},
+"RTP_FFCX": {
+"domain": [
+"REG",
+"ALLYEAR",
+"ALLYEAR",
+"PRC",
+"CG",
+"CG"
+],
+"kind": "par"
+},
+"RTP_GRP": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"CG",
+"IO"
+],
+"kind": "set"
+},
+"RTP_IAN": {
+"domain": [
+"REG",
+"T",
+"P",
+"CUR"
+],
+"kind": "set"
+},
+"RTP_ISHPR": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "set"
+},
+"RTP_MRK": {
+"domain": [
+"REG",
+"T",
+"P",
+"ITEM",
+"COM",
+"BD"
+],
+"kind": "set"
+},
+"RTP_NPV": {
+"domain": [
+"J",
+"R",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "par"
+},
+"RTP_OBJ": {
+"domain": [
+"J",
+"R",
+"ALLYEAR",
+"P",
+"CUR"
+],
+"kind": "par"
+},
+"RTP_OFF": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "set"
+},
+"RTP_PL": {
+"domain": [
+"R",
+"LL",
+"P"
+],
+"kind": "set"
+},
+"RTP_SHAPE": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"J",
+"J",
+"J"
+],
+"kind": "set"
+},
+"RTP_SHAPI": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"BD",
+"J",
+"J",
+"LL",
+"LL"
+],
+"kind": "set"
+},
+"RTP_TT": {
+"domain": [
+"R",
+"YEAR",
+"T",
+"PRC"
+],
+"kind": "set"
+},
+"RTP_VARA": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "set"
+},
+"RTP_VARP": {
+"domain": [
+"R",
+"T",
+"P"
+],
+"kind": "set"
+},
+"RTP_VINTYR": {
+"domain": [
+"REG",
+"ALLYEAR",
+"ALLYEAR",
+"PRC"
+],
+"kind": "set"
+},
+"RTP_VNTBYR": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"RTTC": {
+"domain": [
+"R",
+"ALLYEAR",
+"C"
+],
+"kind": "set"
+},
+"RTX_MARK": {
+"domain": [
+"R",
+"T",
+"ITEM",
+"C",
+"BD",
+"S"
+],
+"kind": "set"
+},
+"RTX_MRK": {
+"domain": [
+"REG",
+"T",
+"ITEM",
+"COM",
+"BD"
+],
+"kind": "set"
+},
+"RT_IAN": {
+"domain": [
+"REG",
+"ALLYEAR",
+"ALLYEAR",
+"CUR",
+"COSTAGG"
+],
+"kind": "set"
+},
+"RT_PP": {
+"domain": [
+"R",
+"T"
+],
+"kind": "set"
+},
+"RUCTS": {
+"domain": [
+"ALL_REG",
+"UC_N",
+"ALLYEAR",
+"TS"
+],
+"kind": "set"
+},
+"RU_CVT": {
+"domain": [
+"R",
+"BLE",
+"SPE",
+"OPR"
+],
+"kind": "par"
+},
+"RU_FEQ": {
+"domain": [
+"R",
+"COM",
+"YEAR"
+],
+"kind": "par"
+},
+"RVP": {
+"domain": [
+"R",
+"ALLYEAR",
+"P"
+],
+"kind": "set"
+},
+"RVPCSL": {
+"domain": [
+"R",
+"YEAR",
+"P",
+"C",
+"S",
+"L"
+],
+"kind": "set"
+},
+"RVPRL": {
+"domain": [
+"R",
+"YEAR",
+"P"
+],
+"kind": "par"
+},
+"RVPS": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"TS"
+],
+"kind": "set"
+},
+"RVPT": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"T"
+],
+"kind": "set"
+},
+"RVP_KMAP": {
+"domain": [
+"R",
+"YEAR",
+"P",
+"YEAR"
+],
+"kind": "set"
+},
+"RVT": {
+"domain": [
+"R",
+"ALLYEAR",
+"T"
+],
+"kind": "set"
+},
+"RVTPC": {
+"domain": [
+"R",
+"ALLYEAR",
+"T",
+"P",
+"C"
+],
+"kind": "set"
+},
+"RXX": {
+"domain": [
+"ALL_R",
+"*",
+"*"
+],
+"kind": "set"
+},
+"RX_MARK": {
+"domain": [
+"R",
+"YEAR",
+"ITEM",
+"C",
+"BD"
+],
+"kind": "set"
+},
+"R_CUREX": {
+"domain": [
+"ALL_REG",
+"CUR",
+"CUR"
+],
+"kind": "par"
+},
+"R_DF": {
+"domain": [
+"R",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"R_UC": {
+"domain": [
+"ALL_R",
+"UC_N"
+],
+"kind": "set"
+},
+"R_UCT": {
+"domain": [
+"ALL_REG",
+"UC_N",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"SALV_DEC": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CUR"
+],
+"kind": "par"
+},
+"SALV_INV": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"SHAPE": {
+"domain": [
+"J",
+"AGE"
+],
+"kind": "par"
+},
+"SHAPED": {
+"domain": [
+"BD",
+"J",
+"AGE"
+],
+"kind": "par"
+},
+"SHEDJ": {
+"domain": [
+"LIM",
+"J"
+],
+"kind": "set"
+},
+"SIDE": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"SOLVESTAT": {
+"domain": [
+"J"
+],
+"kind": "set"
+},
+"SOW": {
+"domain": [
+"ALLSOW"
+],
+"kind": "set"
+},
+"SPE": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"STARTOFF": {
+"domain": [],
+"kind": "par"
+},
+"STG": {
+"domain": [
+"IRE"
+],
+"kind": "set"
+},
+"STGIN_BND": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"C",
+"S",
+"BD"
+],
+"kind": "par"
+},
+"STGOUT_BND": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"C",
+"S",
+"BD"
+],
+"kind": "par"
+},
+"STG_CHRG": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"S"
+],
+"kind": "par"
+},
+"STG_EFF": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"STG_LOSS": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"S"
+],
+"kind": "par"
+},
+"STG_MAXCYC": {
+"domain": [
+"R",
+"YEAR",
+"P"
+],
+"kind": "par"
+},
+"STG_SIFT": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"C",
+"S"
+],
+"kind": "par"
+},
+"STL": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"STOA": {
+"domain": [
+"ALL_TS"
+],
+"kind": "par"
+},
+"STOAL": {
+"domain": [
+"ALL_REG",
+"TS"
+],
+"kind": "par"
+},
+"STS": {
+"domain": [
+"IRE"
+],
+"kind": "set"
+},
+"SUBT": {
+"domain": [
+"T"
+],
+"kind": "set"
+},
+"SUCMAP": {
+"domain": [
+"J",
+"SYSUC"
+],
+"kind": "set"
+},
+"SUM_OBJ": {
+"domain": [
+"ITEM",
+"ITEM"
+],
+"kind": "par"
+},
+"SUPERYR": {
+"domain": [
+"T",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"SW_T": {
+"domain": [
+"ALLYEAR",
+"ALLSOW"
+],
+"kind": "set"
+},
+"SYSINV": {
+"domain": [
+"SYSUC"
+],
+"kind": "set"
+},
+"SYSONE": {
+"domain": [
+"SYSUC"
+],
+"kind": "par"
+},
+"SYSPLIT": {
+"domain": [
+"SYSUC"
+],
+"kind": "par"
+},
+"SYSUC": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"SYSUCMAP": {
+"domain": [
+"SYSUC",
+"*"
+],
+"kind": "set"
+},
+"TM_RESULT": {
+"domain": [
+"ITEM",
+"R",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"TOP": {
+"domain": [
+"REG",
+"PRC",
+"COM",
+"IO"
+],
+"kind": "set"
+},
+"TOP_IRE": {
+"domain": [
+"ALL_REG",
+"COM",
+"ALL_REG",
+"COM",
+"PRC"
+],
+"kind": "set"
+},
+"TPULSE": {
+"domain": [
+"ALLYEAR",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"TPULSEYR": {
+"domain": [
+"T",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"TRACKC": {
+"domain": [
+"R",
+"C"
+],
+"kind": "set"
+},
+"TRACKP": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"TRACKPC": {
+"domain": [
+"R",
+"P",
+"C"
+],
+"kind": "set"
+},
+"TRACKPG": {
+"domain": [
+"R",
+"P",
+"CG"
+],
+"kind": "set"
+},
+"TRN": {
+"domain": [
+"R",
+"COM"
+],
+"kind": "set"
+},
+"TSLVL": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"TSLVLNUM": {
+"domain": [
+"TSLVL"
+],
+"kind": "par"
+},
+"TS_ANN": {
+"domain": [
+"S",
+"S"
+],
+"kind": "set"
+},
+"TS_ARRAY": {
+"domain": [
+"ALL_TS"
+],
+"kind": "par"
+},
+"TS_BD": {
+"domain": [
+"S",
+"BD"
+],
+"kind": "par"
+},
+"TS_CYCLE": {
+"domain": [
+"REG",
+"TS"
+],
+"kind": "par"
+},
+"TS_GROUP": {
+"domain": [
+"ALL_REG",
+"TSLVL",
+"TS"
+],
+"kind": "set"
+},
+"TS_MAP": {
+"domain": [
+"ALL_REG",
+"ALL_TS",
+"ALL_TS"
+],
+"kind": "set"
+},
+"TS_OFF": {
+"domain": [
+"REG",
+"TS",
+"BOHYEAR",
+"EOHYEAR"
+],
+"kind": "set"
+},
+"UC_ACT": {
+"domain": [
+"UC_N",
+"SIDE",
+"ALL_REG",
+"ALLYEAR",
+"PRC",
+"ALL_TS"
+],
+"kind": "par"
+},
+"UC_ACTBET": {
+"domain": [
+"UC_N",
+"ALL_REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"UC_ANNUL": {
+"domain": [
+"UC_NAME"
+],
+"kind": "set"
+},
+"UC_ATTR": {
+"domain": [
+"ALL_R",
+"UC_N",
+"SIDE",
+"UC_GRPTYPE",
+"UC_NAME"
+],
+"kind": "set"
+},
+"UC_CAP": {
+"domain": [
+"UC_N",
+"SIDE",
+"ALL_REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"UC_CAPFLO": {
+"domain": [
+"UC_N",
+"SIDE",
+"R",
+"P",
+"C"
+],
+"kind": "set"
+},
+"UC_COM": {
+"domain": [
+"UC_N",
+"COM_VAR",
+"SIDE",
+"REG",
+"ALLYEAR",
+"COM",
+"S",
+"UC_GRPTYPE"
+],
+"kind": "par"
+},
+"UC_COMCON": {
+"domain": [
+"UC_N",
+"SIDE",
+"ALL_REG",
+"ALLYEAR",
+"COM",
+"TS"
+],
+"kind": "par"
+},
+"UC_COMNET": {
+"domain": [
+"UC_N",
+"SIDE",
+"ALL_REG",
+"ALLYEAR",
+"COM",
+"TS"
+],
+"kind": "par"
+},
+"UC_COMPRD": {
+"domain": [
+"UC_N",
+"SIDE",
+"ALL_REG",
+"ALLYEAR",
+"COM",
+"TS"
+],
+"kind": "par"
+},
+"UC_CONST": {
+"domain": [
+"*",
+"UC_N"
+],
+"kind": "set"
+},
+"UC_COST": {
+"domain": [
+"UC_NAME"
+],
+"kind": "set"
+},
+"UC_CUMACT": {
+"domain": [
+"UC_N",
+"ALL_REG",
+"PRC",
+"ITEM",
+"ITEM"
+],
+"kind": "par"
+},
+"UC_CUMCOM": {
+"domain": [
+"UC_N",
+"ALL_REG",
+"COM_VAR",
+"COM",
+"ITEM",
+"ITEM"
+],
+"kind": "par"
+},
+"UC_CUMFLO": {
+"domain": [
+"UC_N",
+"ALL_REG",
+"PRC",
+"COM",
+"ITEM",
+"ITEM"
+],
+"kind": "par"
+},
+"UC_DS": {
+"domain": [
+"ALL_R",
+"UC_N",
+"TSLVL"
+],
+"kind": "set"
+},
+"UC_DT": {
+"domain": [
+"ALL_R",
+"UC_N"
+],
+"kind": "set"
+},
+"UC_DYNBD": {
+"domain": [
+"R",
+"UC_N"
+],
+"kind": "set"
+},
+"UC_DYNBND": {
+"domain": [
+"UC_N",
+"LIM"
+],
+"kind": "set"
+},
+"UC_DYNDIR": {
+"domain": [
+"ALL_R",
+"UC_N",
+"SIDE"
+],
+"kind": "set"
+},
+"UC_DYNT": {
+"domain": [
+"UC_NAME"
+],
+"kind": "set"
+},
+"UC_FLO": {
+"domain": [
+"UC_N",
+"SIDE",
+"ALL_REG",
+"ALLYEAR",
+"PRC",
+"COM",
+"TS"
+],
+"kind": "par"
+},
+"UC_FLOBET": {
+"domain": [
+"UC_N",
+"ALL_REG",
+"ALLYEAR",
+"PRC",
+"CG"
+],
+"kind": "par"
+},
+"UC_GMAP_C": {
+"domain": [
+"REG",
+"UC_N",
+"COM_VAR",
+"COM",
+"UC_GRPTYPE"
+],
+"kind": "set"
+},
+"UC_GMAP_P": {
+"domain": [
+"REG",
+"UC_N",
+"UC_GRPTYPE",
+"PRC"
+],
+"kind": "set"
+},
+"UC_GMAP_U": {
+"domain": [
+"ALL_R",
+"UC_N",
+"UC_N"
+],
+"kind": "set"
+},
+"UC_GRPTYPE": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"UC_IRE": {
+"domain": [
+"UC_N",
+"SIDE",
+"ALL_REG",
+"ALLYEAR",
+"PRC",
+"COM",
+"TS",
+"IE"
+],
+"kind": "par"
+},
+"UC_JMAP": {
+"domain": [
+"J",
+"UC_N",
+"SIDE",
+"REG",
+"T",
+"PRC",
+"UC_GRPTYPE"
+],
+"kind": "set"
+},
+"UC_MAPCOST": {
+"domain": [
+"UC_COST",
+"UC_NAME"
+],
+"kind": "set"
+},
+"UC_MAP_FLO": {
+"domain": [
+"UC_N",
+"SIDE",
+"ALL_REG",
+"PRC",
+"COM"
+],
+"kind": "set"
+},
+"UC_MAP_IRE": {
+"domain": [
+"UC_N",
+"ALL_REG",
+"PRC",
+"COM",
+"IE"
+],
+"kind": "set"
+},
+"UC_MARKS": {
+"domain": [
+"R",
+"ITEM"
+],
+"kind": "set"
+},
+"UC_N": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"UC_NAME": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"UC_NCAP": {
+"domain": [
+"UC_N",
+"SIDE",
+"ALL_REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"UC_NEWFLO": {
+"domain": [
+"UC_NAME"
+],
+"kind": "set"
+},
+"UC_NUMBER": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"UC_ON": {
+"domain": [
+"ALL_R",
+"UC_N"
+],
+"kind": "set"
+},
+"UC_PERDS": {
+"domain": [
+"UC_NAME"
+],
+"kind": "set"
+},
+"UC_QAFLO": {
+"domain": [
+"J",
+"UC_N",
+"SIDE",
+"R",
+"P",
+"C"
+],
+"kind": "set"
+},
+"UC_RHS": {
+"domain": [
+"UC_N",
+"LIM"
+],
+"kind": "par"
+},
+"UC_RHSMAP": {
+"domain": [
+"REG",
+"T",
+"UC_N",
+"UC_NUMBER",
+"S"
+],
+"kind": "set"
+},
+"UC_RHSR": {
+"domain": [
+"ALL_REG",
+"UC_N",
+"LIM"
+],
+"kind": "par"
+},
+"UC_RHSRS": {
+"domain": [
+"ALL_REG",
+"UC_N",
+"TS",
+"LIM"
+],
+"kind": "par"
+},
+"UC_RHSRT": {
+"domain": [
+"ALL_REG",
+"UC_N",
+"ALLYEAR",
+"LIM"
+],
+"kind": "par"
+},
+"UC_RHSRTS": {
+"domain": [
+"ALL_REG",
+"UC_N",
+"ALLYEAR",
+"TS",
+"LIM"
+],
+"kind": "par"
+},
+"UC_RHSS": {
+"domain": [
+"UC_N",
+"TS",
+"LIM"
+],
+"kind": "par"
+},
+"UC_RHST": {
+"domain": [
+"UC_N",
+"ALLYEAR",
+"LIM"
+],
+"kind": "par"
+},
+"UC_RHSTMP": {
+"domain": [
+"REG",
+"UC_N",
+"T",
+"S",
+"UC_NUMBER"
+],
+"kind": "set"
+},
+"UC_RHSTS": {
+"domain": [
+"UC_N",
+"ALLYEAR",
+"TS",
+"LIM"
+],
+"kind": "par"
+},
+"UC_RTSUC": {
+"domain": [
+"ALL_R",
+"ALLYEAR",
+"UC_N"
+],
+"kind": "set"
+},
+"UC_R_EACH": {
+"domain": [
+"ALL_R",
+"UC_N"
+],
+"kind": "set"
+},
+"UC_R_SUM": {
+"domain": [
+"ALL_R",
+"UC_N"
+],
+"kind": "set"
+},
+"UC_SIGN": {
+"domain": [
+"SIDE"
+],
+"kind": "par"
+},
+"UC_T": {
+"domain": [
+"UC_N",
+"T"
+],
+"kind": "set"
+},
+"UC_TIME": {
+"domain": [
+"UC_N",
+"ALL_R",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"UC_TMAP": {
+"domain": [
+"YEAR",
+"YEAR",
+"T",
+"SIDE",
+"UC_DYNT"
+],
+"kind": "set"
+},
+"UC_TSL": {
+"domain": [
+"ALL_R",
+"UC_N",
+"SIDE",
+"TSLVL"
+],
+"kind": "set"
+},
+"UC_TS_EACH": {
+"domain": [
+"ALL_R",
+"UC_N",
+"ALL_TS"
+],
+"kind": "set"
+},
+"UC_TS_SUM": {
+"domain": [
+"ALL_R",
+"UC_N",
+"ALL_TS"
+],
+"kind": "set"
+},
+"UC_T_EACH": {
+"domain": [
+"ALL_R",
+"UC_N",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"UC_T_SUCC": {
+"domain": [
+"ALL_R",
+"UC_N",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"UC_T_SUM": {
+"domain": [
+"ALL_R",
+"UC_N",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"UC_UCN": {
+"domain": [
+"UC_N",
+"SIDE",
+"ALL_R",
+"ALLYEAR",
+"UC_N"
+],
+"kind": "par"
+},
+"UC_UT": {
+"domain": [
+"UC_N",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"UC_UTS": {
+"domain": [
+"UC_N",
+"ALLYEAR",
+"TS"
+],
+"kind": "set"
+},
+"UNCD1": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"UNCD7": {
+"domain": [
+"*",
+"*",
+"*",
+"*",
+"*",
+"*",
+"*"
+],
+"kind": "set"
+},
+"UNIT": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"UNITS": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"UNITS_ACT": {
+"domain": [
+"UNITS"
+],
+"kind": "set"
+},
+"UNITS_CAP": {
+"domain": [
+"UNITS"
+],
+"kind": "set"
+},
+"UNITS_COM": {
+"domain": [
+"UNITS"
+],
+"kind": "set"
+},
+"UNITS_MONY": {
+"domain": [
+"UNITS"
+],
+"kind": "set"
+},
+"UPT": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"VAL_FLO": {
+"domain": [
+"R",
+"ALLYEAR",
+"LL",
+"PRC",
+"C"
+],
+"kind": "par"
+},
+"VAR_NCAPRNG": {
+"domain": [
+"R",
+"ALLYEAR",
+"P",
+"BD"
+],
+"kind": "par"
+},
+"VDA_CEH": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC"
+],
+"kind": "par"
+},
+"VDA_DISC": {
+"domain": [
+"R",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"VDA_EMCB": {
+"domain": [
+"REG",
+"ALLYEAR",
+"COM",
+"COM"
+],
+"kind": "par"
+},
+"VDA_FLOP": {
+"domain": [
+"REG",
+"ALLYEAR",
+"PRC",
+"CG",
+"S"
+],
+"kind": "par"
+},
+"VN2T": {
+"domain": [
+"YEAR",
+"T"
+],
+"kind": "par"
+},
+"VNT": {
+"domain": [
+"ALLYEAR",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"VNTRT": {
+"domain": [
+"YEAR",
+"YEAR"
+],
+"kind": "set"
+},
+"XPT": {
+"domain": [
+"*"
+],
+"kind": "set"
+},
+"XTRACT": {
+"domain": [
+"R",
+"P"
+],
+"kind": "set"
+},
+"X_MARK": {
+"domain": [
+"R",
+"P",
+"ITEM",
+"C",
+"BD",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"X_RCS": {
+"domain": [
+"R",
+"C",
+"TS",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"X_RP": {
+"domain": [
+"R",
+"P",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"X_RPB": {
+"domain": [
+"R",
+"P",
+"BD",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"X_RPCGSB": {
+"domain": [
+"R",
+"P",
+"C",
+"CG",
+"TS",
+"BD",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"X_RPCL": {
+"domain": [
+"R",
+"P",
+"C",
+"BD",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"X_RPCSL": {
+"domain": [
+"R",
+"P",
+"C",
+"TS",
+"LIM",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"X_RPG": {
+"domain": [
+"R",
+"P",
+"CG",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"X_RPGCGS": {
+"domain": [
+"R",
+"P",
+"CG1",
+"C",
+"CG2",
+"TS",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"X_RPGCS": {
+"domain": [
+"R",
+"P",
+"CG",
+"COM",
+"S",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"X_RPGGS": {
+"domain": [
+"R",
+"P",
+"CG1",
+"CG2",
+"TS",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"X_RPGS": {
+"domain": [
+"R",
+"P",
+"CG",
+"TS",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"X_RPGSB": {
+"domain": [
+"R",
+"P",
+"CG",
+"TS",
+"BD",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"X_RPSB": {
+"domain": [
+"R",
+"P",
+"TS",
+"BD",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"X_RUL": {
+"domain": [
+"ALL_R",
+"UC_N",
+"LIM",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"X_RUSL": {
+"domain": [
+"ALL_R",
+"UC_N",
+"TS",
+"L",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"X_UZRPCS": {
+"domain": [
+"UC_N",
+"SIDE",
+"R",
+"P",
+"C",
+"TS",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"Y": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"YEARVAL": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "par"
+},
+"YK": {
+"domain": [
+"ALLYEAR",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"YK1": {
+"domain": [
+"ALLYEAR",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"YKAGE": {
+"domain": [
+"ALLYEAR",
+"ALLYEAR",
+"AGE"
+],
+"kind": "set"
+},
+"YKK": {
+"domain": [
+"ALLYEAR",
+"ALLYEAR",
+"ALLYEAR"
+],
+"kind": "set"
+},
+"YKVAL": {
+"domain": [
+"ALLYEAR",
+"ALLYEAR"
+],
+"kind": "par"
+},
+"YR_V1": {
+"domain": [],
+"kind": "par"
+},
+"YR_VL": {
+"domain": [],
+"kind": "par"
+},
+"Y_EOH": {
+"domain": [
+"ALLYEAR"
+],
+"kind": "set"
+},
+"Z": {
+"domain": [],
+"kind": "par"
+}
+}

@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "timespp"
+version = "0.1.0"
+description = "Python port of the TIMES (v4.9.8) preprocessor: DD files to the tables an equation layer needs, without GAMS"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "GPL-3.0-or-later" }
+authors = [{ name = "KanORS-EMR" }]
+dependencies = ["duckdb", "pandas"]
+
+[project.urls]
+"TIMES source" = "https://github.com/etsap-TIMES/TIMES_model"
+
+[tool.setuptools]
+packages = ["timespp"]
+
+[tool.setuptools.package-data]
+timespp = ["*.json", "times_src/*"]

@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Question or discussion
+    url: https://github.com/kanors-emr/TIMES-OS/discussions
+    about: Anything that is not a report of a model run

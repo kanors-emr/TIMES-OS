@@ -1,0 +1,910 @@
+ACTCG(cg)
+ACT_BND(r,y,p,s,l) =value
+ACT_COST(r,y,p,cur) =value
+ACT_CSTPL(r,y,p,cur) =value
+ACT_CSTRMP(r,y,p,l,cur) =value
+ACT_CSTSD(r,y,p,upt,l,cur) =value
+ACT_CSTUP(r,y,p,tsl,cur) =value
+ACT_CUM(r,p,u,u2,l) =value
+ACT_EFF(r,y,p,cg,s) =value
+ACT_FLO(r,y,p,cg,s) =value
+ACT_LOSPL(r,y,p,l) =value
+ACT_LOSSD(r,y,p,upt,l) =value
+ACT_MAXNON(r,y,p,upt) =value
+ACT_MINLD(r,y,p) =value
+ACT_SDTIME(r,y,p,upt,l) =value
+ACT_TIME(r,y,p,l) =value
+ACT_UPS(r,y,p,s,l) =value
+ADESC(u)
+AFS(r,y,p,s,l)
+AFUPS(r,y,p,s)
+AGE(age)
+AGEFIL(age)
+AGEJ(j,age)
+AGG_OUT(r,y,c,s) =value
+AGR(r,c)
+ALLSOW(w)
+ALLYEAR(y)
+ALL_REG(r)
+ALL_TS(s)
+ANNUAL(s)
+B(y) =value
+BACKWARD(y)
+BC_INVACT(r,y,y2,p,s) =value
+BC_INVTOT(r,y,p) =value
+BDLOX(l)
+BDNEQ(l)
+BDSIG(l) =value
+BDUPX(l)
+BDVAL(l)
+BEOH(u) =value
+BLE(c)
+BLE_BAL(r,y,c,c2) =value
+BLE_ENV(r,c,c2,opr)
+BLE_INP(r,c,c2)
+BLE_OPR(r,c,c2)
+BLE_SPE(r,c,spe)
+BLE_SPEINP(r,c,spe,c2)
+BLE_SPEOPR(r,c,spe,opr)
+BLE_TP(r,y,u)
+BL_COM(r,c,opr,spe) =value
+BL_DELIVC(r,c,c2,cur) =value
+BL_INP(r,c,c2) =value
+BL_SPEC(r,c,spe) =value
+BL_START(r,c,spe) =value
+BL_TYPE(r,c,spe) =value
+BL_UNIT(r,c,spe) =value
+BL_VAROMC(r,c,cur) =value
+BND_TYPE(l)
+BOHYEAR(y)
+CAP_BND(r,y,p,l) =value
+CAP_NEW(r,y,p,y2,sysuc) =value
+CGTES2(r,y,p,cg,c,cg2)
+CGTEST(r,y,p,cg,c,cg2)
+CG_GRP(r,p,cg,cg2)
+CHP(r,p)
+CHP_ELC(r,p,c)
+CM_MAXC_M(u,y) =value
+CM_RESULT(u,u2,y) =value
+COEF_AF(r,y,y2,p,s,l) =value
+COEF_AFUPS(r,y,p,s) =value
+COEF_CAP(r,y,y2,p) =value
+COEF_CIO(r,y,y2,p,c,io) =value
+COEF_CPT(r,y,y2,p) =value
+COEF_CRF(r,y,p,cur) =value
+COEF_ICOM(r,y,y2,p,c) =value
+COEF_ILED(r,y,p) =value
+COEF_OBFIX(r,y,p,cur) =value
+COEF_OBINV(r,y,p,cur) =value
+COEF_OBJINV(r,y,p) =value
+COEF_OCOM(r,y,y2,p,c) =value
+COEF_PTRAN(r,y,p,cg,c,cg2,s) =value
+COEF_PVT(r,y) =value
+COEF_RCOM(r,y,y2,p,c) =value
+COEF_RPTI(r,y,p) =value
+COEF_RTP(r,y,p) =value
+COEF_RVPT(r,y,p,y2) =value
+COEF_VNT(r,y,p,y2) =value
+COM(cg)
+COMM(r,c)
+COM_AGG(r,y,c,c2) =value
+COM_BNDNET(r,y,c,s,l) =value
+COM_BNDPRD(r,y,c,s,l) =value
+COM_BPRICE(r,y,c,s,cur) =value
+COM_BQTY(r,c,s) =value
+COM_CSTBAL(r,y,c,s,u,cur) =value
+COM_CSTNET(r,y,c,s,cur) =value
+COM_CSTPRD(r,y,c,s,cur) =value
+COM_CUM(r,cv,y,y2,c,l) =value
+COM_CUMNET(r,y,y2,c,l) =value
+COM_CUMPRD(r,y,y2,c,l) =value
+COM_DESC(r,c)
+COM_ELAST(r,y,c,s,l) =value
+COM_ELASTX(r,y,c,l) =value
+COM_FR(r,y,c,s) =value
+COM_GMAP(r,cg,c)
+COM_GRP(cg)
+COM_IE(r,y,c,s) =value
+COM_LIM(r,c,l)
+COM_MSHGV(r,y,c) =value
+COM_OFF(r,c,u,u2)
+COM_PEAK(r,cg)
+COM_PKFLX(r,y,c,s) =value
+COM_PKRSV(r,y,c) =value
+COM_PKTS(r,cg,s)
+COM_PROJ(r,y,c) =value
+COM_STEP(r,c,l) =value
+COM_SUBNET(r,y,c,s,cur) =value
+COM_SUBPRD(r,y,c,s,cur) =value
+COM_TAXNET(r,y,c,s,cur) =value
+COM_TAXPRD(r,y,c,s,cur) =value
+COM_TMAP(r,cg,c)
+COM_TS(r,c,s)
+COM_TSL(r,c,tsl)
+COM_TYPE(cg)
+COM_UNIT(r,c,unit)
+COM_VAR(cv)
+COM_VOC(r,y,c,l) =value
+CONVERT(opr,cvt) =value
+COR_SALVD(r,y,p,cur) =value
+COR_SALVI(r,y,p,cur) =value
+COSTAGG(agg)
+COST_GMAP(agg,agg2,ucn)
+COV_MAP(u,u2)
+CSTVNT(j,r,y,y2,p,sysuc) =value
+CSTVPJ(r,y,p,j,sysuc,y2) =value
+CST_ACTC(r,y,y2,p,rpm) =value
+CST_ANNC(r,y,p,y2,ucn,cur) =value
+CST_COMC(r,y,c) =value
+CST_COME(r,y,c) =value
+CST_COMX(r,y,c) =value
+CST_DAM(r,y,c) =value
+CST_DECC(r,y,y2,p) =value
+CST_FIXC(r,y,y2,p) =value
+CST_FIXX(r,y,y2,p) =value
+CST_FLOC(r,y,y2,p,c) =value
+CST_FLOX(r,y,y2,p,c) =value
+CST_INVC(r,y,y2,p,sysuc) =value
+CST_INVX(r,y,y2,p,sysuc) =value
+CST_IREC(r,y,y2,p,c) =value
+CST_PVC(sysuc,r,c) =value
+CST_PVP(sysuc,r,p) =value
+CST_SALV(r,y,p) =value
+CST_TIME(r,y,s,sysuc) =value
+CUR(cur)
+CUR_GRP(u)
+CUR_MAP(r,cur_grp,cur)
+CVT(u)
+D(y) =value
+DAM_BQTY(r,c) =value
+DAM_COEF(r,y,c,s) =value
+DAM_COST(r,y,c,cur) =value
+DAM_ELAST(r,c,l) =value
+DAM_OBJ(r,y,c,cur) =value
+DAM_STEP(r,c,l) =value
+DAM_TQTY(r,y,c) =value
+DAM_TVOC(r,y,c,l) =value
+DAM_VOC(r,c,l) =value
+DATAYEAR(y)
+DEM(r,c)
+DEM_SECT(u)
+DEM_SMAP(r,dem_sect,c)
+DISTR(r,p)
+DMD(r,p)
+DM_YEAR(y)
+DP_LOSD(r,y,p)
+DP_NON(r,y,p,upt,tsl,l) =value
+DP_PSUD(r,y,p,upt,l) =value
+DP_UNS(r,y,y2,p,tsl,ips,l) =value
+DUMIMP(u)
+E(y) =value
+EACHYEAR(y)
+ELE(r,p)
+ENV(r,c)
+ENV_BL(r,c,c2,opr,y) =value
+ENV_GRP(u)
+ENV_MAP(r,env_grp,c)
+EOHYEAR(y)
+EOHYEARS(y)
+FFCKS(r,p,cg,cg2,s)
+FIL(y)
+FIL2(y) =value
+FIN(r,c)
+FINEST(r,s)
+FIN_GRP(u)
+FIN_MAP(r,fin_grp,c)
+FLO_ASHAR(r,y,p,cg,cg2,s,l) =value
+FLO_BDLVL(r,y,p,cg,s,l) =value
+FLO_BND(r,y,p,cg,s,l) =value
+FLO_COST(r,y,p,c,s,cur) =value
+FLO_CUM(r,p,c,u,u2,l) =value
+FLO_DELIV(r,y,p,c,s,cur) =value
+FLO_EFF(r,y,p,cg,c,s) =value
+FLO_EMIS(r,y,p,cg,c,s) =value
+FLO_FEQ(r,y,p,c) =value
+FLO_FR(r,y,p,c,s,l) =value
+FLO_FUNC(r,y,p,cg,cg2,s) =value
+FLO_FUNCX(r,y,p,cg,cg2) =value
+FLO_MARK(r,y,p,c,l) =value
+FLO_PKCOI(r,y,p,c,s) =value
+FLO_SHAR(r,y,p,c,cg,s,l) =value
+FLO_SUB(r,y,p,c,s,cur) =value
+FLO_SUM(r,y,p,cg,c,cg2,s) =value
+FLO_TAX(r,y,p,c,s,cur) =value
+FORWARD(y)
+FPD(y) =value
+FSCK(r,p,cg,c,cg2)
+FSCKS(r,p,cg,c,cg2,s)
+FSTSL(tsl,r,p,cg,cg2,cg3,s)
+FS_EMCB(r,p,c,c2)
+FS_EMIS(r,p,cg,c,c2)
+FS_EMIT(r,p,c,cg,c2)
+F_IN(r,y,y2,p,c,s) =value
+F_INOUT(r,y,y2,p,c,io) =value
+F_INOUTS(r,y,y2,p,c,s,io) =value
+F_IOS(r,y,y2,p,c,s) =value
+F_IOSET(r,y,y2,p,c,s,io)
+F_OUT(r,y,y2,p,c,s) =value
+F_VIO(r,y,y2,p,io) =value
+GG_DENS(r,c) =value
+GG_GAMMA(r,y,p,c) =value
+GG_KGF(r,y,p,c) =value
+GG_KLP(r,y,p,c) =value
+GG_PP(r,y,p,c,l,j) =value
+GG_PRBD(r,y,c,l) =value
+GR_DEMFR(r,y,c,s) =value
+GR_ENDFR(r,y,c,cg) =value
+GR_GENFR(r,y,c,u) =value
+GR_GENLEV(r,c) =value
+GR_GENMAP(r,p,u) =value
+GR_PTDF(r,y,p,c,r2,c2) =value
+GR_THMIN(r,y,p) =value
+GR_VARGEN(r,s,u,l) =value
+GR_XBND(r,y) =value
+G_CHNGMONY(r,y,cur) =value
+G_CUREX(cur,cur2) =value
+G_CYCLE(tsl) =value
+G_DRATE(r,y,cur) =value
+G_OFFTHD(y) =value
+G_RCUR(r,cur)
+G_RFRIR(r,y) =value
+G_UAMAT(u)
+G_UANRG(u)
+G_UCMAT(u)
+G_UCNRG(u)
+G_UDS(s,side,s2)
+G_UNCA(unit,unit2) =value
+G_YRFR(r,s) =value
+HPL(r,p)
+IE_DEFAULT(u) =value
+IMP(u)
+IMPEXP(ie)
+IND(r,c)
+INT_DEFAULT(u)
+INVSPRED(y,age,y2,y3)
+INVSTEP(y,age,y2,age2)
+IN_OUT(io)
+IPD(y) =value
+IPS(u)
+IRE(ire)
+IRELX(ire)
+IRENX(ire)
+IRE_BND(r,y,c,s,r2,ie,l) =value
+IRE_CCVT(r,c,r2,c2) =value
+IRE_DIST(r,p)
+IRE_FLO(r,y,p,c,r2,c2,s) =value
+IRE_FLOSUM(r,y,p,c,s,ie,c2,io) =value
+IRE_PRICE(r,y,p,c,s,r2,ie,cur) =value
+IRE_TSCVT(r,s,r2,s2) =value
+IRE_XBND(r,y,c,s,ie,l) =value
+ITEM(u)
+J(j)
+JS(j,s)
+JS_CCL(r,j,s) =value
+KAGE(y,age)
+KEEP_FLOF(r,p,c)
+KTYAGE(y,y2,y3,age)
+K_EOH(y)
+LAGT(y) =value
+LASTLL(y)
+LEAD(y) =value
+LIM(l)
+LNX(l)
+M(y) =value
+MAT(r,c)
+MATPRC(prc_grp)
+MAT_GMAP(r,mat_grp,c)
+MAT_GRP(u)
+MAT_TMAP(r,mat_type,c)
+MAT_TYPE(u)
+MAT_VOL(r,c)
+MAT_WT(r,c)
+MILESTONYR(y)
+MIYR_1(y)
+MIYR_L(y)
+MI_DMAS(r,c,c2)
+MODLYEAR(y)
+MREG(r)
+MULTI(j,y) =value
+MY_ARRAY(y) =value
+MY_FIL(y)
+MY_FIL2(y) =value
+MY_TS(s)
+NCAP_AF(r,y,p,s,l) =value
+NCAP_AFA(r,y,p,l) =value
+NCAP_AFAC(r,y,p,cg) =value
+NCAP_AFBX(r,y,p,l) =value
+NCAP_AFC(r,y,p,cg,stl) =value
+NCAP_AFCS(r,y,p,cg,s) =value
+NCAP_AFM(r,y,p) =value
+NCAP_AFS(r,y,p,s,l) =value
+NCAP_AFSM(r,y,p) =value
+NCAP_AFSX(r,y,p,l) =value
+NCAP_AFX(r,y,p) =value
+NCAP_BND(r,y,p,l) =value
+NCAP_BPME(r,y,p) =value
+NCAP_CDME(r,y,p) =value
+NCAP_CEH(r,y,p) =value
+NCAP_CHPR(r,y,p,l) =value
+NCAP_CLAG(r,y,p,c,io) =value
+NCAP_CLED(r,y,p,c) =value
+NCAP_COM(r,y,p,c,io) =value
+NCAP_COST(r,y,p,cur) =value
+NCAP_CPX(r,y,p) =value
+NCAP_DCOST(r,y,p,cur) =value
+NCAP_DELIF(r,y,p) =value
+NCAP_DISC(r,y,p,unit) =value
+NCAP_DLAG(r,y,p) =value
+NCAP_DLAGC(r,y,p,cur) =value
+NCAP_DLIFE(r,y,p) =value
+NCAP_DRATE(r,y,p) =value
+NCAP_ELIFE(r,y,p) =value
+NCAP_FDR(r,y,p) =value
+NCAP_FOM(r,y,p,cur) =value
+NCAP_FOMM(r,y,p) =value
+NCAP_FOMX(r,y,p) =value
+NCAP_FSUB(r,y,p,cur) =value
+NCAP_FSUBM(r,y,p) =value
+NCAP_FSUBX(r,y,p) =value
+NCAP_FTAX(r,y,p,cur) =value
+NCAP_FTAXM(r,y,p) =value
+NCAP_FTAXX(r,y,p) =value
+NCAP_ICOM(r,y,p,c) =value
+NCAP_ILED(r,y,p) =value
+NCAP_ISPCT(r,y,p) =value
+NCAP_ISUB(r,y,p,cur) =value
+NCAP_ITAX(r,y,p,cur) =value
+NCAP_LCOST(r,y,p) =value
+NCAP_LFOM(r,y,p) =value
+NCAP_MSPRF(r,y,c,p,l) =value
+NCAP_OCOM(r,y,p,c) =value
+NCAP_OLIFE(r,y,p) =value
+NCAP_PASTI(r,y,p) =value
+NCAP_PASTY(r,y,p) =value
+NCAP_PKCNT(r,y,p,s) =value
+NCAP_SEMI(r,y,p) =value
+NCAP_START(r,p) =value
+NCAP_TLIFE(r,y,p) =value
+NCAP_VALU(r,y,p,c,cur) =value
+NCAP_YES(r,y,p)
+NE(r,c)
+NONSET(u)
+NORTS(r,y,s) =value
+NO_ACT(r,p)
+NO_RT(r,y) =value
+NO_RVP(r,y,p)
+NRG(r,c)
+NRGELC(r,c)
+NRGFOS(r,c)
+NRGHET(r,c)
+NRGREN(r,c)
+NRGSYN(r,c)
+NRG_FMAP(r,nrg_form,c)
+NRG_FORM(u)
+NRG_GMAP(r,nrg_grid,c)
+NRG_GRID(u)
+NRG_TMAP(r,nrg_type,c)
+NRG_TYPE(u)
+NST(ire)
+OBJSCC(r,y,p,cur) =value
+OBJSIC(r,y,p) =value
+OBJ_1A(r,y,p)
+OBJ_1B(r,y,p)
+OBJ_2A(r,y,p)
+OBJ_2B(r,y,p)
+OBJ_ALTV(r,y) =value
+OBJ_BLNDV(r,y,c,c2,cur) =value
+OBJ_COMNT(r,y,c,s,ucn,cur) =value
+OBJ_COMPD(r,y,c,s,ucn,cur) =value
+OBJ_CRF(r,y,p,cur) =value
+OBJ_CRFD(r,y,p,cur) =value
+OBJ_DCEOH(r,cur) =value
+OBJ_DISC(r,y,cur) =value
+OBJ_DIVI(r,y,p) =value
+OBJ_DIVIII(r,y,p) =value
+OBJ_DIVIV(r,y,p) =value
+OBJ_FCUR(r,y,p,cur)
+OBJ_FSUB(r,y,p,c,s,cur) =value
+OBJ_I2(r,y,p)
+OBJ_IAD(r,cur) =value
+OBJ_ICUR(r,y,p,cur)
+OBJ_IDC(r,y,p,age,y2,age2)
+OBJ_IPRIC(r,y,p,c,s,ie,cur) =value
+OBJ_JD(r,cur,y,age) =value
+OBJ_LIFE(y,r,age,age2,cur) =value
+OBJ_LINT(r,y,y2,cur) =value
+OBJ_PASTI(r,y,p,cur) =value
+OBJ_PVT(r,y,cur) =value
+OBJ_RFR(r,y,cur) =value
+OBJ_SALI(r,y,p,age,y2,age2,y3,y4)
+OBJ_SPRED(r,y,p,age)
+OBJ_SUMII(r,y,p,age,y2,age2)
+OBJ_SUMIII(r,y,p,y2,y3,y4)
+OBJ_SUMIV(y,r,y2,p,age,age2)
+OBJ_SUMIVS(r,y,p,y2,y3)
+OBJ_SUMS(r,y,p)
+OBJ_SUMS3(r,y,p)
+OBJ_SUMSI(r,y,p,y2)
+OBJ_VFLO(r,p,c,cur,ucn)
+OBJ_WD(r,cur,y,age,y2) =value
+OBJ_YES(r,y,p)
+OBV(u)
+OB_ACT(r,p,cur,y) =value
+OB_COM(r,c,s,ucn,cur,y) =value
+OB_DCC(r,p,cur,y) =value
+OB_DLC(r,p,cur,y) =value
+OB_FCOS(r,p,c,s,cur,y) =value
+OB_FDEL(r,p,c,s,cur,y) =value
+OB_FOM(r,p,cur,y) =value
+OB_FSB(r,p,cur,y) =value
+OB_FTAX(r,p,c,s,cur,y) =value
+OB_FTX(r,p,cur,y) =value
+OB_ICOST(r,p,cur,y) =value
+OB_IRE(r,p,c,s,ie,cur,y) =value
+OB_ISUB(r,p,cur,y) =value
+OB_ITAX(r,p,cur,y) =value
+OPR(c)
+OPYEAR(age,age2)
+OTHCOM(u)
+OTHD(r,c)
+PAR_ACTC(j,r,y,y2,p,c,cur) =value
+PAR_ACTL(r,y,y2,p,s) =value
+PAR_ACTM(r,y,y2,p,s) =value
+PAR_CAPBD(r,y,p,l) =value
+PAR_CAPL(r,y,p) =value
+PAR_CAPM(r,y,p) =value
+PAR_COMBALEM(r,y,c,s) =value
+PAR_COMBALGM(r,y,c,s) =value
+PAR_COMC(j,r,y,c,cur) =value
+PAR_COMNETL(r,y,c,s) =value
+PAR_COMNETM(r,y,c,s) =value
+PAR_COMPRDL(r,y,c,s) =value
+PAR_COMPRDM(r,y,c,s) =value
+PAR_CUMCST(r,y,y2,agg,cur) =value
+PAR_CUMFLOL(r,p,c,y,y2) =value
+PAR_CUMFLOM(r,p,c,y,y2) =value
+PAR_CUMRET(r,y,y2,p) =value
+PAR_EOUT(r,y,y2,p,c) =value
+PAR_FLO(r,y,y2,p,c,s) =value
+PAR_FLOC(j,r,y,y2,p,c,cur) =value
+PAR_FLOM(r,y,y2,p,c,s) =value
+PAR_IPRIC(r,y,p,c,s,ie) =value
+PAR_IRE(r,y,y2,p,c,s,ie) =value
+PAR_IREM(r,y,y2,p,c,s,ie) =value
+PAR_NCAPL(r,y,p) =value
+PAR_NCAPM(r,y,p) =value
+PAR_NCAPR(r,y,p,u) =value
+PAR_OBJACT(r,y,y2,p,s,cur) =value
+PAR_OBJBLE(r,y,c,cur) =value
+PAR_OBJCAP(r,y,p,cur) =value
+PAR_OBJCOM(r,y,c,s,cur) =value
+PAR_OBJDEC(r,y,y2,p,cur) =value
+PAR_OBJELS(r,y,c,cur) =value
+PAR_OBJFIX(r,y,y2,p,cur) =value
+PAR_OBJFLO(r,y,y2,p,c,s,cur) =value
+PAR_OBJINV(r,y,y2,p,cur) =value
+PAR_OBJLAT(r,y,p,cur) =value
+PAR_OBJSAL(r,y,p,cur) =value
+PAR_PASTI(r,y,p,u) =value
+PAR_PEAKM(r,y,cg,s) =value
+PAR_RCMX(r,c,j,y,cur) =value
+PAR_RPMX(r,p,j,y,y2,c,cur) =value
+PAR_RTCS(r,y,c,s) =value
+PAR_TOP(r,y,p,c,io) =value
+PAR_UCMAX(uc,r,u,c) =value
+PAR_UCMRK(r,y,u,c,s) =value
+PAR_UCRTP(uc,r,y,p,grp) =value
+PAR_UCSL(uc,u,u2,u3) =value
+PAR_UCSM(uc,u,u2,u3) =value
+PAR_XPRI(r,y,p,c,s,r2,c2) =value
+PASTCV(u)
+PASTMILE(y)
+PASTSUM(r,y,p) =value
+PASTYEAR(y)
+PEAKDA_BL(r,c,y) =value
+PERDINV(y,y2)
+PERIODYR(y,y2)
+PG_SMAP(cg,j,cg2)
+PHYR(y)
+PLUSET(u)
+PRC(p)
+PRC_ACT(r,p)
+PRC_ACTFLO(r,y,p,cg) =value
+PRC_ACTUNT(r,p,cg,unit)
+PRC_AOFF(r,p,u,u2)
+PRC_CAP(r,p)
+PRC_CAPACT(r,p) =value
+PRC_CAPUNT(r,p,cg,unit)
+PRC_CG(r,p,cg)
+PRC_DESC(r,p)
+PRC_DSCNCAP(r,p)
+PRC_DYNUC(uc,side,r,y,p,grp,l) =value
+PRC_FOFF(r,p,c,s,u,u2)
+PRC_GMAP(r,p,u) =value
+PRC_GRP(u)
+PRC_MAP(r,prc_grp,p)
+PRC_MARK(r,y,p,u,c,l) =value
+PRC_NOFF(r,p,u,u2)
+PRC_NSTTS(r,p,s)
+PRC_PKAF(r,p)
+PRC_PKNO(r,p)
+PRC_RCAP(r,p)
+PRC_REACT(r,y,p) =value
+PRC_REFIT(r,p,p2) =value
+PRC_RESID(r,y,p) =value
+PRC_RMAP(r,prc_rsourc,p)
+PRC_RSOURC(u)
+PRC_SC(r,p) =value
+PRC_SEMI(r,p) =value
+PRC_SGL(r,p) =value
+PRC_SIMV(r,p)
+PRC_SPG(r,p,cg)
+PRC_STGIPS(r,p,c)
+PRC_STGTSS(r,p,c)
+PRC_TS(r,p,s)
+PRC_TS2(r,p,s)
+PRC_TSL(r,p,tsl)
+PRC_VINT(r,p)
+PRC_YMAX(r,p) =value
+PRC_YMIN(r,p) =value
+PRE(r,p)
+PREMILE(y)
+PRV(r,p)
+PRW(r,p)
+PYR_S(y)
+P_OUT(r,y,p,c,s) =value
+QASTAT(j)
+RB(r,y) =value
+RC(r,c)
+RCAP(ire)
+RCAP_BLK(r,y,p) =value
+RCAP_BND(r,y,p,l) =value
+RCAP_OCAP(r,y,p,c) =value
+RCJ(r,c,j,l)
+RCS(r,c,s)
+RCS_COMBAL(r,y,c,s,l)
+RCS_COMPRD(r,y,c,s,l)
+RCS_COMTS(r,c,s)
+RC_AGP(r,c,l)
+RC_CUMCOM(r,cv,y,y2,c)
+RC_IOP(r,c,io,p)
+RC_RC(r,c,r2,c2)
+RDCUR(r,cur)
+RD_AGG(r,c)
+RD_NLP(r,c) =value
+RD_SHAR(r,y,c,c2) =value
+REF(r,p)
+REFUNIT(r) =value
+REG(r)
+REG_ACOST(r,y,u) =value
+REG_ACT(u,c)
+REG_BDNCAP(r,l) =value
+REG_BNDCST(r,y,agg,cur,l) =value
+REG_CUMCST(r,y,y2,agg,cur,l) =value
+REG_FIXT(r) =value
+REG_GRP(u)
+REG_IREC(r) =value
+REG_OBJ(r) =value
+REG_RMAP(reg_grp,r)
+REG_WOBJ(r,u,cur) =value
+RENEW(r,p)
+RES(r,c)
+RHS(side)
+RHS_COMBAL(r,y,c,s)
+RHS_COMPRD(r,y,c,s)
+RJLVL(j,r,tsl)
+RJ_SL(r,j,s,s2)
+RLUP(r,tsl,tsl2)
+RMKC(r,u,c)
+RNGLIM(sysuc)
+RNGMAP(sysuc,l)
+RP(r,p)
+RPC(r,p,c)
+RPCC_FFUNC(r,p,cg,cg2)
+RPCG_ASHAR(r,p,cg,cg2,s) =value
+RPCG_PTRAN(r,p,c,c2,cg,cg2)
+RPCS_VAR(r,p,c,s)
+RPC_ACE(r,p,cg)
+RPC_ACT(r,p,cg)
+RPC_AFLO(r,p,cg)
+RPC_AIRE(r,p,c)
+RPC_CAPFLO(r,y,p,c)
+RPC_CONLY(r,y,p,c)
+RPC_CUMFLO(r,p,c,y,y2)
+RPC_CUR(r,p,c,cur)
+RPC_EMIS(r,p,cg)
+RPC_EQIRE(r,p,c,ie)
+RPC_FFUNC(r,p,c)
+RPC_IRE(r,p,c,ie)
+RPC_IREIN(r,p,c,ie,io)
+RPC_IREIO(r,p,c,ie,io)
+RPC_LS(r,p,c)
+RPC_MARKET(r,p,c,ie)
+RPC_NOFLO(r,p,c)
+RPC_PG(r,p,c)
+RPC_PKC(r,p,c)
+RPC_PKF(r,p,c) =value
+RPC_SPG(r,p,c)
+RPC_STG(r,p,c)
+RPC_STGN(r,p,c,io)
+RPG_1ACE(r,p,cg,c)
+RPG_ACE(r,p,cg,io)
+RPG_AFCX(r,p,c,ie)
+RPG_PACE(r,p,cg)
+RPG_RED(r,p,cg,io)
+RPM(u)
+RPS_CAFLAC(r,p,s,l)
+RPS_PRCTS(r,p,s)
+RPS_S1(r,p,s)
+RPS_S2(r,p,s)
+RPS_STG(r,p,s)
+RPS_UPS(r,p,s)
+RPT_OPT(u,j) =value
+RP_AFB(r,p,l) =value
+RP_AIRE(r,p,ie)
+RP_CCG(r,p,c,cg)
+RP_CGC(r,p,cg,c)
+RP_CGG(r,p,c,cg,cg2)
+RP_DCGG(r,p,c,cg,cg2,l)
+RP_DP(r,p)
+RP_DPL(r,p,tsl)
+RP_FLO(r,p)
+RP_GIC(r,p,cg,io,c)
+RP_GRP(r,p,cg)
+RP_INOUT(r,p,io)
+RP_IRE(r,p)
+RP_NRG(r,p)
+RP_PG(r,p,cg)
+RP_PGACT(r,p)
+RP_PGFLO(r,p)
+RP_PGTYPE(r,p,cg)
+RP_PL(r,p,l)
+RP_PRC(r,p)
+RP_SGS(r,p)
+RP_STD(r,p)
+RP_STG(r,p)
+RP_STL(r,p,tsl,l)
+RP_STS(r,p)
+RP_UPC(r,p,tsl,l)
+RP_UPL(r,p,l)
+RP_UPR(r,p,l)
+RP_UPS(r,p,tsl,l)
+RP_UPT(r,p,upt,l)
+RP_UX(r,p)
+RP_XRED(r,p)
+RREG(r,r2)
+RS(r,s)
+RS_BELOW(r,s,s2)
+RS_BELOW1(r,s,s2)
+RS_FR(r,s,s2) =value
+RS_HR(r,s) =value
+RS_MODUS(r,s,j,s2,s3) =value
+RS_PREV(r,s,s2)
+RS_STG(r,s) =value
+RS_STGAV(r,s) =value
+RS_STGPRD(r,s) =value
+RS_TREE(r,s,s2)
+RS_TSLVL(r,s) =value
+RS_UP(r,s,j,s2)
+RTC(r,y,c)
+RTCS_FR(r,y,c,s,s2) =value
+RTCS_SING(r,y,c,s,io)
+RTCS_VARC(r,y,c,s)
+RTC_NET(r,y,c)
+RTC_PRD(r,y,c)
+RTC_SHED(r,y,c,l,j)
+RTFORC(r,y,y2,p) =value
+RTP(r,y,p)
+RTPC(r,y,p,c)
+RTPCS_OUT(r,y,p,c,s)
+RTPCS_VARF(r,y,p,c,s)
+RTPGIG(r,y,p,cg,io,cg2)
+RTPS_BD(r,y,p,s,l)
+RTPS_OFF(r,y,p,s)
+RTPX(r,y,p)
+RTP_CAPVL(r,y,p) =value
+RTP_CAPYR(r,y,y2,p)
+RTP_CG(r,y,p,cg,io)
+RTP_CGC(r,y,p,cg,cg2)
+RTP_CPTYR(r,y,y2,p)
+RTP_CPX(r,y,p,y2) =value
+RTP_FFCX(r,y,y2,p,cg,cg2) =value
+RTP_GRP(r,y,p,cg,io)
+RTP_IAN(r,y,p,cur)
+RTP_ISHPR(r,y,p)
+RTP_MRK(r,y,p,u,c,l)
+RTP_NPV(j,r,y,p,cur) =value
+RTP_OBJ(j,r,y,p,cur) =value
+RTP_OFF(r,y,p)
+RTP_PL(r,y,p)
+RTP_SHAPE(r,y,p,j,j2,j3)
+RTP_SHAPI(r,y,p,l,j,j2,y2,y3)
+RTP_TT(r,y,y2,p)
+RTP_VARA(r,y,p)
+RTP_VARP(r,y,p)
+RTP_VINTYR(r,y,y2,p)
+RTP_VNTBYR(r,y,p,y2)
+RTTC(r,y,c)
+RTX_MARK(r,y,u,c,l,s)
+RTX_MRK(r,y,u,c,l)
+RT_IAN(r,y,y2,cur,agg)
+RT_PP(r,y)
+RUCTS(r,uc,y,s)
+RU_CVT(r,ble,spe,opr) =value
+RU_FEQ(r,c,y) =value
+RVP(r,y,p)
+RVPCSL(r,y,p,c,s,l)
+RVPRL(r,y,p) =value
+RVPS(r,y,p,s)
+RVPT(r,y,p,y2)
+RVP_KMAP(r,y,p,y2)
+RVT(r,y,y2)
+RVTPC(r,y,y2,p,c)
+RXX(r,u,u2)
+RX_MARK(r,y,u,c,l)
+R_CUREX(r,cur,cur2) =value
+R_DF(r,y) =value
+R_UC(r,uc)
+R_UCT(r,uc,y)
+SALV_DEC(r,y,p,cur) =value
+SALV_INV(r,y,p,y2) =value
+SHAPE(j,age) =value
+SHAPED(l,j,age) =value
+SHEDJ(l,j)
+SIDE(side)
+SOLVESTAT(j)
+SOW(w)
+SPE(u)
+STG(ire)
+STGIN_BND(r,y,p,c,s,l) =value
+STGOUT_BND(r,y,p,c,s,l) =value
+STG_CHRG(r,y,p,s) =value
+STG_EFF(r,y,p) =value
+STG_LOSS(r,y,p,s) =value
+STG_MAXCYC(r,y,p) =value
+STG_SIFT(r,y,p,c,s) =value
+STL(u)
+STOA(s) =value
+STOAL(r,s) =value
+STS(ire)
+SUBT(y)
+SUCMAP(j,sysuc)
+SUM_OBJ(u,u2) =value
+SUPERYR(y,y2)
+SW_T(y,w)
+SYSINV(sysuc)
+SYSONE(sysuc) =value
+SYSPLIT(sysuc) =value
+SYSUC(u)
+SYSUCMAP(sysuc,u)
+TM_RESULT(u,r,y) =value
+TOP(r,p,c,io)
+TOP_IRE(r,c,r2,c2,p)
+TPULSE(y,y2) =value
+TPULSEYR(y,y2)
+TRACKC(r,c)
+TRACKP(r,p)
+TRACKPC(r,p,c)
+TRACKPG(r,p,cg)
+TRN(r,c)
+TSLVL(tsl)
+TSLVLNUM(tsl) =value
+TS_ANN(s,s2)
+TS_ARRAY(s) =value
+TS_BD(s,l) =value
+TS_CYCLE(r,s) =value
+TS_GROUP(r,tsl,s)
+TS_MAP(r,s,s2)
+TS_OFF(r,s,y,y2)
+UC_ACT(uc,side,r,y,p,s) =value
+UC_ACTBET(uc,r,y,p) =value
+UC_ANNUL(ucn)
+UC_ATTR(r,uc,side,grp,ucn)
+UC_CAP(uc,side,r,y,p) =value
+UC_CAPFLO(uc,side,r,p,c)
+UC_COM(uc,cv,side,r,y,c,s,grp) =value
+UC_COMCON(uc,side,r,y,c,s) =value
+UC_COMNET(uc,side,r,y,c,s) =value
+UC_COMPRD(uc,side,r,y,c,s) =value
+UC_CONST(u,uc)
+UC_COST(ucn)
+UC_CUMACT(uc,r,p,u,u2) =value
+UC_CUMCOM(uc,r,cv,c,u,u2) =value
+UC_CUMFLO(uc,r,p,c,u,u2) =value
+UC_DS(r,uc,tsl)
+UC_DT(r,uc)
+UC_DYNBD(r,uc)
+UC_DYNBND(uc,l)
+UC_DYNDIR(r,uc,side)
+UC_DYNT(ucn)
+UC_FLO(uc,side,r,y,p,c,s) =value
+UC_FLOBET(uc,r,y,p,cg) =value
+UC_GMAP_C(r,uc,cv,c,grp)
+UC_GMAP_P(r,uc,grp,p)
+UC_GMAP_U(r,uc,uc2)
+UC_GRPTYPE(grp)
+UC_IRE(uc,side,r,y,p,c,s,ie) =value
+UC_JMAP(j,uc,side,r,y,p,grp)
+UC_MAPCOST(ucn,ucn2)
+UC_MAP_FLO(uc,side,r,p,c)
+UC_MAP_IRE(uc,r,p,c,ie)
+UC_MARKS(r,u)
+UC_N(uc)
+UC_NAME(ucn)
+UC_NCAP(uc,side,r,y,p) =value
+UC_NEWFLO(ucn)
+UC_NUMBER(u)
+UC_ON(r,uc)
+UC_PERDS(ucn)
+UC_QAFLO(j,uc,side,r,p,c)
+UC_RHS(uc,l) =value
+UC_RHSMAP(r,y,uc,uc_number,s)
+UC_RHSR(r,uc,l) =value
+UC_RHSRS(r,uc,s,l) =value
+UC_RHSRT(r,uc,y,l) =value
+UC_RHSRTS(r,uc,y,s,l) =value
+UC_RHSS(uc,s,l) =value
+UC_RHST(uc,y,l) =value
+UC_RHSTMP(r,uc,y,s,uc_number)
+UC_RHSTS(uc,y,s,l) =value
+UC_RTSUC(r,y,uc)
+UC_R_EACH(r,uc)
+UC_R_SUM(r,uc)
+UC_SIGN(side) =value
+UC_T(uc,y)
+UC_TIME(uc,r,y) =value
+UC_TMAP(y,y2,y3,side,uc_dynt)
+UC_TSL(r,uc,side,tsl)
+UC_TS_EACH(r,uc,s)
+UC_TS_SUM(r,uc,s)
+UC_T_EACH(r,uc,y)
+UC_T_SUCC(r,uc,y)
+UC_T_SUM(r,uc,y)
+UC_UCN(uc,side,r,y,uc2) =value
+UC_UT(uc,y)
+UC_UTS(uc,y,s)
+UNCD1(u)
+UNCD7(u,u2,u3,u4,u5,u6,u7)
+UNIT(u)
+UNITS(unit)
+UNITS_ACT(unit)
+UNITS_CAP(unit)
+UNITS_COM(unit)
+UNITS_MONY(unit)
+UPT(u)
+VAL_FLO(r,y,y2,p,c) =value
+VAR_NCAPRNG(r,y,p,l) =value
+VDA_CEH(r,y,p) =value
+VDA_DISC(r,y) =value
+VDA_EMCB(r,y,c,c2) =value
+VDA_FLOP(r,y,p,cg,s) =value
+VN2T(y,y2) =value
+VNT(y,y2)
+VNTRT(y,y2)
+XPT(u)
+XTRACT(r,p)
+X_MARK(r,p,u,c,l,y) =value
+X_RCS(r,c,s,y) =value
+X_RP(r,p,y) =value
+X_RPB(r,p,l,y) =value
+X_RPCGSB(r,p,c,cg,s,l,y) =value
+X_RPCL(r,p,c,l,y) =value
+X_RPCSL(r,p,c,s,l,y) =value
+X_RPG(r,p,cg,y) =value
+X_RPGCGS(r,p,cg,c,cg2,s,y) =value
+X_RPGCS(r,p,cg,c,s,y) =value
+X_RPGGS(r,p,cg,cg2,s,y) =value
+X_RPGS(r,p,cg,s,y) =value
+X_RPGSB(r,p,cg,s,l,y) =value
+X_RPSB(r,p,s,l,y) =value
+X_RUL(r,uc,l,y) =value
+X_RUSL(r,uc,s,l,y) =value
+X_UZRPCS(uc,side,r,p,c,s,y) =value
+Y(y)
+YEARVAL(y) =value
+YK(y,y2)
+YK1(y,y2)
+YKAGE(y,y2,age)
+YKK(y,y2,y3)
+YKVAL(y,y2) =value
+Y_EOH(y)

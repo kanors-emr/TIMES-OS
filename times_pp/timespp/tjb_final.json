@@ -1,0 +1,397 @@
+{
+ "declarations and DD files": [
+  "ACT_CSTRMP",
+  "AFUPS",
+  "BACKWARD",
+  "COEF_ICOM",
+  "COEF_OBFIX",
+  "COEF_OBINV",
+  "COEF_OCOM",
+  "COM",
+  "COM_TMAP",
+  "COM_TYPE",
+  "CST_ANNC",
+  "FLO_FR",
+  "FORWARD",
+  "GG_ARC",
+  "GG_DENS",
+  "GG_EDGE",
+  "GG_GAMMA",
+  "GG_KGF",
+  "GG_KLP",
+  "GG_LINK",
+  "GG_MM",
+  "GG_PP",
+  "GG_PPM",
+  "GG_PPW",
+  "GG_PRBD",
+  "GG_RTPC",
+  "GG_TOP",
+  "GG_WINK",
+  "GG_WTX",
+  "GR_ADO",
+  "GR_CANDID",
+  "GR_CAPUP",
+  "GR_DEMFR",
+  "GR_ENDFR",
+  "GR_GENFR",
+  "GR_GENMAP",
+  "GR_PTDF",
+  "GR_XBND",
+  "IRE_BND",
+  "IRE_XBND",
+  "JS_CCL",
+  "MILESTONYR",
+  "NCAP_COM",
+  "NCAP_FDR",
+  "NO_RVP",
+  "OBJANN",
+  "OBJ_CDEC",
+  "OBJ_COMPD",
+  "OBJ_SUMS3",
+  "PRC_REACT",
+  "PRC_VINT",
+  "REG",
+  "RJ_SL",
+  "RPC_AIRE",
+  "RPS_UPS",
+  "RP_GRID",
+  "RP_RTF",
+  "RP_UPC",
+  "RP_UPS",
+  "RP_UX",
+  "RS_HR",
+  "RS_MODUS",
+  "RS_UP",
+  "RTP_FFCX",
+  "RTP_TT",
+  "SALV_DEC",
+  "STGIN_BND",
+  "STG_CHRG",
+  "STG_MAXCYC",
+  "UC_DYNBND",
+  "UC_T",
+  "UC_TIME",
+  "UC_UCN"
+ ],
+ "init_ext.vda": [
+  "GG_O",
+  "OMG",
+  "PRC_PKNO"
+ ],
+ "ppmain.mod (periods, timeslices, topology): control sets of the topology; storage processes": [
+  "PRC_STGIPS",
+  "RP",
+  "RPC_IRE",
+  "RP_FLO",
+  "RP_IRE",
+  "RP_STS",
+  "TOP"
+ ],
+ "ppmain.mod (periods, timeslices, topology): periods and years": [
+  "LAGT",
+  "LEAD",
+  "MIYR_1"
+ ],
+ "ppmain.mod (periods, timeslices, topology): timeslices (timslice.mod)": [
+  "FINEST",
+  "G_YRFR",
+  "RS_BELOW",
+  "RS_BELOW1",
+  "RS_STGAV",
+  "RS_STGPRD",
+  "RS_TREE",
+  "RS_TSLVL",
+  "TS_GROUP",
+  "TS_MAP"
+ ],
+ "ppmain.mod (periods, timeslices, topology): past investments, start years of new processes": [
+  "PASTYEAR"
+ ],
+ "preppm.mod (inter-/extrapolation): year sets, currencies, commodity costs, UC_COM, vintages": [
+  "PRC_RCAP",
+  "RDCUR"
+ ],
+ "preppm.mod (inter-/extrapolation): standard parameters (fillparm)": [
+  "COM_AGG",
+  "COM_PKFLX",
+  "COM_PKRSV",
+  "COM_PROJ",
+  "UC_CAP",
+  "UC_NCAP"
+ ],
+ "preppm.mod (inter-/extrapolation): bounds": [
+  "COM_BNDNET",
+  "COM_BNDPRD"
+ ],
+ "preppm.mod (inter-/extrapolation): extensions (prep_ext.vda)": [
+  "ACT_MINLD",
+  "ACT_UPS",
+  "PRC_DYNUC"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): years of the horizon and of late costs": [
+  "PERIODYR",
+  "SUBT"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): control sets of regions, processes, commodities; primary groups": [
+  "COM_GMAP",
+  "RC",
+  "RPC",
+  "RP_AIRE"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): timeslices of the commodities; peak timeslices": [
+  "COM_PKTS",
+  "COM_TS",
+  "RCS_COMTS",
+  "RTC"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): timeslices of the processes": [
+  "RPS_PRCTS",
+  "RPS_S1",
+  "RPS_S2"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): timeslices of the flow variables": [
+  "PRC_NSTTS",
+  "RPC_STG"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): lifetimes, lead times, capacity transfer": [
+  "COEF_RPTI",
+  "PRC_REFIT"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): capacity bounds, availability periods, PRC_ACTFLO / PRC_CAPACT defaults": [
+  "PRC_CAPACT",
+  "RPC_PG",
+  "RP_PGACT",
+  "RP_STD",
+  "RTP",
+  "RTPC",
+  "RTP_CPTYR"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)": [
+  "FLO_ASHAR",
+  "GR_ADMIT",
+  "GR_ALGMAP",
+  "GR_ALLMAP",
+  "GR_DEMMAP",
+  "GR_ENDC",
+  "GR_FLOW",
+  "GR_GENP",
+  "GR_GMAPC",
+  "GR_GNALL",
+  "GR_PRCMAP",
+  "GR_TOP",
+  "NCAP_TLIFE",
+  "RC_GRID"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): SHAPE / MULTI curves, defaults of the attributes not by timeslice": [
+  "STG_EFF"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): commodity attributes by timeslice": [
+  "COM_IE"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): timeslice fractions; elastic demands": [
+  "COM_ELAST",
+  "COM_FR",
+  "RS_FR",
+  "RTCS_FR"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): availability factors and peak contribution by timeslice": [
+  "NCAP_PKCNT",
+  "RPCS_VAR",
+  "RPC_PKC"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): flow attributes by timeslice (and pp_chp.mod)": [
+  "ACT_FLO",
+  "FLO_PKCOI",
+  "PRC_ACTFLO",
+  "PRC_MARK",
+  "RTX_MARK",
+  "RX_MARK"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): inter-regional exchange": [
+  "IRE_FLO",
+  "IRE_FLOSUM",
+  "PRC_MAP",
+  "RPC_EQIRE",
+  "RPC_IREIO",
+  "RPC_MARKET"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): commodity balance types; conversion factors of trade": [
+  "DEM",
+  "IRE_CCVT",
+  "IRE_TSCVT"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): bounds by timeslice; cumulative bounds": [
+  "ACT_BND",
+  "RC_CUMCOM",
+  "RPC_CUMFLO",
+  "UC_CUMCOM",
+  "UC_CUMFLO"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): where the balances need VAR_COMNET / VAR_COMPRD": [
+  "RC_AGP",
+  "RTC_NET",
+  "RTC_PRD"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): storage": [
+  "ACT_TIME",
+  "PRC_STGTSS",
+  "PRC_TS",
+  "RPC_LS",
+  "RPC_STGN",
+  "RPS_STG",
+  "RP_STG",
+  "STG_LOSS",
+  "STG_SIFT"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): user constraints": [
+  "RHS_COMBAL",
+  "RHS_COMPRD",
+  "RS_PREV",
+  "RTP_VARP",
+  "UC_ACT",
+  "UC_ATTR",
+  "UC_COM",
+  "UC_DS",
+  "UC_DT",
+  "UC_DYNDIR",
+  "UC_FLO",
+  "UC_GMAP_C",
+  "UC_GMAP_P",
+  "UC_IRE",
+  "UC_MAP_FLO",
+  "UC_MAP_IRE",
+  "UC_R_EACH",
+  "UC_R_SUM",
+  "UC_TSL",
+  "UC_TS_EACH",
+  "UC_TS_SUM",
+  "UC_T_EACH",
+  "UC_T_SUM"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending": [
+  "RCS_COMPRD"
+ ],
+ "ppmain.mod (control sets, levelling, trade, UC): control sets of the variables (pp_reduce.red)": [
+  "PRC_ACT",
+  "RPC_PKF",
+  "RTPCS_VARF",
+  "RTP_VARA",
+  "RTP_VINTYR"
+ ],
+ "ppm_ext.vda": [
+  "FS_EMIT",
+  "NCAP_AFC",
+  "NCAP_AFCS",
+  "PRC_SC",
+  "RPC_ACE",
+  "RPC_EMIS",
+  "RPG_ACE",
+  "RPG_AFCX",
+  "RPG_PACE",
+  "RPS_CAFLAC",
+  "RP_UPL"
+ ],
+ "coefmain.mod": [
+  "B",
+  "COEF_AF",
+  "COEF_CIO",
+  "D",
+  "E",
+  "M",
+  "OBJ_COMNT",
+  "OBJ_DISC",
+  "OBJ_IPRIC",
+  "OBJ_LINT",
+  "OBJ_PVT",
+  "OBJ_VFLO",
+  "OB_ACT",
+  "OB_FCOS",
+  "OB_FDEL",
+  "OB_FTAX",
+  "PRC_CG",
+  "RPC_CUR",
+  "TS_ANN",
+  "Y_EOH"
+ ],
+ "coef_ext.vda": [
+  "ACT_CSTUP",
+  "ACT_EFF",
+  "COEF_AFUPS",
+  "COEF_CPT",
+  "COEF_PTRAN",
+  "FLO_SHAR",
+  "NCAP_PASTI",
+  "RCS_COMBAL",
+  "RPCC_FFUNC",
+  "RPCG_ASHAR",
+  "RP_PGFLO",
+  "RP_STL",
+  "RTCS_VARC",
+  "RTFORC",
+  "TOP_IRE"
+ ],
+ "retirement and refit controls": [
+  "RVPRL",
+  "VAR_RCAP",
+  "VAR_SCAP",
+  "VNTRT"
+ ],
+ "objective coefficients": [
+  "COEF_OBFIXR",
+  "OBJSCC",
+  "OBJ_CFIX",
+  "OBJ_CINV",
+  "OBJ_DCEOH",
+  "OBJ_IAD",
+  "OBJ_ICUR",
+  "OBJ_PASTI",
+  "OBJ_SUMS",
+  "VARCOST_LIN"
+ ],
+ "bounds, AFS, UC maps": [
+  "AFS",
+  "CAP_BND",
+  "FLO_BND",
+  "FLO_CUM",
+  "GR_GRID",
+  "RP_UPR",
+  "RTP_OFF",
+  "RVPT",
+  "STGOUT_BND",
+  "UC_RHS",
+  "UC_RHSMAP",
+  "UC_RHSR",
+  "UC_RHSRT",
+  "UC_RHST",
+  "UC_RHSTS",
+  "UC_RTSUC",
+  "UC_UT",
+  "UC_UTS",
+  "VAR_ACT",
+  "VAR_CAP",
+  "VAR_COMAUX",
+  "VAR_COMNET",
+  "VAR_COMPRD",
+  "VAR_CUMFLO",
+  "VAR_FLO",
+  "VAR_NCAP",
+  "VAR_OBJ",
+  "VAR_SIN",
+  "VAR_SOUT",
+  "VAR_UC",
+  "VAR_UCR",
+  "VAR_UCRT",
+  "VAR_UCRTS",
+  "VAR_UCT",
+  "VAR_UCTS"
+ ],
+ "pp_qack.mod (final control sets)": [
+  "COEF_VNT",
+  "RPG_RED",
+  "RVP_KMAP"
+ ],
+ "side: lvlus(UC_FLO)": [
+  "UC_FLO"
+ ]
+}

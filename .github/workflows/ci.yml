@@ -1,0 +1,49 @@
+name: open chain
+
+# The open chain, end to end, with no GAMS: DD files -> times_pp -> times_eq -> HiGHS on the
+# reference cases listed in models/ci_models.txt, each compared with the GAMS result published
+# beside it (expected.json, and gams_solution.db3 / gams_matrix.db3 where the case has them).
+# A change that stops any case from reproducing its published result goes red.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  example:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.12"]
+        include:
+          - os: ubuntu-latest
+            python: "3.11"                 # the oldest Python the chain needs (the regular expressions of gamsdata.py)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: "1.11"
+      - uses: julia-actions/cache@v2
+      - name: setup (installs the Python and Julia environments and the TIMES source; no GAMS)
+        run: python TIMES.py setup
+      - name: the Python tests (the DD reader, the refusals, the runner's safety)
+        shell: bash
+        run: |
+          PY=.venv/bin/python; [ -x "$PY" ] || PY=.venv/Scripts/python.exe
+          "$PY" -m pip install pytest
+          "$PY" -m pytest -q times_pp/tests
+      - name: the reference cases reproduce their GAMS result
+        run: python .github/scripts/check_models.py
+      - name: a serial and a parallel build give the same matrix
+        run: python .github/scripts/check_parallel.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reports-${{ matrix.os }}-${{ matrix.python }}
+          path: runs/ci/*/report_*.*

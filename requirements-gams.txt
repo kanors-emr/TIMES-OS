@@ -1,0 +1,6 @@
+# The GDX packages: for the comparison with TIMES in GAMS (run --check, --gams run, a GAMS listing in the run folder),
+# --lp <a solver of your GAMS> and --jacobian. setup installs them when it finds GAMS, or with setup --gdx.
+# gamsapi[transfer] reads and writes GDX files; gamspy_base brings the GDX library and comes under the GAMS licence
+# (no GAMS licence is needed to use it). The open chain (DD files -> HiGHS -> Veda files) needs neither.
+gamsapi[transfer]
+gamspy_base

@@ -1,0 +1,134 @@
+*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+* Copyright (C) 2000-2026 Energy Technology Systems Analysis Programme (ETSAP)
+* This file is part of the IEA-ETSAP TIMES model generator, licensed
+* under the GNU General Public License v3.0 (see file NOTICE-GPLv3.txt).
+*-----------------------------------------------------------------------------
+* INITMTY.cli - Extension for Climate Module
+*-----------------------------------------------------------------------------
+* Questions/Comments:
+*-----------------------------------------------------------------------------
+$ SETGLOBAL CLI YES
+  SCALAR ATTLVL /0/, VALLVL /0/, CM_CALIB /0/;
+*-----------------------------------------------------------------------------
+* Set for calibration quantities
+  SET CM_PREDEF 'Historical CO2 concentration and incremental forcing quantities' /
+    CO2-ATM 'Mass of CO2 in the atmosphere (in GtC)'
+    CO2-UP 'Mass of CO2 in the upper ocean layer (in GtC)'
+    CO2-LO 'Mass of CO2 in the lower ocean layer (in GtC)'
+    CH4-ATM, CH4-UP, CH4-LO 'Mass of CH4 in the atmosphere'
+    N2O-ATM, N2O-UP, N2O-LO 'Mass of N2O in the atmosphere'
+    FORCING 'Radiative Forcing'
+    FORC-CO2, FORC-CH4, FORC-N2O, FORC-FGS, FORC-KYO
+    CO2-GTC, CH4-MT,  N2O-MT, FGS-MT
+    CO2-PPM, CH4-PPB, N2O-PPB, FGS-CON
+    DELTA-ATM 'Temperature change in the surface'
+    DELTA-LO 'Temperature change in the deep ocean layer'
+  /;
+  SET COM_GRP / SET.CM_PREDEF /;
+  SET CM_HISTS(CG) / SET.CM_PREDEF /;
+  ALIAS(CM_VAR,CM_HISTS);
+  ALIAS(CG,CM_ITEM);
+  SET CM_OFOR(CM_ITEM) / FORC-CH4, FORC-N2O, FORC-FGS /;
+  SET UC_GRPTYPE / CLI /;
+  SET CM_Q 'Reservoir Qualifier' / SET.LIM, ATM, CM-EMIS, CM-PPX, CM-FORC, CM-DT, CM-ATM, CM-LO, CM-UP, LIFE /;
+
+* Mapping and conversion parameter for total CO2 emissions
+  PARAMETER CM_CO2GTC(REG,C) 'Conversion factors from CO2 commodities to GtC' //;
+  PARAMETER CM_GHGMAP(R,C,CG) 'Conversion factors from regional GHG commodities to CLI' //;
+  PARAMETER CM_PPM(CM_ITEM) 'Conversion factors between Gt/Mt and ppm/ppb'
+    / CO2-GTC 2.13, CH4-MT 2.84, N2O-MT 7.81 /;
+
+* Climate module time-dependent parameters
+  PARAMETER CM_HISTORY(ALLYEAR,CM_ITEM) 'Calibration values for CO2 and forcing' //;
+  PARAMETER CM_STATS(CM_ITEM,ALLYEAR,CM_Q) 'Calibration values for CO2 and forcing' //;
+  PARAMETER CM_EXOFORC(ALLYEAR) 'Radiative forcing from exogenous sources' //;
+  PARAMETER CM_MAXCO2C(ALLYEAR) 'Maximum allowable atmospheric CO2 concentration' //;
+  PARAMETER CM_MAXC(ALLYEAR,ITEM) 'Maximum level of climate variable' //;
+  PARAMETER CM_DECAY(CM_ITEM,CM_Q) 'Annual decay of concentration' //;
+  PARAMETER CM_COUPLE(CM_ITEM,YEAR,CM_ITEM,CM_Q) 'Coupled impact on concentration' //;
+  PARAMETER CM_LINFOR(ALLYEAR,CM_ITEM,LIM) 'Linearized forcing function' //;
+  PARAMETER UC_CLI(UC_N,SIDE,REG,ALLYEAR,CM_ITEM) 'Climate variable' //;
+
+* Reporting parameters
+  PARAMETER CM_DT_FORC(ALLYEAR) 'Delta forcing' //;
+  PARAMETER CM_MAXC_M(ITEM,ALLYEAR) 'Marginals of max constraints' //;
+  PARAMETER CM_SRESULT(ALLSOW,ITEM,ITEM,ALLYEAR) 'Climate Module basic results' //;
+  PARAMETER CM_SMAXC_M(ALLSOW,ITEM,ALLYEAR) 'Marginals for max constraints' //;
+
+* Internal sets for reservoirs
+  SET CM_STCC / CS, SIGMA1 /;
+  SET CM_BOX(CM_Q) 'Reservoir buckets' / ATM, UP, LO, N /;
+  SET CM_EMIS(CM_ITEM) / CO2-GTC /;
+  SET CM_KIND(CM_ITEM) / CO2-GTC /;
+  SET CM_TKIND(CM_ITEM);
+  SET CM_CONC(CM_ITEM,CM_BOX) / CO2-GTC.ATM /;
+  SET CM_ATMAP(CM_ITEM,CM_ITEM) 'Atmospheric reservoir buckets'
+  / CO2-GTC.CO2-PPM, CH4-MT.CH4-PPB, N2O-MT.N2O-PPB, FGS-MT.FGS-CON, FORCING.DELTA-ATM /;
+  ALIAS (CM_BUCK, CM_BOX);
+  SET CM_BOXMAP(CM_ITEM,CM_ITEM,CM_BOX) / CO2-GTC.CO2-ATM.ATM, CO2-GTC.CO2-UP.UP, CO2-GTC.CO2-LO.LO,
+                                  CH4-MT.CH4-ATM.ATM, CH4-MT.CH4-UP.UP, N2O-MT.N2O-ATM.ATM, N2O-MT.N2O-UP.UP
+                                  FORCING.DELTA-ATM.ATM, FORCING.DELTA-LO.LO /;
+  SET PRET(T,T) //;
+  SET SUPERYR(T,ALLYEAR) 'SUpremum PERiod YeaR' //;
+  SET CM_FORCMAP(CM_ITEM,CM_ITEM) / FORCING.FORC-FGS,FORC-KYO.FORC-FGS
+    FORC-CO2.CO2-GTC,FORC-CH4.CH4-MT,FORC-N2O.N2O-MT,FORC-FGS.FGS-MT,FORC-FGS.FORC-FGS /;
+
+* Internal parameters
+  PARAMETER CM_STAT0(CM_ITEM,CM_Q) / N2O-MT.LIFE 121, CH4-MT.LIFE 7.2 /;
+  PARAMETER CM_SIG1(ALLSOW) //;
+  PARAMETER CM_PHI(CM_ITEM,*,*) 'Conc. transport matrix between reservoirs' //;
+  PARAMETER CM_SIG(ALLSOW,*,*) 'Temperature transport matrix between reservoirs' //;
+  PARAMETER CM_AA(CM_ITEM,ALLYEAR,ALLSOW,*,*) 'Periodical CO2 transport matrix' //;
+  PARAMETER CM_BB(CM_ITEM,ALLYEAR,ALLSOW,CM_BOX) 'Periodical emission transport vector' //;
+  PARAMETER CM_CC(CM_ITEM,ALLYEAR,ALLSOW,CM_BOX) 'Periodical emission transport vector' //;
+  PARAMETER CM_RR(J,CM_BOX,*) 'Reporting' //;
+  PARAMETER CM_DELTAT(ALLYEAR,CM_BOX) 'Temperature change in the Temp boxes' //;
+  PARAMETER CM_LED(ALLYEAR) //;
+  PARAMETER CM_BEMI(CM_ITEM,LL) //;
+  PARAMETER CM_EVAR(CM_ITEM,LL) //;
+
+*-----------------------------------------------------------------------------
+* If CM_CO2GTC is not implemented in the shell, IRE_CCVT can alternatively be used
+* For that purpose, a predefined commodity for global CO2 emissions is needed:
+  SET COM_GRP / FORC-CO2, FORC-CH4, FORC-N2O, FORC-FGS, FORC-KYO, DELTA /;
+  SET COM     / CO2-GTC, CH4-MT, N2O-MT, FORCING, CO2-ATM, DELTA-ATM /;
+*-----------------------------------------------------------------------------
+  PARAMETER CM_CONST(*) 'Climate module constants' /
+    EXT-EOH     -1
+    BEOHMOD     20
+    CALIBSET    0  /;
+  PARAMETER CM_DEFAULT(ALLYEAR,ITEM) /
+    0.PHI-UP-AT	  0.0529
+    0.PHI-AT-UP	  0.0578
+    0.PHI-LO-UP	  0.00037
+    0.PHI-UP-LO	  0.0102
+    0.GAMMA	  3.81924
+    0.LAMBDA	  1.2731
+    0.CS	  3
+    0.SIGMA1	  0.0843
+    0.SIGMA2	  0.9621
+    0.SIGMA3	  0.006
+    0.CO2-PREIND  591.7
+    0.PHI-CH4	  0.0925
+    0.PHI-N2O	  0.0087
+ /;
+*-----------------------------------------------------------------------------
+$SET X1 %EOTIME%
+* The following parameters describe historical mass of CO2 in the ATM and ocean
+* as well as historical temperature increases in surface and deep ocean
+**** User provided values override these default hard-coded values ****
+  TABLE CM_DEFAULT(ALLYEAR,ITEM)
+        CO2-ATM   CO2-UP   CO2-LO   DELTA-ATM   DELTA-LO  CH4-ATM  CH4-UP  N2O-ATM  N2O-UP
+2005     807.27    793     19217     0.884       0.13      3051     1988     382     2109
+2010     828       812     19222     0.93        0.152     3121     1988     415     2109
+2015     853       832     19228     1.06        0.177     3221     1988     454     2109
+2020     880       853     19235     1.21        0.205     3348     1988     492     2109
+2024     903       870     19241     1.34        0.23      3493     1988     529     2109
+%X1%     807.27   1600     10010     0.8842     0.505681   3150     1850     390     2103
+;
+* Alternative calibration parameters
+  TABLE CM_DEFAULT(ALLYEAR,ITEM)
+     PHI-UP-AT  PHI-AT-UP  PHI-LO-UP  PHI-UP-LO  GAMMA    CS  SIGMA1   SIGMA2   SIGMA3   CO2-PREIND PHI-CH4  PHI-N2O
+%X1%  0.008127   0.023132   0.001126   0.000092  3.70426  3   0.087403 1.396454 0.013246 589.996039  0.087   0.0081
+;
+*-----------------------------------------------------------------------------

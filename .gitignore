@@ -1,0 +1,16 @@
+# generated
+__pycache__/
+Manifest.toml
+*.db3
+!models/**/*.db3
+*.duckdb
+# what TIMES.py writes: results, the places of the programs on this machine, the Python and Julia environments
+runs/
+settings.json
+.venv/
+.julia_env/
+# written by TIMES.py setup: the precompile workload of TimesEq
+times_eq/precompile/
+/.julia_bin/
+# fetched by TIMES.py setup when GAMS is found: IEA-ETSAP's TIMES source, for the comparison with TIMES in GAMS
+/TIMES_model-v*/

@@ -1,0 +1,1217 @@
+{
+ "VAR_ACT": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "S"
+ ],
+ "VAR_BLND": [
+  "R",
+  "ALLYEAR",
+  "COM",
+  "COM"
+ ],
+ "VAR_CAP": [
+  "R",
+  "ALLYEAR",
+  "P"
+ ],
+ "VAR_COMNET": [
+  "R",
+  "ALLYEAR",
+  "C",
+  "S"
+ ],
+ "VAR_COMPRD": [
+  "R",
+  "ALLYEAR",
+  "C",
+  "S"
+ ],
+ "VAR_IRE": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "C",
+  "S",
+  "IE"
+ ],
+ "VAR_DEM": [
+  "R",
+  "MILESTONYR",
+  "C"
+ ],
+ "VAR_ELAST": [
+  "R",
+  "ALLYEAR",
+  "C",
+  "S",
+  "J",
+  "BD"
+ ],
+ "VAR_FLO": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "C",
+  "S"
+ ],
+ "VAR_CUMCOM": [
+  "R",
+  "C",
+  "COM_VAR",
+  "ALLYEAR",
+  "ALLYEAR"
+ ],
+ "VAR_CUMFLO": [
+  "R",
+  "P",
+  "C",
+  "ALLYEAR",
+  "ALLYEAR"
+ ],
+ "VAR_CUMCST": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "COSTAGG",
+  "CUR"
+ ],
+ "VAR_NCAP": [
+  "R",
+  "ALLYEAR",
+  "P"
+ ],
+ "VAR_DAM": [
+  "R",
+  "T",
+  "C",
+  "BD",
+  "J"
+ ],
+ "VAR_OBJ": [
+  "R",
+  "OBV",
+  "CUR"
+ ],
+ "VAR_OBJELS": [
+  "R",
+  "BD",
+  "CUR"
+ ],
+ "VAR_SIN": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "C",
+  "S"
+ ],
+ "VAR_SOUT": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "C",
+  "S"
+ ],
+ "VAR_UC": [
+  "UC_N"
+ ],
+ "VAR_UCR": [
+  "UC_N",
+  "R"
+ ],
+ "VAR_UCT": [
+  "UC_N",
+  "T"
+ ],
+ "VAR_UCRT": [
+  "UC_N",
+  "R",
+  "T"
+ ],
+ "VAR_UCTS": [
+  "UC_N",
+  "T",
+  "S"
+ ],
+ "VAR_UCRTS": [
+  "UC_N",
+  "R",
+  "T",
+  "S"
+ ],
+ "VAR_UPS": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "S",
+  "L"
+ ],
+ "VAR_UPT": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "S",
+  "UPT"
+ ],
+ "VAR_UDP": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "S",
+  "L"
+ ],
+ "VAR_RLD": [
+  "R",
+  "T",
+  "S",
+  "ITEM"
+ ],
+ "VAR_DNCAP": [
+  "R",
+  "ALLYEAR",
+  "P",
+  "UNIT"
+ ],
+ "VAR_SNCAP": [
+  "R",
+  "ALLYEAR",
+  "P"
+ ],
+ "VAR_RCAP": [
+  "R",
+  "ALLYEAR",
+  "LL",
+  "P"
+ ],
+ "VAR_SCAP": [
+  "R",
+  "ALLYEAR",
+  "LL",
+  "P"
+ ],
+ "VAR_DRCAP": [
+  "R",
+  "ALLYEAR",
+  "LL",
+  "P",
+  "J"
+ ],
+ "VAS_UPDEV": [
+  "ALLSOW"
+ ],
+ "EQ_OBJELS": [
+  "R",
+  "BD",
+  "CUR"
+ ],
+ "EQ_OBJFIX": [
+  "R",
+  "CUR"
+ ],
+ "EQ_OBJINV": [
+  "R",
+  "CUR"
+ ],
+ "EQ_OBJSALV": [
+  "R",
+  "CUR"
+ ],
+ "EQ_OBJVAR": [
+  "R",
+  "CUR"
+ ],
+ "EQ_ACTFLO": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "S"
+ ],
+ "EQG_ACTBND": [
+  "R",
+  "ALLYEAR",
+  "P",
+  "S"
+ ],
+ "EQE_ACTBND": [
+  "R",
+  "ALLYEAR",
+  "P",
+  "S"
+ ],
+ "EQL_ACTBND": [
+  "R",
+  "ALLYEAR",
+  "P",
+  "S"
+ ],
+ "EQG_BNDNET": [
+  "R",
+  "ALLYEAR",
+  "C",
+  "S"
+ ],
+ "EQE_BNDNET": [
+  "R",
+  "ALLYEAR",
+  "C",
+  "S"
+ ],
+ "EQL_BNDNET": [
+  "R",
+  "ALLYEAR",
+  "C",
+  "S"
+ ],
+ "EQG_BNDPRD": [
+  "R",
+  "ALLYEAR",
+  "C",
+  "S"
+ ],
+ "EQE_BNDPRD": [
+  "R",
+  "ALLYEAR",
+  "C",
+  "S"
+ ],
+ "EQL_BNDPRD": [
+  "R",
+  "ALLYEAR",
+  "C",
+  "S"
+ ],
+ "EQL_CAPACT": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "S"
+ ],
+ "EQE_CAPACT": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "S"
+ ],
+ "EQG_CAPACT": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "S"
+ ],
+ "EQG_COMBAL": [
+  "R",
+  "ALLYEAR",
+  "C",
+  "S"
+ ],
+ "EQE_COMBAL": [
+  "R",
+  "ALLYEAR",
+  "C",
+  "S"
+ ],
+ "EQE_COMPRD": [
+  "R",
+  "ALLYEAR",
+  "C",
+  "S"
+ ],
+ "EQL_COMCES": [
+  "R",
+  "ALLYEAR",
+  "C",
+  "C",
+  "S"
+ ],
+ "EQE_CPT": [
+  "R",
+  "ALLYEAR",
+  "P"
+ ],
+ "EQG_CPT": [
+  "R",
+  "ALLYEAR",
+  "P"
+ ],
+ "EQL_CPT": [
+  "R",
+  "ALLYEAR",
+  "P"
+ ],
+ "EQG_FLOBND": [
+  "R",
+  "T",
+  "P",
+  "CG",
+  "S"
+ ],
+ "EQE_FLOBND": [
+  "R",
+  "T",
+  "P",
+  "CG",
+  "S"
+ ],
+ "EQL_FLOBND": [
+  "R",
+  "T",
+  "P",
+  "CG",
+  "S"
+ ],
+ "EQG_FLOFR": [
+  "R",
+  "T",
+  "P",
+  "C",
+  "S",
+  "L"
+ ],
+ "EQE_FLOFR": [
+  "R",
+  "T",
+  "P",
+  "C",
+  "S",
+  "L"
+ ],
+ "EQL_FLOFR": [
+  "R",
+  "T",
+  "P",
+  "C",
+  "S",
+  "L"
+ ],
+ "EQG_INSHR": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "C",
+  "CG",
+  "S"
+ ],
+ "EQE_INSHR": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "C",
+  "CG",
+  "S"
+ ],
+ "EQL_INSHR": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "C",
+  "CG",
+  "S"
+ ],
+ "EQ_IRE": [
+  "R",
+  "ALLYEAR",
+  "P",
+  "C",
+  "IE",
+  "S"
+ ],
+ "EQG_IREBND": [
+  "R",
+  "ALLYEAR",
+  "C",
+  "S",
+  "ALL_REG",
+  "IE"
+ ],
+ "EQE_IREBND": [
+  "R",
+  "ALLYEAR",
+  "C",
+  "S",
+  "ALL_REG",
+  "IE"
+ ],
+ "EQL_IREBND": [
+  "R",
+  "ALLYEAR",
+  "C",
+  "S",
+  "ALL_REG",
+  "IE"
+ ],
+ "EQG_XBND": [
+  "ALL_REG",
+  "ALLYEAR",
+  "C",
+  "S",
+  "IE"
+ ],
+ "EQE_XBND": [
+  "ALL_REG",
+  "ALLYEAR",
+  "C",
+  "S",
+  "IE"
+ ],
+ "EQL_XBND": [
+  "ALL_REG",
+  "ALLYEAR",
+  "C",
+  "S",
+  "IE"
+ ],
+ "EQG_OUTSHR": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "C",
+  "CG",
+  "S"
+ ],
+ "EQE_OUTSHR": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "C",
+  "CG",
+  "S"
+ ],
+ "EQL_OUTSHR": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "C",
+  "CG",
+  "S"
+ ],
+ "EQG_FLOMRK": [
+  "R",
+  "ALLYEAR",
+  "ITEM",
+  "C",
+  "S"
+ ],
+ "EQE_FLOMRK": [
+  "R",
+  "ALLYEAR",
+  "ITEM",
+  "C",
+  "S"
+ ],
+ "EQL_FLOMRK": [
+  "R",
+  "ALLYEAR",
+  "ITEM",
+  "C",
+  "S"
+ ],
+ "EQ_PEAK": [
+  "R",
+  "ALLYEAR",
+  "COM_GRP",
+  "S"
+ ],
+ "EQ_PTRANS": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "CG",
+  "CG",
+  "S"
+ ],
+ "EQ_CUMNET": [
+  "R",
+  "C",
+  "ALLYEAR",
+  "ALLYEAR"
+ ],
+ "EQ_CUMPRD": [
+  "R",
+  "C",
+  "ALLYEAR",
+  "ALLYEAR"
+ ],
+ "EQ_CUMFLO": [
+  "R",
+  "P",
+  "C",
+  "ALLYEAR",
+  "LL"
+ ],
+ "EQ_STGTSS": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "S"
+ ],
+ "EQ_STSBAL": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "TSL",
+  "S",
+  "L"
+ ],
+ "EQ_STSLEV": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "TSLVL",
+  "S",
+  "ALLSOW"
+ ],
+ "EQG_STGIN": [
+  "R",
+  "ALLYEAR",
+  "P",
+  "C",
+  "S"
+ ],
+ "EQE_STGIN": [
+  "R",
+  "ALLYEAR",
+  "P",
+  "C",
+  "S"
+ ],
+ "EQL_STGIN": [
+  "R",
+  "ALLYEAR",
+  "P",
+  "C",
+  "S"
+ ],
+ "EQG_STGOUT": [
+  "R",
+  "ALLYEAR",
+  "P",
+  "C",
+  "S"
+ ],
+ "EQE_STGOUT": [
+  "R",
+  "ALLYEAR",
+  "P",
+  "C",
+  "S"
+ ],
+ "EQL_STGOUT": [
+  "R",
+  "ALLYEAR",
+  "P",
+  "C",
+  "S"
+ ],
+ "EQ_STGIPS": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "ITEM"
+ ],
+ "EQ_STGAUX": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "C",
+  "S"
+ ],
+ "EQE_UC": [
+  "UC_N"
+ ],
+ "EQE_UCR": [
+  "R",
+  "UC_N"
+ ],
+ "EQE_UCT": [
+  "UC_N",
+  "T"
+ ],
+ "EQE_UCRT": [
+  "R",
+  "T",
+  "UC_N"
+ ],
+ "EQE_UCRS": [
+  "R",
+  "T",
+  "UC_N",
+  "TSL",
+  "S"
+ ],
+ "EQE_UCTS": [
+  "UC_N",
+  "T",
+  "S"
+ ],
+ "EQE_UCRTS": [
+  "R",
+  "T",
+  "UC_N",
+  "S"
+ ],
+ "EQE_UCSU": [
+  "UC_N",
+  "T"
+ ],
+ "EQE_UCRSU": [
+  "R",
+  "T",
+  "UC_N"
+ ],
+ "EQE_UCSUS": [
+  "UC_N",
+  "T",
+  "S"
+ ],
+ "EQE_UCRSUS": [
+  "R",
+  "T",
+  "UC_N",
+  "S"
+ ],
+ "EQ_BNDCST": [
+  "REG",
+  "ALLYEAR",
+  "T",
+  "ALLYEAR",
+  "COSTCAT",
+  "CUR"
+ ],
+ "EQL_BLND": [
+  "R",
+  "YEAR",
+  "BLE",
+  "SPE",
+  "ALLSOW"
+ ],
+ "EQG_BLND": [
+  "R",
+  "YEAR",
+  "BLE",
+  "SPE",
+  "ALLSOW"
+ ],
+ "EQE_BLND": [
+  "R",
+  "YEAR",
+  "BLE",
+  "SPE",
+  "ALLSOW"
+ ],
+ "EQN_BLND": [
+  "R",
+  "YEAR",
+  "BLE",
+  "SPE",
+  "ALLSOW"
+ ],
+ "EQ_DAMAGE": [
+  "R",
+  "T",
+  "C"
+ ],
+ "EQ_OBJDAM": [
+  "R",
+  "CUR"
+ ],
+ "EQ_DSCRET": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P"
+ ],
+ "EQ_CUMRET": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P"
+ ],
+ "EQL_SCAP": [
+  "R",
+  "ALLYEAR",
+  "P",
+  "IPS"
+ ],
+ "EQL_REFIT": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "L"
+ ],
+ "EQE_ACTEFF": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "CG",
+  "IO",
+  "S"
+ ],
+ "EQL_CAFLAC": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "S"
+ ],
+ "EQE_CAFLAC": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "S"
+ ],
+ "EQL_CAPFLO": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "CG",
+  "S"
+ ],
+ "EQ_CAPLOAD": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "S",
+  "L"
+ ],
+ "EQ_ACTRAMP": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "S",
+  "L"
+ ],
+ "EQE_ACTUPS": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "TSL",
+  "L",
+  "S"
+ ],
+ "EQL_ACTUPS": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "TSL",
+  "L",
+  "S"
+ ],
+ "EQL_ACTUPC": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "TSL",
+  "L",
+  "S"
+ ],
+ "EQ_ACTPL": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "S"
+ ],
+ "EQ_ACTRMPC": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "S"
+ ],
+ "EQL_STGCCL": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "ALLSOW"
+ ],
+ "EQ_SLSIFT": [
+  "R",
+  "ALLYEAR",
+  "P",
+  "C",
+  "S",
+  "L",
+  "L"
+ ],
+ "EQE_UCRTP": [
+  "UC_N",
+  "R",
+  "T",
+  "P",
+  "UC_GRPTYPE",
+  "BD"
+ ],
+ "EQN_UCRTP": [
+  "UC_N",
+  "R",
+  "T",
+  "P",
+  "UC_GRPTYPE",
+  "BD"
+ ],
+ "EQN_UCRTC": [
+  "UC_N",
+  "COM_VAR",
+  "R",
+  "T",
+  "C",
+  "TS",
+  "BD"
+ ],
+ "EQE_ASHAR": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "CG",
+  "COM_GRP",
+  "S"
+ ],
+ "EQL_ASHAR": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "CG",
+  "COM_GRP",
+  "S"
+ ],
+ "EQG_ASHAR": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "CG",
+  "COM_GRP",
+  "S"
+ ],
+ "EQG_UCMAX": [
+  "UC_N",
+  "ALL_R",
+  "ITEM",
+  "C",
+  "*"
+ ],
+ "EQG_UCSUMAX": [
+  "UC_N"
+ ],
+ "EQ_RL_LOAD": [
+  "R",
+  "T",
+  "S"
+ ],
+ "EQ_RL_NDIS": [
+  "R",
+  "T",
+  "S",
+  "ITEM"
+ ],
+ "EQ_RL_STCAP": [
+  "R",
+  "T",
+  "S"
+ ],
+ "EQ_RL_PKCAP": [
+  "R",
+  "T",
+  "S"
+ ],
+ "EQ_RL_THMIN": [
+  "R",
+  "T",
+  "S",
+  "BD"
+ ],
+ "EQ_SDLOGIC": [
+  "R",
+  "LL",
+  "T",
+  "P",
+  "TSL",
+  "S",
+  "L",
+  "ALLSOW"
+ ],
+ "EQ_SUDUPT": [
+  "R",
+  "LL",
+  "T",
+  "P",
+  "TSL",
+  "S",
+  "UPT",
+  "ALLSOW"
+ ],
+ "EQ_SDSLANT": [
+  "R",
+  "LL",
+  "T",
+  "P",
+  "TSL",
+  "S",
+  "ALLSOW"
+ ],
+ "EQ_SDMINON": [
+  "R",
+  "LL",
+  "T",
+  "P",
+  "S",
+  "ALLSOW"
+ ],
+ "EQ_SUDLOAD": [
+  "R",
+  "LL",
+  "T",
+  "P",
+  "S",
+  "ALLSOW"
+ ],
+ "EQ_SUDTIME": [
+  "R",
+  "LL",
+  "T",
+  "P",
+  "TSL",
+  "S",
+  "BD",
+  "ALLSOW"
+ ],
+ "EQ_SUDPLL": [
+  "R",
+  "LL",
+  "T",
+  "P",
+  "TSL",
+  "S",
+  "ALLSOW"
+ ],
+ "EQ_EXPOBJ": [
+  "ALLSOW"
+ ],
+ "EQ_UPDEV": [
+  "ALLSOW"
+ ],
+ "EQ_ROBJ": [
+  "R"
+ ],
+ "EQ_SOBJ": [
+  "LIM"
+ ],
+ "VAR_BSPRS": [
+  "R",
+  "ALLYEAR",
+  "ALLYEAR",
+  "P",
+  "C",
+  "S",
+  "L"
+ ],
+ "VAR_COMLV": [
+  "*",
+  "R",
+  "ALLYEAR",
+  "C",
+  "S"
+ ],
+ "VAR_C": [
+  "R",
+  "T"
+ ],
+ "VAR_INV": [
+  "R",
+  "T"
+ ],
+ "VAR_EC": [
+  "R",
+  "ALLYEAR"
+ ],
+ "VAR_NTX": [
+  "R",
+  "T"
+ ],
+ "VAR_K": [
+  "R",
+  "T"
+ ],
+ "VAR_D": [
+  "R",
+  "T",
+  "CG"
+ ],
+ "VAR_SP": [
+  "R",
+  "T",
+  "CG"
+ ],
+ "VAR_OBJCOST": [
+  "R",
+  "ALLYEAR"
+ ],
+ "VAR_MELA": [
+  "R",
+  "T",
+  "CG",
+  "J",
+  "BD"
+ ],
+ "VAR_ANNCST": [
+  "OBV",
+  "R",
+  "ALLYEAR",
+  "CUR"
+ ],
+ "EQ_ENSCST": [
+  "R",
+  "T"
+ ],
+ "EQ_TRDBAL": [
+  "T"
+ ],
+ "EQ_CONSO": [
+  "R",
+  "T"
+ ],
+ "EQ_CONDA": [
+  "R",
+  "T"
+ ],
+ "EQ_LOGBD": [
+  "R",
+  "T"
+ ],
+ "EQ_MACSH": [
+  "R",
+  "T",
+  "CG",
+  "CG"
+ ],
+ "EQ_MACAG": [
+  "R",
+  "T",
+  "CG"
+ ],
+ "EQ_MACES": [
+  "R",
+  "T",
+  "CG",
+  "CG"
+ ],
+ "EQ_KNCAP": [
+  "R",
+  "T"
+ ],
+ "EQ_MCAP": [
+  "R",
+  "T"
+ ],
+ "EQ_TMC": [
+  "R",
+  "T"
+ ],
+ "EQ_IVECBND": [
+  "R",
+  "T"
+ ],
+ "EQ_DD": [
+  "R",
+  "T",
+  "C"
+ ],
+ "EQ_DEMSH": [
+  "R",
+  "T",
+  "C"
+ ],
+ "EQ_DEMAG": [
+  "R",
+  "T"
+ ],
+ "EQ_DEMCES": [
+  "R",
+  "T",
+  "C"
+ ],
+ "EQ_OBJ": [
+  "R",
+  "ALLYEAR"
+ ],
+ "EQ_ANNINV": [
+  "REG",
+  "ALLYEAR",
+  "CUR"
+ ],
+ "EQ_ANNFIX": [
+  "REG",
+  "ALLYEAR",
+  "CUR"
+ ],
+ "EQ_ANNVAR": [
+  "REG",
+  "ALLYEAR",
+  "CUR"
+ ],
+ "VAR_CLITOT": [
+  "CM_ITEM",
+  "ALLYEAR"
+ ],
+ "VAR_CLIBOX": [
+  "CM_ITEM",
+  "CM_BOX",
+  "ALLYEAR"
+ ],
+ "EQ_CLITOT": [
+  "CM_ITEM",
+  "ALLYEAR",
+  "ALLYEAR"
+ ],
+ "EQ_CLICONC": [
+  "CM_ITEM",
+  "CM_BOX",
+  "ALLYEAR"
+ ],
+ "EQ_CLITEMP": [
+  "CM_ITEM",
+  "CM_BOX",
+  "ALLYEAR"
+ ],
+ "EQ_CLIMAX": [
+  "ALLYEAR",
+  "CM_ITEM"
+ ]
+}

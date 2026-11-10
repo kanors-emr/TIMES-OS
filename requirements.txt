@@ -1,0 +1,6 @@
+# Python packages of TIMES (python TIMES.py setup installs them into .venv)
+duckdb<2          # DuckDB 2.0 stops the preprocessor (an unfinished result before register): pinned until the code is adapted
+pandas
+numpy
+# the comparison with TIMES in GAMS, --lp and --jacobian also need requirements-gams.txt (GDX; setup installs it
+# when it finds GAMS, or with setup --gdx)

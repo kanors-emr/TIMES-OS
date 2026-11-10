@@ -1,0 +1,4032 @@
+{
+"ACTCG": {
+"after": "coefmain.mod",
+"sides": []
+},
+"ACT_BND": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"ACT_COST": {
+"after": "coefmain.mod",
+"sides": []
+},
+"ACT_CSTPL": {
+"after": "preppm.mod (inter-/extrapolation): year sets, currencies, commodity costs, UC_COM, vintages",
+"sides": []
+},
+"ACT_CSTRMP": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"ACT_CSTSD": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"ACT_CSTUP": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"ACT_CUM": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): bounds by timeslice; cumulative bounds",
+"sides": []
+},
+"ACT_EFF": {
+"after": "retirement and refit controls",
+"sides": []
+},
+"ACT_FLO": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"ACT_LOSPL": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"ACT_LOSSD": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"ACT_MAXNON": {
+"after": "preppm.mod (inter-/extrapolation): extensions (prep_ext.vda)",
+"sides": []
+},
+"ACT_MINLD": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"ACT_SDTIME": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"ACT_TIME": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"ACT_UPS": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"ADESC": {
+"after": null,
+"sides": []
+},
+"AFS": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"AFUPS": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"AGE": {
+"after": "objective coefficients",
+"sides": []
+},
+"AGEFIL": {
+"after": null,
+"sides": []
+},
+"AGEJ": {
+"after": null,
+"sides": []
+},
+"AGG_OUT": {
+"after": null,
+"sides": []
+},
+"AGR": {
+"after": null,
+"sides": []
+},
+"ALLSOW": {
+"after": null,
+"sides": []
+},
+"ALLYEAR": {
+"after": "objective coefficients",
+"sides": []
+},
+"ALL_REG": {
+"after": "ppmain.mod (periods, timeslices, topology): timeslices (timslice.mod)",
+"sides": []
+},
+"ALL_TS": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"ANNUAL": {
+"after": "bounds, AFS, UC maps",
+"sides": [
+"lvlus(UC_FLO)"
+]
+},
+"B": {
+"after": "bounds, AFS, UC maps",
+"sides": [
+"lvlus(UC_FLO)"
+]
+},
+"BACKWARD": {
+"after": "init_ext.vda",
+"sides": []
+},
+"BC_AGG": {
+"after": "objective coefficients",
+"sides": []
+},
+"BC_COMNET": {
+"after": "objective coefficients",
+"sides": []
+},
+"BC_COMPRD": {
+"after": "objective coefficients",
+"sides": []
+},
+"BC_FLO": {
+"after": "objective coefficients",
+"sides": []
+},
+"BC_INVACT": {
+"after": null,
+"sides": []
+},
+"BC_INVTOT": {
+"after": null,
+"sides": []
+},
+"BC_NCAP": {
+"after": "objective coefficients",
+"sides": []
+},
+"BC_ROW": {
+"after": "objective coefficients",
+"sides": []
+},
+"BDLOX": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): capacity bounds, availability periods, PRC_ACTFLO / PRC_CAPACT defaults",
+"sides": []
+},
+"BDNEQ": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"BDSIG": {
+"after": null,
+"sides": []
+},
+"BDUPX": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): where the balances need VAR_COMNET / VAR_COMPRD",
+"sides": []
+},
+"BDVAL": {
+"after": null,
+"sides": []
+},
+"BEOH": {
+"after": null,
+"sides": []
+},
+"BLE": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"BLE_BAL": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"BLE_ENV": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"BLE_INP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"BLE_OPR": {
+"after": "coefmain.mod",
+"sides": []
+},
+"BLE_SPE": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"BLE_SPEINP": {
+"after": null,
+"sides": []
+},
+"BLE_SPEOPR": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"BLE_TP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"BL_COM": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"BL_DELIVC": {
+"after": "preppm.mod (inter-/extrapolation): year sets, currencies, commodity costs, UC_COM, vintages",
+"sides": []
+},
+"BL_INP": {
+"after": null,
+"sides": []
+},
+"BL_SPEC": {
+"after": null,
+"sides": []
+},
+"BL_START": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"BL_TYPE": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"BL_UNIT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"BL_VAROMC": {
+"after": "preppm.mod (inter-/extrapolation): year sets, currencies, commodity costs, UC_COM, vintages",
+"sides": []
+},
+"BND_TYPE": {
+"after": null,
+"sides": []
+},
+"BOHYEAR": {
+"after": "preppm.mod (inter-/extrapolation): extensions (prep_ext.vda)",
+"sides": []
+},
+"CAPACITYUNITTIMESREPORT": {
+"after": null,
+"sides": []
+},
+"CAP_BND": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"CAP_NEW": {
+"after": null,
+"sides": []
+},
+"CGTES2": {
+"after": null,
+"sides": []
+},
+"CGTEST": {
+"after": null,
+"sides": []
+},
+"CG_GRP": {
+"after": null,
+"sides": []
+},
+"CHP": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"CHP_ELC": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"CM_MAXC_M": {
+"after": null,
+"sides": []
+},
+"CM_RESULT": {
+"after": null,
+"sides": []
+},
+"COEF_AF": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"COEF_AFUPS": {
+"after": "retirement and refit controls",
+"sides": []
+},
+"COEF_CAP": {
+"after": null,
+"sides": []
+},
+"COEF_CIO": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"COEF_CPT": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"COEF_CRF": {
+"after": null,
+"sides": []
+},
+"COEF_ICOM": {
+"after": "coefmain.mod",
+"sides": []
+},
+"COEF_ILED": {
+"after": "objective coefficients",
+"sides": []
+},
+"COEF_OBFIX": {
+"after": "objective coefficients",
+"sides": []
+},
+"COEF_OBFIXR": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"COEF_OBINV": {
+"after": "objective coefficients",
+"sides": []
+},
+"COEF_OBJINV": {
+"after": null,
+"sides": []
+},
+"COEF_OCOM": {
+"after": "coefmain.mod",
+"sides": []
+},
+"COEF_PTRAN": {
+"after": "retirement and refit controls",
+"sides": [
+"coef_ptr"
+]
+},
+"COEF_PVT": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"COEF_RCOM": {
+"after": null,
+"sides": []
+},
+"COEF_RPTI": {
+"after": "objective coefficients",
+"sides": []
+},
+"COEF_RTP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): lifetimes, lead times, capacity transfer",
+"sides": []
+},
+"COEF_RVPT": {
+"after": null,
+"sides": []
+},
+"COEF_VNT": {
+"after": "solve.stp (the steps of a myopic run)",
+"sides": []
+},
+"COM": {
+"after": "bounds, AFS, UC maps",
+"sides": [
+"coef_ptr"
+]
+},
+"COMGROUPTIMESREPORT": {
+"after": null,
+"sides": []
+},
+"COMM": {
+"after": null,
+"sides": []
+},
+"COM_AGG": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): where the balances need VAR_COMNET / VAR_COMPRD",
+"sides": []
+},
+"COM_BNDNET": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"COM_BNDPRD": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"COM_BPRICE": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): timeslice fractions; elastic demands",
+"sides": []
+},
+"COM_BQTY": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): commodity attributes by timeslice",
+"sides": []
+},
+"COM_CSTBAL": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"COM_CSTNET": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): where the balances need VAR_COMNET / VAR_COMPRD",
+"sides": []
+},
+"COM_CSTPRD": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): where the balances need VAR_COMNET / VAR_COMPRD",
+"sides": []
+},
+"COM_CUM": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"COM_CUMNET": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): bounds by timeslice; cumulative bounds",
+"sides": []
+},
+"COM_CUMPRD": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): bounds by timeslice; cumulative bounds",
+"sides": []
+},
+"COM_DESC": {
+"after": null,
+"sides": []
+},
+"COM_ELAST": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): availability factors and peak contribution by timeslice",
+"sides": []
+},
+"COM_ELASTX": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): SHAPE / MULTI curves, defaults of the attributes not by timeslice",
+"sides": []
+},
+"COM_FR": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): availability factors and peak contribution by timeslice",
+"sides": []
+},
+"COM_GMAP": {
+"after": "pp_qack.mod (final control sets)",
+"sides": [
+"coef_ptr"
+]
+},
+"COM_GRP": {
+"after": null,
+"sides": []
+},
+"COM_IE": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): timeslice fractions; elastic demands",
+"sides": []
+},
+"COM_LIM": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"COM_MSHGV": {
+"after": null,
+"sides": []
+},
+"COM_OFF": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): timeslices of the commodities; peak timeslices",
+"sides": []
+},
+"COM_PEAK": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): flow attributes by timeslice (and pp_chp.mod)",
+"sides": []
+},
+"COM_PKFLX": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): commodity attributes by timeslice",
+"sides": []
+},
+"COM_PKRSV": {
+"after": "preppm.mod (inter-/extrapolation): bounds",
+"sides": []
+},
+"COM_PKTS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): availability factors and peak contribution by timeslice",
+"sides": []
+},
+"COM_PROJ": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): timeslice fractions; elastic demands",
+"sides": []
+},
+"COM_STEP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): timeslice fractions; elastic demands",
+"sides": []
+},
+"COM_SUBNET": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): where the balances need VAR_COMNET / VAR_COMPRD",
+"sides": []
+},
+"COM_SUBPRD": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): where the balances need VAR_COMNET / VAR_COMPRD",
+"sides": []
+},
+"COM_TAXNET": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): where the balances need VAR_COMNET / VAR_COMPRD",
+"sides": []
+},
+"COM_TAXPRD": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): where the balances need VAR_COMNET / VAR_COMPRD",
+"sides": []
+},
+"COM_TMAP": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"COM_TS": {
+"after": "coefmain.mod",
+"sides": []
+},
+"COM_TSL": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"COM_TYPE": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"COM_UNIT": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"COM_VAR": {
+"after": null,
+"sides": []
+},
+"COM_VOC": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): timeslice fractions; elastic demands",
+"sides": []
+},
+"CONVERT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"COR_SALVD": {
+"after": "objective coefficients",
+"sides": []
+},
+"COR_SALVI": {
+"after": "objective coefficients",
+"sides": []
+},
+"COSTAGG": {
+"after": null,
+"sides": []
+},
+"COST_GMAP": {
+"after": null,
+"sides": []
+},
+"COV_MAP": {
+"after": null,
+"sides": []
+},
+"CSTVNT": {
+"after": null,
+"sides": []
+},
+"CSTVPJ": {
+"after": null,
+"sides": []
+},
+"CST_ACTC": {
+"after": null,
+"sides": []
+},
+"CST_ANNC": {
+"after": "objective coefficients",
+"sides": []
+},
+"CST_COMC": {
+"after": null,
+"sides": []
+},
+"CST_COME": {
+"after": null,
+"sides": []
+},
+"CST_COMX": {
+"after": null,
+"sides": []
+},
+"CST_DAM": {
+"after": null,
+"sides": []
+},
+"CST_DECC": {
+"after": null,
+"sides": []
+},
+"CST_FIXC": {
+"after": null,
+"sides": []
+},
+"CST_FIXX": {
+"after": null,
+"sides": []
+},
+"CST_FLOC": {
+"after": null,
+"sides": []
+},
+"CST_FLOX": {
+"after": null,
+"sides": []
+},
+"CST_INVC": {
+"after": null,
+"sides": []
+},
+"CST_INVX": {
+"after": null,
+"sides": []
+},
+"CST_IREC": {
+"after": null,
+"sides": []
+},
+"CST_PVC": {
+"after": null,
+"sides": []
+},
+"CST_PVP": {
+"after": null,
+"sides": []
+},
+"CST_SALV": {
+"after": null,
+"sides": []
+},
+"CST_TIME": {
+"after": null,
+"sides": []
+},
+"CUR": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"CUR_GRP": {
+"after": null,
+"sides": []
+},
+"CUR_MAP": {
+"after": null,
+"sides": []
+},
+"CVT": {
+"after": null,
+"sides": []
+},
+"D": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"DAM_BQTY": {
+"after": null,
+"sides": []
+},
+"DAM_COEF": {
+"after": null,
+"sides": []
+},
+"DAM_COST": {
+"after": "preppm.mod (inter-/extrapolation): cost parameters",
+"sides": []
+},
+"DAM_ELAST": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): where the balances need VAR_COMNET / VAR_COMPRD",
+"sides": []
+},
+"DAM_OBJ": {
+"after": null,
+"sides": []
+},
+"DAM_STEP": {
+"after": null,
+"sides": []
+},
+"DAM_TQTY": {
+"after": null,
+"sides": []
+},
+"DAM_TVOC": {
+"after": null,
+"sides": []
+},
+"DAM_VOC": {
+"after": null,
+"sides": []
+},
+"DATAYEAR": {
+"after": "coefmain.mod",
+"sides": []
+},
+"DEM": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"DEM_SECT": {
+"after": null,
+"sides": []
+},
+"DEM_SMAP": {
+"after": null,
+"sides": []
+},
+"DISTR": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): inter-regional exchange",
+"sides": []
+},
+"DMD": {
+"after": null,
+"sides": []
+},
+"DM_YEAR": {
+"after": "coefmain.mod",
+"sides": []
+},
+"DP_LOSD": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"DP_NON": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"DP_PSUD": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"DP_UNS": {
+"after": null,
+"sides": []
+},
+"DUMIMP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"E": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"EACHYEAR": {
+"after": "objective coefficients",
+"sides": []
+},
+"ELE": {
+"after": null,
+"sides": []
+},
+"ENV": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"ENV_BL": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"ENV_GRP": {
+"after": null,
+"sides": []
+},
+"ENV_MAP": {
+"after": null,
+"sides": []
+},
+"EOHYEAR": {
+"after": "init_ext.vda",
+"sides": []
+},
+"EOHYEARS": {
+"after": "objective coefficients",
+"sides": []
+},
+"FFCKS": {
+"after": null,
+"sides": []
+},
+"FIL": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): capacity bounds, availability periods, PRC_ACTFLO / PRC_CAPACT defaults",
+"sides": []
+},
+"FIL2": {
+"after": "preppm.mod (inter-/extrapolation): SHAPE / MULTI pointers (preshape.gms)",
+"sides": []
+},
+"FIN": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"FINEST": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): availability factors and peak contribution by timeslice",
+"sides": []
+},
+"FIN_GRP": {
+"after": null,
+"sides": []
+},
+"FIN_MAP": {
+"after": null,
+"sides": []
+},
+"FLO_ASHAR": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"FLO_BDLVL": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): bounds by timeslice; cumulative bounds",
+"sides": []
+},
+"FLO_BND": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"FLO_COST": {
+"after": "coefmain.mod",
+"sides": []
+},
+"FLO_CUM": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"FLO_DELIV": {
+"after": "coefmain.mod",
+"sides": []
+},
+"FLO_EFF": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): flow attributes by timeslice (and pp_chp.mod)",
+"sides": []
+},
+"FLO_EMIS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"FLO_FEQ": {
+"after": null,
+"sides": []
+},
+"FLO_FR": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): bounds by timeslice; cumulative bounds",
+"sides": []
+},
+"FLO_FUNC": {
+"after": "coefmain.mod",
+"sides": [
+"coef_ptr"
+]
+},
+"FLO_FUNCX": {
+"after": "coefmain.mod",
+"sides": []
+},
+"FLO_MARK": {
+"after": "preppm.mod (inter-/extrapolation): SHAPE / MULTI pointers (preshape.gms)",
+"sides": []
+},
+"FLO_PKCOI": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): inter-regional exchange",
+"sides": []
+},
+"FLO_SHAR": {
+"after": "retirement and refit controls",
+"sides": []
+},
+"FLO_SUB": {
+"after": "coefmain.mod",
+"sides": []
+},
+"FLO_SUM": {
+"after": "ppm_ext.vda",
+"sides": [
+"coef_ptr"
+]
+},
+"FLO_TAX": {
+"after": "coefmain.mod",
+"sides": []
+},
+"FORWARD": {
+"after": "init_ext.vda",
+"sides": []
+},
+"FPD": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"FSCK": {
+"after": null,
+"sides": []
+},
+"FSCKS": {
+"after": null,
+"sides": []
+},
+"FSTSL": {
+"after": null,
+"sides": []
+},
+"FS_EMCB": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"FS_EMIS": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"FS_EMIT": {
+"after": "coefmain.mod",
+"sides": []
+},
+"F_IN": {
+"after": null,
+"sides": []
+},
+"F_INOUT": {
+"after": null,
+"sides": []
+},
+"F_INOUTS": {
+"after": null,
+"sides": []
+},
+"F_IOS": {
+"after": null,
+"sides": []
+},
+"F_IOSET": {
+"after": null,
+"sides": []
+},
+"F_OUT": {
+"after": null,
+"sides": []
+},
+"F_VIO": {
+"after": null,
+"sides": []
+},
+"GG_ARC": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GG_DENS": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"GG_EDGE": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GG_GAMMA": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"GG_KGF": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GG_KLP": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"GG_LINK": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"GG_MM": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GG_O": {
+"after": "ppmain.mod (periods, timeslices, topology): control sets of the topology; storage processes",
+"sides": []
+},
+"GG_PP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GG_PPM": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GG_PPW": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"GG_PRBD": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"GG_RTC": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"GG_RTPC": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"GG_TOP": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"GG_VI": {
+"after": "init_ext.vda",
+"sides": []
+},
+"GG_WINK": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GG_WTX": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GR_ADMIT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): SHAPE / MULTI curves, defaults of the attributes not by timeslice",
+"sides": []
+},
+"GR_ADO": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GR_ALGMAP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): SHAPE / MULTI curves, defaults of the attributes not by timeslice",
+"sides": []
+},
+"GR_ALLMAP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): SHAPE / MULTI curves, defaults of the attributes not by timeslice",
+"sides": []
+},
+"GR_ARC": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GR_CANDID": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"GR_CAPUP": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"GR_CMAP": {
+"after": "init_ext.vda",
+"sides": []
+},
+"GR_DEMFR": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GR_DEMMAP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): SHAPE / MULTI curves, defaults of the attributes not by timeslice",
+"sides": []
+},
+"GR_ENDC": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): SHAPE / MULTI curves, defaults of the attributes not by timeslice",
+"sides": []
+},
+"GR_ENDFR": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GR_FLOW": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"GR_GENFR": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GR_GENLEV": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GR_GENMAP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GR_GENP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): SHAPE / MULTI curves, defaults of the attributes not by timeslice",
+"sides": []
+},
+"GR_GID": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"GR_GMAPC": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): SHAPE / MULTI curves, defaults of the attributes not by timeslice",
+"sides": []
+},
+"GR_GNALL": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): SHAPE / MULTI curves, defaults of the attributes not by timeslice",
+"sides": []
+},
+"GR_GRID": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"GR_PRCMAP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): SHAPE / MULTI curves, defaults of the attributes not by timeslice",
+"sides": []
+},
+"GR_PTDF": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GR_SUS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GR_THMIN": {
+"after": "init_ext.vda",
+"sides": []
+},
+"GR_TOP": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"GR_UNITS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"GR_VARGEN": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"GR_XBND": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"G_CHNGMONY": {
+"after": null,
+"sides": []
+},
+"G_CUREX": {
+"after": "preppm.mod (inter-/extrapolation): year sets, currencies, commodity costs, UC_COM, vintages",
+"sides": []
+},
+"G_CYCLE": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"G_DRATE": {
+"after": "objective coefficients",
+"sides": []
+},
+"G_OFFTHD": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): capacity bounds, availability periods, PRC_ACTFLO / PRC_CAPACT defaults",
+"sides": []
+},
+"G_RCUR": {
+"after": "objective coefficients",
+"sides": []
+},
+"G_RFRIR": {
+"after": "coefmain.mod",
+"sides": []
+},
+"G_UAMAT": {
+"after": null,
+"sides": []
+},
+"G_UANRG": {
+"after": null,
+"sides": []
+},
+"G_UCMAT": {
+"after": null,
+"sides": []
+},
+"G_UCNRG": {
+"after": null,
+"sides": []
+},
+"G_UDS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"G_UNCA": {
+"after": null,
+"sides": []
+},
+"G_YRFR": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): storage",
+"sides": []
+},
+"HPL": {
+"after": null,
+"sides": []
+},
+"IE_DEFAULT": {
+"after": "preppm.mod (inter-/extrapolation): extensions (prep_ext.vda)",
+"sides": []
+},
+"IMP": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"IMPEXP": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"IND": {
+"after": null,
+"sides": []
+},
+"INT_DEFAULT": {
+"after": "coefmain.mod",
+"sides": []
+},
+"INVSPRED": {
+"after": "objective coefficients",
+"sides": []
+},
+"INVSTEP": {
+"after": null,
+"sides": []
+},
+"IN_OUT": {
+"after": null,
+"sides": []
+},
+"IPD": {
+"after": "objective coefficients",
+"sides": []
+},
+"IPS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): storage",
+"sides": []
+},
+"IRE": {
+"after": "init_ext.vda",
+"sides": []
+},
+"IRELX": {
+"after": null,
+"sides": []
+},
+"IRENX": {
+"after": null,
+"sides": []
+},
+"IRE_BND": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): bounds by timeslice; cumulative bounds",
+"sides": []
+},
+"IRE_CCVT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): bounds by timeslice; cumulative bounds",
+"sides": []
+},
+"IRE_DIST": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): inter-regional exchange",
+"sides": []
+},
+"IRE_FLO": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): commodity balance types; conversion factors of trade",
+"sides": []
+},
+"IRE_FLOSUM": {
+"after": "objective coefficients",
+"sides": []
+},
+"IRE_PRICE": {
+"after": "coefmain.mod",
+"sides": []
+},
+"IRE_TSCVT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): bounds by timeslice; cumulative bounds",
+"sides": []
+},
+"IRE_XBND": {
+"after": "preppm.mod (inter-/extrapolation): bounds",
+"sides": []
+},
+"ITEM": {
+"after": null,
+"sides": []
+},
+"J": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"JS": {
+"after": "ppmain.mod (periods, timeslices, topology): timeslices (timslice.mod)",
+"sides": []
+},
+"JS_CCL": {
+"after": "ppmain.mod (periods, timeslices, topology): timeslices (timslice.mod)",
+"sides": []
+},
+"KAGE": {
+"after": "objective coefficients",
+"sides": []
+},
+"KEEP_FLOF": {
+"after": "ppm_ext.vda",
+"sides": [
+"coef_ptr"
+]
+},
+"KTYAGE": {
+"after": null,
+"sides": []
+},
+"K_EOH": {
+"after": "objective coefficients",
+"sides": []
+},
+"LAGT": {
+"after": "objective coefficients",
+"sides": []
+},
+"LASTLL": {
+"after": "ppmain.mod (periods, timeslices, topology): past investments, start years of new processes",
+"sides": []
+},
+"LEAD": {
+"after": "retirement and refit controls",
+"sides": []
+},
+"LIM": {
+"after": null,
+"sides": []
+},
+"LNX": {
+"after": null,
+"sides": []
+},
+"M": {
+"after": "objective coefficients",
+"sides": [
+"coef_ptr",
+"lvlus(UC_FLO)"
+]
+},
+"MAT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): commodity balance types; conversion factors of trade",
+"sides": []
+},
+"MATPRC": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of regions, processes, commodities; primary groups",
+"sides": []
+},
+"MAT_GMAP": {
+"after": null,
+"sides": []
+},
+"MAT_GRP": {
+"after": null,
+"sides": []
+},
+"MAT_TMAP": {
+"after": null,
+"sides": []
+},
+"MAT_TYPE": {
+"after": null,
+"sides": []
+},
+"MAT_VOL": {
+"after": null,
+"sides": []
+},
+"MAT_WT": {
+"after": null,
+"sides": []
+},
+"MILESTONYR": {
+"after": "pp_qack.mod (final control sets)",
+"sides": [
+"lvlus(UC_FLO)"
+]
+},
+"MIYR_1": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"MIYR_L": {
+"after": "ppmain.mod (periods, timeslices, topology): periods and years",
+"sides": []
+},
+"MI_DMAS": {
+"after": null,
+"sides": []
+},
+"MODLYEAR": {
+"after": "pp_qack.mod (final control sets)",
+"sides": [
+"coef_ptr"
+]
+},
+"MREG": {
+"after": null,
+"sides": []
+},
+"MULTI": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"MY_ARRAY": {
+"after": null,
+"sides": []
+},
+"MY_FIL": {
+"after": "preppm.mod (inter-/extrapolation): SHAPE / MULTI pointers (preshape.gms)",
+"sides": []
+},
+"MY_FIL2": {
+"after": null,
+"sides": []
+},
+"MY_TS": {
+"after": null,
+"sides": []
+},
+"NCAP_AF": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"NCAP_AFA": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_AFAC": {
+"after": "preppm.mod (inter-/extrapolation): extensions (prep_ext.vda)",
+"sides": []
+},
+"NCAP_AFBX": {
+"after": null,
+"sides": []
+},
+"NCAP_AFC": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"NCAP_AFCS": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"NCAP_AFM": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_AFS": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_AFSM": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_AFSX": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_AFX": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_BND": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"NCAP_BPME": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): flow attributes by timeslice (and pp_chp.mod)",
+"sides": []
+},
+"NCAP_CDME": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): flow attributes by timeslice (and pp_chp.mod)",
+"sides": []
+},
+"NCAP_CEH": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"NCAP_CHPR": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"NCAP_CLAG": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_CLED": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_COM": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_COST": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_CPX": {
+"after": "objective coefficients",
+"sides": []
+},
+"NCAP_DCOST": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_DELIF": {
+"after": "objective coefficients",
+"sides": []
+},
+"NCAP_DISC": {
+"after": "init_ext.vda",
+"sides": []
+},
+"NCAP_DLAG": {
+"after": "objective coefficients",
+"sides": []
+},
+"NCAP_DLAGC": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_DLIFE": {
+"after": "objective coefficients",
+"sides": []
+},
+"NCAP_DRATE": {
+"after": "objective coefficients",
+"sides": []
+},
+"NCAP_ELIFE": {
+"after": "objective coefficients",
+"sides": []
+},
+"NCAP_FDR": {
+"after": "objective coefficients",
+"sides": []
+},
+"NCAP_FOM": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_FOMM": {
+"after": "objective coefficients",
+"sides": []
+},
+"NCAP_FOMX": {
+"after": "objective coefficients",
+"sides": []
+},
+"NCAP_FSUB": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_FSUBM": {
+"after": "objective coefficients",
+"sides": []
+},
+"NCAP_FSUBX": {
+"after": "objective coefficients",
+"sides": []
+},
+"NCAP_FTAX": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_FTAXM": {
+"after": "objective coefficients",
+"sides": []
+},
+"NCAP_FTAXX": {
+"after": "objective coefficients",
+"sides": []
+},
+"NCAP_ICOM": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_ILED": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"NCAP_ISPCT": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_ISUB": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_ITAX": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NCAP_LCOST": {
+"after": null,
+"sides": []
+},
+"NCAP_LFOM": {
+"after": null,
+"sides": []
+},
+"NCAP_MSPRF": {
+"after": null,
+"sides": []
+},
+"NCAP_OCOM": {
+"after": "objective coefficients",
+"sides": []
+},
+"NCAP_OLIFE": {
+"after": "retirement and refit controls",
+"sides": []
+},
+"NCAP_PASTI": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"NCAP_PASTY": {
+"after": "ppmain.mod (periods, timeslices, topology): periods and years",
+"sides": []
+},
+"NCAP_PKCNT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): flow attributes by timeslice (and pp_chp.mod)",
+"sides": []
+},
+"NCAP_SEMI": {
+"after": "init_ext.vda",
+"sides": []
+},
+"NCAP_START": {
+"after": "ppmain.mod (periods, timeslices, topology): past investments, start years of new processes",
+"sides": []
+},
+"NCAP_TLIFE": {
+"after": "objective coefficients",
+"sides": []
+},
+"NCAP_VALU": {
+"after": "objective coefficients",
+"sides": []
+},
+"NCAP_YES": {
+"after": null,
+"sides": []
+},
+"NE": {
+"after": "coefmain.mod",
+"sides": []
+},
+"NONSET": {
+"after": null,
+"sides": []
+},
+"NORTS": {
+"after": "ppmain.mod (periods, timeslices, topology): timeslices (timslice.mod)",
+"sides": []
+},
+"NO_ACT": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"NO_RT": {
+"after": null,
+"sides": []
+},
+"NO_RVP": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"NRG": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): commodity balance types; conversion factors of trade",
+"sides": []
+},
+"NRGELC": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"NRGFOS": {
+"after": null,
+"sides": []
+},
+"NRGHET": {
+"after": null,
+"sides": []
+},
+"NRGREN": {
+"after": null,
+"sides": []
+},
+"NRGSYN": {
+"after": null,
+"sides": []
+},
+"NRG_FMAP": {
+"after": null,
+"sides": []
+},
+"NRG_FORM": {
+"after": null,
+"sides": []
+},
+"NRG_GMAP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"NRG_GRID": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"NRG_TMAP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): commodity balance types; conversion factors of trade",
+"sides": []
+},
+"NRG_TYPE": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): flow attributes by timeslice (and pp_chp.mod)",
+"sides": []
+},
+"NST": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): timeslices of the flow variables",
+"sides": []
+},
+"OBJANN": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJSCC": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"OBJSIC": {
+"after": null,
+"sides": []
+},
+"OBJ_1A": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_1B": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_2A": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"OBJ_2B": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_ALTV": {
+"after": null,
+"sides": []
+},
+"OBJ_BLNDV": {
+"after": null,
+"sides": []
+},
+"OBJ_CDEC": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_CFIX": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"OBJ_CINV": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"OBJ_COMNT": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_COMPD": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_CRF": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_CRFD": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_DCEOH": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"OBJ_DISC": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_DIVI": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_DIVIII": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_DIVIV": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_FCUR": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_FSUB": {
+"after": "coefmain.mod",
+"sides": []
+},
+"OBJ_I2": {
+"after": null,
+"sides": []
+},
+"OBJ_IAD": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"OBJ_ICUR": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"OBJ_IDC": {
+"after": null,
+"sides": []
+},
+"OBJ_IPRIC": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"OBJ_JD": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_LIFE": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_LINT": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"OBJ_PASTI": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"OBJ_PVT": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_RFR": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_SALI": {
+"after": null,
+"sides": []
+},
+"OBJ_SPRED": {
+"after": null,
+"sides": []
+},
+"OBJ_SUMII": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_SUMIII": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_SUMIV": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_SUMIVS": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_SUMS": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"OBJ_SUMS3": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_SUMSI": {
+"after": null,
+"sides": []
+},
+"OBJ_VFLO": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_WD": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBJ_YES": {
+"after": "objective coefficients",
+"sides": []
+},
+"OBV": {
+"after": null,
+"sides": []
+},
+"OB_ACT": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"OB_COM": {
+"after": null,
+"sides": []
+},
+"OB_DCC": {
+"after": "objective coefficients",
+"sides": []
+},
+"OB_DLC": {
+"after": "objective coefficients",
+"sides": []
+},
+"OB_FCOS": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"OB_FDEL": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"OB_FOM": {
+"after": "objective coefficients",
+"sides": []
+},
+"OB_FSB": {
+"after": "objective coefficients",
+"sides": []
+},
+"OB_FTAX": {
+"after": "objective coefficients",
+"sides": []
+},
+"OB_FTX": {
+"after": "objective coefficients",
+"sides": []
+},
+"OB_ICOST": {
+"after": "objective coefficients",
+"sides": []
+},
+"OB_IRE": {
+"after": null,
+"sides": []
+},
+"OB_ISUB": {
+"after": "objective coefficients",
+"sides": []
+},
+"OB_ITAX": {
+"after": "objective coefficients",
+"sides": []
+},
+"OMG": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"OPR": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"OPYEAR": {
+"after": "objective coefficients",
+"sides": []
+},
+"OTHCOM": {
+"after": null,
+"sides": []
+},
+"OTHD": {
+"after": null,
+"sides": []
+},
+"PAR_ACTC": {
+"after": null,
+"sides": []
+},
+"PAR_ACTL": {
+"after": null,
+"sides": []
+},
+"PAR_ACTM": {
+"after": null,
+"sides": []
+},
+"PAR_CAPBD": {
+"after": null,
+"sides": []
+},
+"PAR_CAPL": {
+"after": null,
+"sides": []
+},
+"PAR_CAPM": {
+"after": null,
+"sides": []
+},
+"PAR_COMBALEM": {
+"after": null,
+"sides": []
+},
+"PAR_COMBALGM": {
+"after": null,
+"sides": []
+},
+"PAR_COMC": {
+"after": null,
+"sides": []
+},
+"PAR_COMNETL": {
+"after": null,
+"sides": []
+},
+"PAR_COMNETM": {
+"after": null,
+"sides": []
+},
+"PAR_COMPRDL": {
+"after": null,
+"sides": []
+},
+"PAR_COMPRDM": {
+"after": null,
+"sides": []
+},
+"PAR_CUMCST": {
+"after": null,
+"sides": []
+},
+"PAR_CUMFLOL": {
+"after": null,
+"sides": []
+},
+"PAR_CUMFLOM": {
+"after": null,
+"sides": []
+},
+"PAR_CUMRET": {
+"after": null,
+"sides": []
+},
+"PAR_EOUT": {
+"after": null,
+"sides": []
+},
+"PAR_FLO": {
+"after": null,
+"sides": []
+},
+"PAR_FLOC": {
+"after": null,
+"sides": []
+},
+"PAR_FLOM": {
+"after": null,
+"sides": []
+},
+"PAR_IPRIC": {
+"after": null,
+"sides": []
+},
+"PAR_IRE": {
+"after": null,
+"sides": []
+},
+"PAR_IREM": {
+"after": null,
+"sides": []
+},
+"PAR_NCAPL": {
+"after": null,
+"sides": []
+},
+"PAR_NCAPM": {
+"after": null,
+"sides": []
+},
+"PAR_NCAPR": {
+"after": null,
+"sides": []
+},
+"PAR_OBJACT": {
+"after": null,
+"sides": []
+},
+"PAR_OBJBLE": {
+"after": null,
+"sides": []
+},
+"PAR_OBJCAP": {
+"after": null,
+"sides": []
+},
+"PAR_OBJCOM": {
+"after": null,
+"sides": []
+},
+"PAR_OBJDEC": {
+"after": null,
+"sides": []
+},
+"PAR_OBJELS": {
+"after": null,
+"sides": []
+},
+"PAR_OBJFIX": {
+"after": null,
+"sides": []
+},
+"PAR_OBJFLO": {
+"after": null,
+"sides": []
+},
+"PAR_OBJINV": {
+"after": null,
+"sides": []
+},
+"PAR_OBJLAT": {
+"after": null,
+"sides": []
+},
+"PAR_OBJSAL": {
+"after": null,
+"sides": []
+},
+"PAR_PASTI": {
+"after": null,
+"sides": []
+},
+"PAR_PEAKM": {
+"after": null,
+"sides": []
+},
+"PAR_RCMX": {
+"after": null,
+"sides": []
+},
+"PAR_RPMX": {
+"after": null,
+"sides": []
+},
+"PAR_RTCS": {
+"after": null,
+"sides": []
+},
+"PAR_TOP": {
+"after": null,
+"sides": []
+},
+"PAR_UCMAX": {
+"after": null,
+"sides": []
+},
+"PAR_UCMRK": {
+"after": null,
+"sides": []
+},
+"PAR_UCRTP": {
+"after": null,
+"sides": []
+},
+"PAR_UCSL": {
+"after": null,
+"sides": []
+},
+"PAR_UCSM": {
+"after": null,
+"sides": []
+},
+"PAR_XPRI": {
+"after": null,
+"sides": []
+},
+"PASTCV": {
+"after": null,
+"sides": []
+},
+"PASTMILE": {
+"after": "objective coefficients",
+"sides": []
+},
+"PASTSUM": {
+"after": null,
+"sides": []
+},
+"PASTYEAR": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"PEAKDA_BL": {
+"after": null,
+"sides": []
+},
+"PERDINV": {
+"after": "coefmain.mod",
+"sides": []
+},
+"PERIODYR": {
+"after": "objective coefficients",
+"sides": []
+},
+"PG_SMAP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of regions, processes, commodities; primary groups",
+"sides": []
+},
+"PHYR": {
+"after": "coefmain.mod",
+"sides": []
+},
+"PLUSET": {
+"after": null,
+"sides": []
+},
+"PRC": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"PRC_ACT": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"PRC_ACTFLO": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"PRC_ACTUNT": {
+"after": "ppmain.mod (periods, timeslices, topology): control sets of the topology; storage processes",
+"sides": []
+},
+"PRC_AOFF": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): capacity bounds, availability periods, PRC_ACTFLO / PRC_CAPACT defaults",
+"sides": []
+},
+"PRC_CAP": {
+"after": "retirement and refit controls",
+"sides": []
+},
+"PRC_CAPACT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"PRC_CAPUNT": {
+"after": null,
+"sides": []
+},
+"PRC_CG": {
+"after": "coef_ext.vda",
+"sides": [
+"coef_ptr"
+]
+},
+"PRC_DESC": {
+"after": null,
+"sides": []
+},
+"PRC_DSCNCAP": {
+"after": "init_ext.vda",
+"sides": []
+},
+"PRC_DYNUC": {
+"after": "preppm.mod (inter-/extrapolation): SHAPE / MULTI pointers (preshape.gms)",
+"sides": []
+},
+"PRC_FOFF": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): capacity bounds, availability periods, PRC_ACTFLO / PRC_CAPACT defaults",
+"sides": []
+},
+"PRC_GMAP": {
+"after": null,
+"sides": []
+},
+"PRC_GRP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): inter-regional exchange",
+"sides": []
+},
+"PRC_MAP": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"PRC_MARK": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): inter-regional exchange",
+"sides": []
+},
+"PRC_NOFF": {
+"after": "ppmain.mod (periods, timeslices, topology): past investments, start years of new processes",
+"sides": []
+},
+"PRC_NSTTS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): storage",
+"sides": []
+},
+"PRC_PKAF": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): availability factors and peak contribution by timeslice",
+"sides": []
+},
+"PRC_PKNO": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): flow attributes by timeslice (and pp_chp.mod)",
+"sides": []
+},
+"PRC_RCAP": {
+"after": "objective coefficients",
+"sides": []
+},
+"PRC_REACT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"PRC_REFIT": {
+"after": "objective coefficients",
+"sides": []
+},
+"PRC_RESID": {
+"after": "objective coefficients",
+"sides": []
+},
+"PRC_RMAP": {
+"after": null,
+"sides": []
+},
+"PRC_RSOURC": {
+"after": null,
+"sides": []
+},
+"PRC_SC": {
+"after": "coefmain.mod",
+"sides": []
+},
+"PRC_SEMI": {
+"after": "init_ext.vda",
+"sides": []
+},
+"PRC_SGL": {
+"after": "coef_ext.vda",
+"sides": [
+"lvlus(UC_FLO)"
+]
+},
+"PRC_SIMV": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): capacity bounds, availability periods, PRC_ACTFLO / PRC_CAPACT defaults",
+"sides": []
+},
+"PRC_SPG": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"PRC_STGIPS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): storage",
+"sides": []
+},
+"PRC_STGTSS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"PRC_TS": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"PRC_TS2": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the variables (pp_reduce.red)",
+"sides": []
+},
+"PRC_TSL": {
+"after": "bounds, AFS, UC maps",
+"sides": [
+"coef_ptr",
+"lvlus(UC_FLO)"
+]
+},
+"PRC_VINT": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"PRC_YMAX": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): timeslices of the flow variables",
+"sides": []
+},
+"PRC_YMIN": {
+"after": null,
+"sides": []
+},
+"PRE": {
+"after": null,
+"sides": []
+},
+"PREMILE": {
+"after": null,
+"sides": []
+},
+"PRV": {
+"after": "ppmain.mod (periods, timeslices, topology): periods and years",
+"sides": []
+},
+"PRW": {
+"after": null,
+"sides": []
+},
+"PYR_S": {
+"after": "objective coefficients",
+"sides": []
+},
+"P_OUT": {
+"after": null,
+"sides": []
+},
+"QASTAT": {
+"after": null,
+"sides": []
+},
+"RB": {
+"after": "coefmain.mod",
+"sides": []
+},
+"RC": {
+"after": "coef_ext.vda",
+"sides": [
+"coef_ptr"
+]
+},
+"RCAP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): capacity bounds, availability periods, PRC_ACTFLO / PRC_CAPACT defaults",
+"sides": []
+},
+"RCAP_BLK": {
+"after": "retirement and refit controls",
+"sides": []
+},
+"RCAP_BND": {
+"after": "retirement and refit controls",
+"sides": []
+},
+"RCAP_OCAP": {
+"after": "retirement and refit controls",
+"sides": []
+},
+"RCJ": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): timeslice fractions; elastic demands",
+"sides": []
+},
+"RCS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): availability factors and peak contribution by timeslice",
+"sides": []
+},
+"RCS_COMBAL": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RCS_COMPRD": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the variables (pp_reduce.red)",
+"sides": []
+},
+"RCS_COMTS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): timeslice fractions; elastic demands",
+"sides": []
+},
+"RC_AGP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): storage",
+"sides": []
+},
+"RC_CUMCOM": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RC_GRID": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): SHAPE / MULTI curves, defaults of the attributes not by timeslice",
+"sides": []
+},
+"RC_IOP": {
+"after": null,
+"sides": []
+},
+"RC_RC": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): commodity balance types; conversion factors of trade",
+"sides": []
+},
+"RDCUR": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RD_AGG": {
+"after": null,
+"sides": []
+},
+"RD_NLP": {
+"after": null,
+"sides": []
+},
+"RD_SHAR": {
+"after": null,
+"sides": []
+},
+"REF": {
+"after": null,
+"sides": []
+},
+"REFUNIT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"REG": {
+"after": "pp_qack.mod (final control sets)",
+"sides": [
+"lvlus(UC_FLO)"
+]
+},
+"REG_ACOST": {
+"after": null,
+"sides": []
+},
+"REG_ACT": {
+"after": null,
+"sides": []
+},
+"REG_BDNCAP": {
+"after": null,
+"sides": []
+},
+"REG_BNDCST": {
+"after": "objective coefficients",
+"sides": []
+},
+"REG_CUMCST": {
+"after": "objective coefficients",
+"sides": []
+},
+"REG_FIXT": {
+"after": null,
+"sides": []
+},
+"REG_GRP": {
+"after": null,
+"sides": []
+},
+"REG_IREC": {
+"after": null,
+"sides": []
+},
+"REG_OBJ": {
+"after": null,
+"sides": []
+},
+"REG_RMAP": {
+"after": null,
+"sides": []
+},
+"REG_WOBJ": {
+"after": null,
+"sides": []
+},
+"RENEW": {
+"after": null,
+"sides": []
+},
+"RES": {
+"after": null,
+"sides": []
+},
+"RHS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"RHS_COMBAL": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RHS_COMPRD": {
+"after": "objective coefficients",
+"sides": []
+},
+"RJLVL": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"RJ_SL": {
+"after": "ppmain.mod (periods, timeslices, topology): timeslices (timslice.mod)",
+"sides": []
+},
+"RLUP": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RMKC": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): flow attributes by timeslice (and pp_chp.mod)",
+"sides": []
+},
+"RNGLIM": {
+"after": null,
+"sides": []
+},
+"RNGMAP": {
+"after": null,
+"sides": []
+},
+"RP": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RPC": {
+"after": "coef_ext.vda",
+"sides": [
+"coef_ptr"
+]
+},
+"RPCC_FFUNC": {
+"after": "retirement and refit controls",
+"sides": [
+"coef_ptr"
+]
+},
+"RPCG_ASHAR": {
+"after": "retirement and refit controls",
+"sides": []
+},
+"RPCG_PTRAN": {
+"after": "coef_ext.vda",
+"sides": [
+"coef_ptr"
+]
+},
+"RPCS_VAR": {
+"after": "bounds, AFS, UC maps",
+"sides": [
+"coef_ptr",
+"lvlus(UC_FLO)"
+]
+},
+"RPC_ACE": {
+"after": "coefmain.mod",
+"sides": []
+},
+"RPC_ACT": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RPC_AFLO": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"RPC_AIRE": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the variables (pp_reduce.red)",
+"sides": []
+},
+"RPC_CAPFLO": {
+"after": "coefmain.mod",
+"sides": []
+},
+"RPC_CONLY": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RPC_CUMFLO": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RPC_CUR": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RPC_EMIS": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RPC_EQIRE": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RPC_FFUNC": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RPC_IRE": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RPC_IREIN": {
+"after": null,
+"sides": []
+},
+"RPC_IREIO": {
+"after": "coefmain.mod",
+"sides": []
+},
+"RPC_LS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"RPC_MARKET": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): commodity balance types; conversion factors of trade",
+"sides": []
+},
+"RPC_NOFLO": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RPC_PG": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"RPC_PKC": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the variables (pp_reduce.red)",
+"sides": []
+},
+"RPC_PKF": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"RPC_SPG": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"RPC_STG": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"RPC_STGN": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"RPG_1ACE": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"RPG_ACE": {
+"after": "coefmain.mod",
+"sides": []
+},
+"RPG_AFCX": {
+"after": "coefmain.mod",
+"sides": []
+},
+"RPG_PACE": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RPG_RED": {
+"after": "solve.stp (the steps of a myopic run)",
+"sides": []
+},
+"RPM": {
+"after": null,
+"sides": []
+},
+"RPS_CAFLAC": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RPS_PRCTS": {
+"after": "coefmain.mod",
+"sides": []
+},
+"RPS_S1": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"RPS_S2": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"RPS_STG": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RPS_UPS": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RPT_OPT": {
+"after": "coefmain.mod",
+"sides": []
+},
+"RP_AFB": {
+"after": "coefmain.mod",
+"sides": []
+},
+"RP_AIRE": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"RP_CCG": {
+"after": null,
+"sides": []
+},
+"RP_CGC": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"RP_CGG": {
+"after": null,
+"sides": []
+},
+"RP_DCGG": {
+"after": null,
+"sides": []
+},
+"RP_DP": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RP_DPL": {
+"after": null,
+"sides": []
+},
+"RP_FLO": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RP_GIC": {
+"after": null,
+"sides": []
+},
+"RP_GRID": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RP_GRP": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"RP_INOUT": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"RP_IRE": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"RP_NRG": {
+"after": null,
+"sides": []
+},
+"RP_PG": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"RP_PGACT": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"RP_PGFLO": {
+"after": "retirement and refit controls",
+"sides": []
+},
+"RP_PGTYPE": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"RP_PL": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RP_PRC": {
+"after": "coefmain.mod",
+"sides": []
+},
+"RP_RTF": {
+"after": "retirement and refit controls",
+"sides": []
+},
+"RP_SGS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"RP_STD": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"RP_STG": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RP_STL": {
+"after": "retirement and refit controls",
+"sides": []
+},
+"RP_STS": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RP_UPC": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RP_UPL": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RP_UPR": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RP_UPS": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RP_UPT": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"RP_UX": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RP_XRED": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RREG": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): commodity balance types; conversion factors of trade",
+"sides": []
+},
+"RS": {
+"after": null,
+"sides": []
+},
+"RS_BELOW": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RS_BELOW1": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RS_FR": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): availability factors and peak contribution by timeslice",
+"sides": []
+},
+"RS_HR": {
+"after": "ppmain.mod (periods, timeslices, topology): timeslices (timslice.mod)",
+"sides": []
+},
+"RS_MODUS": {
+"after": "ppmain.mod (periods, timeslices, topology): timeslices (timslice.mod)",
+"sides": []
+},
+"RS_PREV": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"RS_STG": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"RS_STGAV": {
+"after": "ppmain.mod (periods, timeslices, topology): past investments, start years of new processes",
+"sides": []
+},
+"RS_STGPRD": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RS_TREE": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): availability factors and peak contribution by timeslice",
+"sides": []
+},
+"RS_TSLVL": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"RS_UP": {
+"after": "ppmain.mod (periods, timeslices, topology): timeslices (timslice.mod)",
+"sides": []
+},
+"RTC": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RTCS_FR": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): availability factors and peak contribution by timeslice",
+"sides": []
+},
+"RTCS_SING": {
+"after": null,
+"sides": []
+},
+"RTCS_VARC": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RTC_NET": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): storage",
+"sides": []
+},
+"RTC_PRD": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): storage",
+"sides": []
+},
+"RTC_SHED": {
+"after": null,
+"sides": []
+},
+"RTFORC": {
+"after": "retirement and refit controls",
+"sides": []
+},
+"RTP": {
+"after": "pp_qack.mod (final control sets)",
+"sides": [
+"coef_ptr"
+]
+},
+"RTPC": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RTPCS_OUT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the variables (pp_reduce.red)",
+"sides": []
+},
+"RTPCS_VARF": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RTPGIG": {
+"after": null,
+"sides": []
+},
+"RTPS_BD": {
+"after": null,
+"sides": []
+},
+"RTPS_OFF": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RTPX": {
+"after": null,
+"sides": []
+},
+"RTP_CAPVL": {
+"after": "objective coefficients",
+"sides": []
+},
+"RTP_CAPYR": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"RTP_CG": {
+"after": null,
+"sides": []
+},
+"RTP_CGC": {
+"after": null,
+"sides": []
+},
+"RTP_CPTYR": {
+"after": "objective coefficients",
+"sides": []
+},
+"RTP_CPX": {
+"after": "objective coefficients",
+"sides": []
+},
+"RTP_FFCX": {
+"after": "coefmain.mod",
+"sides": []
+},
+"RTP_GRP": {
+"after": null,
+"sides": []
+},
+"RTP_IAN": {
+"after": null,
+"sides": []
+},
+"RTP_ISHPR": {
+"after": "objective coefficients",
+"sides": []
+},
+"RTP_MRK": {
+"after": null,
+"sides": []
+},
+"RTP_NPV": {
+"after": null,
+"sides": []
+},
+"RTP_OBJ": {
+"after": null,
+"sides": []
+},
+"RTP_OFF": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RTP_PL": {
+"after": null,
+"sides": []
+},
+"RTP_SHAPE": {
+"after": "objective coefficients",
+"sides": []
+},
+"RTP_SHAPI": {
+"after": null,
+"sides": []
+},
+"RTP_TT": {
+"after": "retirement and refit controls",
+"sides": []
+},
+"RTP_VARA": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RTP_VARP": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RTP_VINTYR": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RTP_VNTBYR": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RTTC": {
+"after": null,
+"sides": []
+},
+"RTX_MARK": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): inter-regional exchange",
+"sides": []
+},
+"RTX_MRK": {
+"after": null,
+"sides": []
+},
+"RT_IAN": {
+"after": "objective coefficients",
+"sides": []
+},
+"RT_PP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): years of the horizon and of late costs",
+"sides": []
+},
+"RUCTS": {
+"after": null,
+"sides": []
+},
+"RU_CVT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"RU_FEQ": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"RVP": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"RVPCSL": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"RVPRL": {
+"after": "objective coefficients",
+"sides": []
+},
+"RVPS": {
+"after": null,
+"sides": []
+},
+"RVPT": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"RVP_KMAP": {
+"after": "solve.stp (the steps of a myopic run)",
+"sides": []
+},
+"RVT": {
+"after": null,
+"sides": []
+},
+"RVTPC": {
+"after": null,
+"sides": []
+},
+"RXX": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"RX_MARK": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): inter-regional exchange",
+"sides": []
+},
+"R_CUREX": {
+"after": "preppm.mod (inter-/extrapolation): year sets, currencies, commodity costs, UC_COM, vintages",
+"sides": []
+},
+"R_DF": {
+"after": "coefmain.mod",
+"sides": []
+},
+"R_UC": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the variables (pp_reduce.red)",
+"sides": []
+},
+"R_UCT": {
+"after": null,
+"sides": []
+},
+"SALV_DEC": {
+"after": "objective coefficients",
+"sides": []
+},
+"SALV_INV": {
+"after": "objective coefficients",
+"sides": []
+},
+"SECTORTIMESREPORT": {
+"after": null,
+"sides": []
+},
+"SERVICETIMESREPORT": {
+"after": null,
+"sides": []
+},
+"SHAPE": {
+"after": "objective coefficients",
+"sides": []
+},
+"SHAPED": {
+"after": null,
+"sides": []
+},
+"SHEDJ": {
+"after": null,
+"sides": []
+},
+"SIDE": {
+"after": "objective coefficients",
+"sides": [
+"lvlus(UC_FLO)"
+]
+},
+"SOLVESTAT": {
+"after": null,
+"sides": []
+},
+"SOW": {
+"after": "coefmain.mod",
+"sides": []
+},
+"SPE": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"STG": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"STGIN_BND": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"STGOUT_BND": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"STG_CHRG": {
+"after": "preppm.mod (inter-/extrapolation): standard parameters (fillparm)",
+"sides": []
+},
+"STG_EFF": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): commodity attributes by timeslice",
+"sides": []
+},
+"STG_LOSS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"STG_MAXCYC": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"STG_SIFT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"STL": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"STOA": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"STOAL": {
+"after": "bounds, AFS, UC maps",
+"sides": [
+"lvlus(UC_FLO)"
+]
+},
+"STS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): timeslices of the processes",
+"sides": []
+},
+"SUBSECTORTIMESREPORT": {
+"after": null,
+"sides": []
+},
+"SUBT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of regions, processes, commodities; primary groups",
+"sides": []
+},
+"SUCMAP": {
+"after": null,
+"sides": []
+},
+"SUM_OBJ": {
+"after": null,
+"sides": []
+},
+"SUPERYR": {
+"after": null,
+"sides": []
+},
+"SW_T": {
+"after": "coefmain.mod",
+"sides": []
+},
+"SYSINV": {
+"after": null,
+"sides": []
+},
+"SYSONE": {
+"after": null,
+"sides": []
+},
+"SYSPLIT": {
+"after": null,
+"sides": []
+},
+"SYSUC": {
+"after": null,
+"sides": []
+},
+"SYSUCMAP": {
+"after": null,
+"sides": []
+},
+"TECHGROUPTIMESREPORT": {
+"after": null,
+"sides": []
+},
+"TM_RESULT": {
+"after": null,
+"sides": []
+},
+"TOP": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"TOP_IRE": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"TPULSE": {
+"after": "objective coefficients",
+"sides": []
+},
+"TPULSEYR": {
+"after": "coefmain.mod",
+"sides": []
+},
+"TRACKC": {
+"after": "ppmain.mod (periods, timeslices, topology): control sets of the topology; storage processes",
+"sides": []
+},
+"TRACKP": {
+"after": "ppmain.mod (periods, timeslices, topology): past investments, start years of new processes",
+"sides": []
+},
+"TRACKPC": {
+"after": "ppmain.mod (periods, timeslices, topology): control sets of the topology; storage processes",
+"sides": []
+},
+"TRACKPG": {
+"after": null,
+"sides": []
+},
+"TRN": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): storage",
+"sides": []
+},
+"TSLVL": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"TSLVLNUM": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"TS_ANN": {
+"after": "objective coefficients",
+"sides": []
+},
+"TS_ARRAY": {
+"after": null,
+"sides": []
+},
+"TS_BD": {
+"after": null,
+"sides": []
+},
+"TS_CYCLE": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"TS_GROUP": {
+"after": "bounds, AFS, UC maps",
+"sides": [
+"coef_ptr"
+]
+},
+"TS_MAP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): where the balances need VAR_COMNET / VAR_COMPRD",
+"sides": [
+"coef_ptr"
+]
+},
+"TS_OFF": {
+"after": "ppmain.mod (periods, timeslices, topology): timeslices (timslice.mod)",
+"sides": []
+},
+"UC_ACT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"UC_ACTBET": {
+"after": "init_ext.vda",
+"sides": []
+},
+"UC_ANNUL": {
+"after": null,
+"sides": []
+},
+"UC_ATTR": {
+"after": "objective coefficients",
+"sides": []
+},
+"UC_CAP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"UC_CAPFLO": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"UC_COM": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"UC_COMCON": {
+"after": "preppm.mod (inter-/extrapolation): year sets, currencies, commodity costs, UC_COM, vintages",
+"sides": []
+},
+"UC_COMNET": {
+"after": "preppm.mod (inter-/extrapolation): year sets, currencies, commodity costs, UC_COM, vintages",
+"sides": []
+},
+"UC_COMPRD": {
+"after": "preppm.mod (inter-/extrapolation): year sets, currencies, commodity costs, UC_COM, vintages",
+"sides": []
+},
+"UC_CONST": {
+"after": null,
+"sides": []
+},
+"UC_COST": {
+"after": null,
+"sides": []
+},
+"UC_CUMACT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): bounds by timeslice; cumulative bounds",
+"sides": []
+},
+"UC_CUMCOM": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): where the balances need VAR_COMNET / VAR_COMPRD",
+"sides": []
+},
+"UC_CUMFLO": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): where the balances need VAR_COMNET / VAR_COMPRD",
+"sides": []
+},
+"UC_DS": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"UC_DT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"UC_DYNBD": {
+"after": null,
+"sides": []
+},
+"UC_DYNBND": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"UC_DYNDIR": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"UC_DYNT": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"UC_FLO": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": [
+"lvlus(UC_FLO)"
+]
+},
+"UC_FLOBET": {
+"after": "preppm.mod (inter-/extrapolation): extensions (prep_ext.vda)",
+"sides": []
+},
+"UC_GMAP_C": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"UC_GMAP_P": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"UC_GMAP_U": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"UC_GRPTYPE": {
+"after": null,
+"sides": []
+},
+"UC_ICOST": {
+"after": "objective coefficients",
+"sides": []
+},
+"UC_IRE": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"UC_JMAP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"UC_MAPCOST": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"UC_MAP_FLO": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"UC_MAP_IRE": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"UC_MARKS": {
+"after": null,
+"sides": []
+},
+"UC_N": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"UC_NAME": {
+"after": null,
+"sides": []
+},
+"UC_NCAP": {
+"after": "objective coefficients",
+"sides": []
+},
+"UC_NEWFLO": {
+"after": null,
+"sides": []
+},
+"UC_NUMBER": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"UC_ON": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"UC_PERDS": {
+"after": null,
+"sides": []
+},
+"UC_QAFLO": {
+"after": null,
+"sides": []
+},
+"UC_RHS": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"UC_RHSMAP": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"UC_RHSR": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"UC_RHSRS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"UC_RHSRT": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"UC_RHSRTS": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"UC_RHSS": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): user constraints",
+"sides": []
+},
+"UC_RHST": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"UC_RHSTMP": {
+"after": null,
+"sides": []
+},
+"UC_RHSTS": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"UC_RTSUC": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"UC_R_EACH": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"UC_R_SUM": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"UC_SIGN": {
+"after": null,
+"sides": []
+},
+"UC_T": {
+"after": "init_ext.vda",
+"sides": []
+},
+"UC_TIME": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"UC_TMAP": {
+"after": null,
+"sides": []
+},
+"UC_TSL": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"UC_TS_EACH": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"UC_TS_SUM": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"UC_T_EACH": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"UC_T_SUCC": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"UC_T_SUM": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): control sets of the commodity balances; blending",
+"sides": []
+},
+"UC_UCN": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"UC_UT": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"UC_UTS": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"UNCD1": {
+"after": null,
+"sides": []
+},
+"UNCD7": {
+"after": null,
+"sides": []
+},
+"UNIT": {
+"after": null,
+"sides": []
+},
+"UNITS": {
+"after": null,
+"sides": []
+},
+"UNITS_ACT": {
+"after": null,
+"sides": []
+},
+"UNITS_CAP": {
+"after": null,
+"sides": []
+},
+"UNITS_COM": {
+"after": null,
+"sides": []
+},
+"UNITS_MONY": {
+"after": null,
+"sides": []
+},
+"UPT": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"VAL_FLO": {
+"after": null,
+"sides": []
+},
+"VARCOST_LIN": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"VAR_ACT": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VAR_CAP": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VAR_COMAUX": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VAR_COMNET": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VAR_COMPRD": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VAR_CUMCOM": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"VAR_CUMCST": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"VAR_CUMFLO": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VAR_FLO": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VAR_GG_PADD": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"VAR_GG_PDIF": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"VAR_GG_PR": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"VAR_GG_STEP": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"VAR_GG_Y": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"VAR_IRE": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"VAR_NCAP": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VAR_NCAPRNG": {
+"after": null,
+"sides": []
+},
+"VAR_OBJ": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VAR_RCAP": {
+"after": "objective coefficients",
+"sides": []
+},
+"VAR_SCAP": {
+"after": "objective coefficients",
+"sides": []
+},
+"VAR_SIN": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VAR_SOUT": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VAR_UC": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VAR_UCR": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VAR_UCRT": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VAR_UCRTS": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VAR_UCT": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VAR_UCTS": {
+"after": "pp_qack.mod (final control sets)",
+"sides": []
+},
+"VDA_CEH": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"VDA_DISC": {
+"after": "coef_ext.vda",
+"sides": []
+},
+"VDA_EMCB": {
+"after": "ppm_ext.vda",
+"sides": []
+},
+"VDA_FLOP": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): VEDA flow attributes before levelling (pp_prelv.vda), FLO_SHAR checks (pp_qafs.mod)",
+"sides": []
+},
+"VN2T": {
+"after": "retirement and refit controls",
+"sides": []
+},
+"VNT": {
+"after": "bounds, AFS, UC maps",
+"sides": []
+},
+"VNTRT": {
+"after": "objective coefficients",
+"sides": []
+},
+"XPT": {
+"after": null,
+"sides": []
+},
+"XTRACT": {
+"after": null,
+"sides": []
+},
+"X_MARK": {
+"after": null,
+"sides": []
+},
+"X_RCS": {
+"after": null,
+"sides": []
+},
+"X_RP": {
+"after": "coefmain.mod",
+"sides": []
+},
+"X_RPB": {
+"after": null,
+"sides": []
+},
+"X_RPCGSB": {
+"after": null,
+"sides": []
+},
+"X_RPCL": {
+"after": null,
+"sides": []
+},
+"X_RPCSL": {
+"after": null,
+"sides": []
+},
+"X_RPG": {
+"after": null,
+"sides": []
+},
+"X_RPGCGS": {
+"after": null,
+"sides": []
+},
+"X_RPGCS": {
+"after": null,
+"sides": []
+},
+"X_RPGGS": {
+"after": null,
+"sides": []
+},
+"X_RPGS": {
+"after": null,
+"sides": []
+},
+"X_RPGSB": {
+"after": null,
+"sides": []
+},
+"X_RPSB": {
+"after": null,
+"sides": []
+},
+"X_RUL": {
+"after": null,
+"sides": []
+},
+"X_RUSL": {
+"after": null,
+"sides": []
+},
+"X_UZRPCS": {
+"after": null,
+"sides": []
+},
+"Y": {
+"after": "pp_qack.mod (final control sets)",
+"sides": [
+"coef_ptr",
+"lvlus(UC_FLO)"
+]
+},
+"YEARVAL": {
+"after": null,
+"sides": []
+},
+"YK": {
+"after": "coefmain.mod",
+"sides": []
+},
+"YK1": {
+"after": "ppmain.mod (control sets, levelling, trade, UC): flow attributes by timeslice (and pp_chp.mod)",
+"sides": []
+},
+"YKAGE": {
+"after": null,
+"sides": []
+},
+"YKK": {
+"after": "objective coefficients",
+"sides": []
+},
+"YKVAL": {
+"after": null,
+"sides": []
+},
+"Y_EOH": {
+"after": "objective coefficients",
+"sides": []
+}
+}
