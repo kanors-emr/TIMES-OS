@@ -39,6 +39,9 @@ python TIMES.py run <run folder>
 - `setup` installs Julia if none is found (on Windows through winget or the Microsoft Store; on any system as a
   portable copy from julialang.org, no administrator rights needed), installs the Python and Julia packages into
   this folder, compiles the Julia code and runs the example model. Allow ten to fifteen minutes the first time.
+- Stochastic models (`$SET STAGES YES` or `$SET SPINES YES`): their equations compiled ahead are a package of their
+  own, which `setup` compiles with the rest. Where it is missing or out of date, the first run of such a model
+  compiles it (a few minutes, once; the run says so).
 - No git? Download the repository as a ZIP from GitHub instead of `git clone`.
 - A **run folder** holds one model run: the run file (`<case>.run`) and its DD files.
 - The result is `runs/<case>/report_<case>.txt`. **Its first line is the verdict**: `SOLVED`, `UNSUPPORTED` (with the

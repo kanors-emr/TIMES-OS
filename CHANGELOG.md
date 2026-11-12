@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.0.1 (November 2026): a shorter setup
+
+#### Setup
+- `setup` takes about half the time it took in 1.0.0 (on a Windows desktop 13.5 to 6.75 minutes), and its
+  largest compile needs about 5 GB of memory instead of about 10 GB; a change in `times_eq/src` is compiled again
+  in less than half the time too. Less code is compiled for the same models:
+  - the equations of stochastic TIMES (`STAGES`, `SPINES`) are compiled ahead in an add-on package of their own
+    (`times_eq/addons/TimesEqStochastic`), which `setup` compiles after TimesEq. A run of a model with `STAGES`
+    or `SPINES` that finds it missing or out of date compiles it first (a few minutes, once), and says so;
+  - the equations built in threads share one compiled task instead of one for each equation family
+    (`times_eq/src/TimesEq.jl`);
+  - the terms of user constraints are compiled once for each kind of expression, instead of once for each way
+    a constraint calls them (`times_eq/src/equations/userco.jl`).
+- With Julia 1.11, a run of a model with `STAGES` or `SPINES` no longer compiles part of the model at every run
+  (`times_eq/src/model.jl`).
+- `check` shows whether the stochastic add-on is compiled.
+
+#### Runs
+- A time limit beyond what the system's waits accept (a run file's `OPTION RESLIM` times the solves a run allows, of
+  about 4 million seconds or more) stopped the timer with `OverflowError: timeout value is too large` on Windows; the
+  run went on without a limit. Such a limit now counts as no limit, without the message (`TIMES.py`).
+
+- The models built are the same as in 1.0.0.
+
 ## 1.0.0 (November 2026): the public release, under the GNU General Public License
 
 - TIMES Open Stack (TIMES-OS) is released under the GNU General Public License, version 3 or later, the licence of

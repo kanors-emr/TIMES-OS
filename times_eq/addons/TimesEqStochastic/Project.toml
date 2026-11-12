@@ -1,0 +1,14 @@
+name = "TimesEqStochastic"
+uuid = "9df4f6c9-5869-4434-ac3d-16d3750b7416"
+version = "0.1.0"
+
+[deps]
+JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
+PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
+TimesEq = "cb114957-84c0-488e-862f-6e374d3cba32"
+
+[compat]
+JuMP = "1"
+PrecompileTools = "1"
+TimesEq = "0.1"
+julia = "1.11"

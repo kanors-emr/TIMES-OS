@@ -36,6 +36,12 @@ powershell -ExecutionPolicy Bypass -File .\setup.ps1
   Everything `setup` installs by default is open-source. The GDX packages (`requirements-gams.txt`: `gamsapi[transfer]`
   and `gamspy_base`, which comes under the GAMS licence) serve only the comparison with GAMS, `--lp` and `--jacobian`:
   `setup` installs them when it finds GAMS, or with `setup --gdx`.
+- **Stochastic models.** The equations of stochastic TIMES (`$SET STAGES YES`, `$SET SPINES YES`) compiled ahead
+  are a package of their own in this repository (`times_eq/addons/TimesEqStochastic`), which `setup` compiles with
+  the rest. Where it is missing or out of date (after a change in `times_eq/src`, or an update of the code without a
+  new `setup`), the first run of a model with one of the two switches installs and compiles it, for a few minutes,
+  once (nothing is downloaded); the run says so before it starts, and later runs start at once. `check` shows
+  whether it is compiled. A `SENSIS` run does not need it.
 - A **run folder** holds one model run: the run file (`<case>.run`) and the DD files (`*.dd`). It is written from the model
   workbooks by Veda or by another VedaTL parser (VedaTL, the Veda Tag Language, is how TIMES model workbooks are
   written). The input files are only read; a run writes the results that later runs read into the folder's `GAMSSAVE` (or the

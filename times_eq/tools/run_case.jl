@@ -21,6 +21,16 @@
 # start-up (about 1.5 s) is no longer part of the run. Its input closed before the two lines: the process ends.
 const T_SCRIPT = time()                      # before the packages are loaded: their loading is timed as well
 using TimesEq
+# Stochastic TIMES (TIMESEQ_STOCHASTIC=1: TIMES.py sets it for a run file with STAGES or SPINES): the add-on
+# TimesEqStochastic holds the equation functions compiled for its variable families. Where it is not installed the
+# run goes on, and compiles them itself.
+if get(ENV, "TIMESEQ_STOCHASTIC", "") == "1"
+    try
+        @eval using TimesEqStochastic
+    catch
+        @warn "The add-on TimesEqStochastic is not in this Julia environment: the equations of stochastic TIMES are compiled in this run (python TIMES.py setup installs it)."
+    end
+end
 if get(ARGS, 1, "") == "--wait"
     const EARLY = time() - T_SCRIPT
     const SETTINGS, ARGUMENTS = readline(stdin), readline(stdin; keep = true)

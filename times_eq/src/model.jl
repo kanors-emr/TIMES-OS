@@ -165,9 +165,14 @@ function Model(d::Data; cufscal::Float64 = 10.0, names::Bool = false)
     sw = sow_context(d)
     # (SENSIS: the variables of the deterministic model; VAS_EXPOBJ keeps its name, eqobj.mod 107)
     vname(n) = (sw !== nothing && sw.sensis && n == :VAR_EXPOBJ) ? :VAS_EXPOBJ : n
+    # (The stochastic variable families behind an inference barrier: the compiler then does not work out, while this
+    # package is compiled, what the model's constructor, finish! and the other callers of a built model do with them;
+    # that code belongs to the add-on TimesEqStochastic, whose workload runs it. Otherwise it was inferred here, never
+    # run here, and Julia 1.11 did not keep in the add-on's cache what the add-on compiled of it: every stochastic run
+    # compiled it again. The cost is one dynamic call where the model is made and where `build` hands it on.)
     v = (sw === nothing || sw.sensis) ?
         VarsT(map(n -> Var(vname(n), jump, Dict{NTuple{length(VARS[n]),Id},JuMP.VariableRef}(), d.bounds[n], n in FREE), keys(VARS))) :
-        sow_vars(d, jump, sw)
+        Base.inferencebarrier(sow_vars(d, jump, sw))
     T = sort(t.MILESTONYR.rows; by = y -> year(d.L, y))
     sub = d.step > 0 ? Set{Id}(t.SUBT.rows) : Set{Id}(T)
     fwd = d.step > 0 ? Set{Id}(t.FORWARD.rows) : Set{Id}()

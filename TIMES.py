@@ -32,6 +32,9 @@ setup   creates .venv and installs the Python packages there, installs the Julia
         open chain needs only open-source packages.
         The Julia package is compiled ahead on a whole case (models/DemoS_012), so that a run does not wait for the
         compiler; after a change in times_eq/src the next run compiles it again first (about 5 minutes).
+        The equations of stochastic TIMES (STAGES, SPINES) compiled ahead are a package of their own
+        (times_eq/addons/TimesEqStochastic), compiled with the rest.  Where it is missing or older than times_eq/src,
+        the first run of a model with STAGES or SPINES installs and compiles it (a few minutes, once), and says so.
         --dev  for work on times_eq/src: compile ahead only the equation functions (about 2 minutes after a change
                instead of 5), and every run compiles the rest (about 1.5 minutes more per run).  setup without --dev
                goes back to the whole case.
@@ -344,6 +347,10 @@ def call(cmd, cwd=None, log=None, timeout=None, env=None, echo=None, follow=None
     started: (process, text) for a program already started (`started_early`): `text` goes to its input, which is then
     closed, and the program is followed from there as if started now (`cmd` and `env` are then not used)."""
     t0 = time.time()
+    # A limit beyond what the system's waits accept (on Windows about 49.7 days, 2**32 ms: threading.Timer and
+    # subprocess fail with OverflowError) is no limit: a run file's RESLIM of 1E7 s or more means none was meant.
+    if timeout is not None and timeout >= 4.0e6:
+        timeout = None
     e = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1", PYTHONUNBUFFERED="1")
     e.update(env or {})
     try:
@@ -479,14 +486,15 @@ def for_settings(path):
 
 
 def pin_timeseq_path():
-    """The TimesEq source in .julia_env is ../times_eq (and TimesPPKernels ../times_pp/jlkernels), so the checkout
-    can be moved."""
+    """The TimesEq source in .julia_env is ../times_eq (TimesPPKernels ../times_pp/jlkernels, the add-on of stochastic
+    TIMES ../times_eq/addons/TimesEqStochastic), so the checkout can be moved."""
     for name in ("Project.toml", "Manifest.toml"):
         path = os.path.join(JULIA_ENV, name)
         if not os.path.isfile(path):
             continue
         text = read(path)
         new = re.sub(r'(path\s*=\s*")[^"]*times_eq(")', r'\1../times_eq\2', text)
+        new = re.sub(rf'(path\s*=\s*")[^"]*times_eq[\\/]+addons[\\/]+{STOCH_ADDON}(")', rf'\1../times_eq/addons/{STOCH_ADDON}\2', new)
         new = re.sub(r'(path\s*=\s*")[^"]*times_pp[\\/]+jlkernels(")', r'\1../times_pp/jlkernels\2', new)
         if new != text:
             write(path, new)
@@ -909,6 +917,14 @@ def check(verbose=True):
         ipopt = os.path.isfile(man) and re.search(r'(?m)^\[\[deps\.Ipopt\]\]', read(man)) is not None
         lines.append(("ok" if ipopt else "NOTE", "Ipopt (the calibration of TIMES-MACRO MLF)", "installed in .julia_env" if ipopt
                       else "not installed: a run with MACRO MLF cannot calibrate  -> run: python TIMES.py setup"))
+        # stochastic TIMES: its equations compiled ahead are an add-on, compiled by setup or by the first such run
+        if ready and stochastic_installed():
+            julia_compiled(julia)
+        lines.append(("ok", "Stochastic TIMES (STAGES, SPINES): its add-on", "compiled (TimesEqStochastic in .julia_env)")
+                     if ready and stochastic_installed() and STOCH["compiled"] else
+                     ("NOTE", "Stochastic TIMES (STAGES, SPINES): its add-on",
+                      ("installed, not compiled" if ready and stochastic_installed() else "not installed")
+                      + ": the first run with STAGES or SPINES compiles it (a few minutes, once); python TIMES.py setup does it now"))
     else:
         chain = False
         lines.append(("MISSING", "Julia", "not found  -> run: python TIMES.py setup   (it installs Julia: winget's Juliaup, the Microsoft Store's "
@@ -1126,10 +1142,71 @@ def refresh_workload():
 
 
 def julia_compiled(julia):
-    """Whether TimesEq is compiled for the current code (False: the next Julia start compiles it). None if unknown."""
+    """Whether TimesEq is compiled for the current code (False: the next Julia start compiles it). None if unknown.
+    The same Julia start says it for the add-on of stochastic TIMES, when that is installed (STOCH["compiled"])."""
     code, out, _ = call([julia, "--startup-file=no", f"--project={JULIA_ENV}", "-e",
-                         f'print(Base.isprecompiled(Base.PkgId(Base.UUID("{TIMESEQ_UUID}"), "TimesEq")))'], timeout=300)
-    return {"true": True, "false": False}.get(out.strip().splitlines()[-1] if code == 0 and out.strip() else "", None)
+                         f'print(Base.isprecompiled(Base.PkgId(Base.UUID("{TIMESEQ_UUID}"), "TimesEq")))'
+                         + (f'; print(" ", Base.isprecompiled(Base.PkgId(Base.UUID("{STOCH_UUID}"), "{STOCH_ADDON}")))' if stochastic_installed() else "")],
+                        timeout=300)
+    words = out.strip().splitlines()[-1].split() if code == 0 and out.strip() else []
+    known = {"true": True, "false": False}
+    STOCH["compiled"] = known.get(words[1]) if len(words) > 1 else None
+    return known.get(words[0]) if words else None
+
+
+# Stochastic TIMES (STAGES, SPINES). The equations are TimesEq's; compiled ahead for the stochastic variable families
+# they are in a package of their own, times_eq/addons/TimesEqStochastic, which only models with one of the two switches
+# need. setup installs and compiles it; where it is missing or out of date the first such run does (stochastic_addon).
+STOCH_ADDON = "TimesEqStochastic"
+STOCH_UUID = "9df4f6c9-5869-4434-ac3d-16d3750b7416"
+STOCH_PATH = os.path.join(ROOT, "times_eq", "addons", STOCH_ADDON)
+STOCH = {"compiled": None}      # whether the add-on is compiled for the current code, once this process has asked Julia
+
+
+def needs_stochastic(run_text):
+    """True for a run file whose model has the variable families of stochastic TIMES: STAGES or SPINES, and not
+    SENSIS (a SENSIS run builds one deterministic model for each state of the world)."""
+    yes = lambda k: (switch(run_text, k) or "") == "YES"
+    return (yes("STAGES") or yes("SPINES")) and not yes("SENSIS")
+
+
+def stochastic_installed():
+    """The add-on of stochastic TIMES is in .julia_env."""
+    man = os.path.join(JULIA_ENV, "Manifest.toml")
+    return os.path.isfile(man) and re.search(rf'(?m)^\[\[deps\.{STOCH_ADDON}\]\]', read(man)) is not None
+
+
+def stochastic_addon(julia, case=""):
+    """Before Julia is started for a model with STAGES or SPINES: the add-on is added to .julia_env when it is not
+    there (from this repository; no download) and compiled when it is not (once, several minutes), and each is said,
+    so that the wait is explained. -> True when the run can load it; False: the run compiles that code itself."""
+    if not julia or not os.path.isdir(STOCH_PATH):
+        return False
+    tag = f"[{case}] " if case else ""
+    if STOCH["compiled"]:
+        return True
+    if not stochastic_installed():
+        print(f"{tag}stochastic TIMES: adding its add-on ({STOCH_ADDON}, from this repository) to .julia_env ...", flush=True)
+        path = STOCH_PATH.replace("\\", "/")
+        code, out, t = call([julia, "--startup-file=no", f"--project={JULIA_ENV}", "-e",
+                             f'using Pkg; Pkg.offline(true); Pkg.develop(Pkg.PackageSpec(path="{path}"))'],
+                            env={"JULIA_PKG_PRECOMPILE_AUTO": "0"}, timeout=1800)
+        if code != 0 or not stochastic_installed():
+            print(f"{tag}   NOT added: this run compiles the equations of stochastic TIMES itself\n" + (julia_error(out) or out[-1500:]), flush=True)
+            return False
+        pin_timeseq_path()
+        STOCH["compiled"] = None
+    if STOCH["compiled"] is None:
+        julia_compiled(julia)
+    if not STOCH["compiled"]:
+        print(f"{tag}stochastic TIMES: compiling its add-on once (several minutes); later runs start at once ...", flush=True)
+        code, out, t = call([julia, "--startup-file=no", f"--project={JULIA_ENV}", "-e", f'using Pkg; Pkg.precompile("{STOCH_ADDON}")'], timeout=7200)
+        if code != 0 or julia_error(out):
+            print(f"{tag}   NOT compiled: this run compiles the equations of stochastic TIMES itself\n" + (julia_error(out) or out[-1500:]), flush=True)
+            return False
+        print(f"{tag}   done  ({t:.0f} s)", flush=True)
+        STOCH["compiled"] = True
+    return True
 
 
 def compile_notice(julia):
@@ -1261,9 +1338,18 @@ def setup(args):
             path = os.path.join(ROOT, "times_eq").replace("\\", "/")
             # TimesPPKernels: the preprocessor's Julia kernels (times_pp/jlkernels; on by default, TIMESPP_KERNELS=none turns them off)
             kpath = os.path.join(ROOT, "times_pp", "jlkernels").replace("\\", "/")
+            # the add-on of stochastic TIMES is compiled with the rest; --dev leaves it out of .julia_env (what was
+            # compiled of it stays), and the first run with STAGES or SPINES puts it in
+            kind = "dev" if "--dev" in args else "full"
+            spath = STOCH_PATH.replace("\\", "/")
+            addon = (f', Pkg.PackageSpec(path="{spath}")' if kind == "full" else "")
+            leave = ("" if kind == "full" else f'haskey(Pkg.project().dependencies, "{STOCH_ADDON}") && Pkg.rm("{STOCH_ADDON}"); ')
+            if kind == "dev":
+                print("   stochastic TIMES (STAGES, SPINES): --dev leaves its add-on out; the first run of such a model compiles it")
             code, out, t = call([julia, "--startup-file=no", f"--project={JULIA_ENV}", "-e",
-                                 f'using Pkg; Pkg.develop([Pkg.PackageSpec(path="{path}"), Pkg.PackageSpec(path="{kpath}")]); '
-                                 f'Pkg.add(["JuMP", "HiGHS", "Ipopt"]); Pkg.precompile()'], timeout=7200)
+                                 f'using Pkg; Pkg.develop([Pkg.PackageSpec(path="{path}"), Pkg.PackageSpec(path="{kpath}"){addon}]); '
+                                 f'Pkg.add(["JuMP", "HiGHS", "Ipopt"]); {leave}Pkg.precompile()'], env={"JULIA_PKG_PRECOMPILE_AUTO": "0"}, timeout=7200)
+            s["setup"] = kind
             if code == 0 and julia_error(out):              # Pkg.precompile can report a failed package and still exit 0
                 code = 1
             print("   " + ("done" if code == 0 else "FAILED:\n" + out[-3000:]) + f"  ({t:.0f} s)")
@@ -1628,14 +1714,15 @@ def julia_threads(tjb):
 EARLY = []          # Julia processes started for a run (julia_early) and not given it yet
 
 
-def julia_early(julia, flags):
+def julia_early(julia, flags, env=None):
     """Julia started as the preprocessor starts: it loads its packages (about 1.5 s) while the preprocessor runs, and
     waits for its run on its input (times_eq/tools/run_case.jl --wait; `call` with `started`). TIMES_EARLY=0:
-    not started early. -> the process, or None"""
+    not started early. env: what the packages need to know as they load (TIMESEQ_STOCHASTIC). -> the process, or None"""
     end_early()
     if (setting("EARLY", "1") or "1").strip() == "0":
         return None
     e = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1", PYTHONUNBUFFERED="1")
+    e.update(env or {})
     try:
         p = subprocess.Popen([julia] + flags + ["--startup-file=no", f"--project={JULIA_ENV}", os.path.join(ROOT, "times_eq", "tools", "run_case.jl"), "--wait"],
                              stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=e,
@@ -1842,7 +1929,7 @@ def one_case(folder, out_root, o, case=None):
                                                        "from_parent_folder": os.path.dirname(p) != folder} for _, p in dds],
                   "run_file_sha256_16": sha(run_file),
                   "switches": {k: switch(run_text, k) for k in ("REDUCE", "OBJ", "OBJANN", "OBLONG", "MID_YEAR", "VAR_UC", "VARCOST", "DSCAUTO", "VALIDATE",
-                                                                 "STAGES", "MACRO", "DAMAGE", "CLI", "ETL", "TIMESED", "SPOINT", "FIXBOH", "TIMESTEP", "BOTIME", "EOTIME")
+                                                                 "STAGES", "SPINES", "SENSIS", "MACRO", "DAMAGE", "CLI", "ETL", "TIMESED", "SPOINT", "FIXBOH", "TIMESTEP", "BOTIME", "EOTIME")
                                if switch(run_text, k) is not None}}
     # the open chain reads the TIMES declarations carried with it (times_pp/timespp/times_src); the TIMES source folder
     # is needed only to run GAMS, and when there is one its declaration files should be the same ones
@@ -1954,6 +2041,14 @@ def one_case(folder, out_root, o, case=None):
                                       + (["--low-memory"] if o["low_memory"] else []), env=pp_env,
                                       cwd=os.path.join(ROOT, "times_pp"), log=os.path.join(out, "preprocess.log"), timeout=o["pp_limit"], echo="    ")
     pp_thread = threading.Thread(target=pp_run, daemon=True)
+    # stochastic TIMES: Julia loads the add-on with its equations compiled (installed and compiled here the first time,
+    # before the run is timed)
+    t_addon = time.time()
+    stoch_env = {"TIMESEQ_STOCHASTIC": "1"} if julia and needs_stochastic(run_text) and stochastic_addon(julia, case) else {}
+    R["input"]["stochastic_addon"] = bool(stoch_env)
+    if time.time() - t_addon >= 1.0:
+        R["timings"]["stochastic_addon"] = round(time.time() - t_addon, 1)
+        notes.append(f"stochastic TIMES: its add-on was installed or compiled before this run ({time.time() - t_addon:.0f} s, once)")
     # the peak memory of phase 1 (the port: preprocessor, Julia, model.db3 beside them, the Veda files; GAMS alone),
     # the working sets of the processes this run starts, summed, every 0.5 s (TreePeak); not the matrix check
     mem = TreePeak(0.5)
@@ -1962,7 +2057,7 @@ def one_case(folder, out_root, o, case=None):
     R["timings"]["before_preprocess"] = round(t_pp - t_start, 1)   # start-up of the run: settings, the copy of the input
     # Julia started now loads its packages while the preprocessor runs; it is given its run when the tables are there
     jflags_early = julia_threads("")[0] if julia else None
-    j_early = julia_early(julia, jflags_early) if julia else None
+    j_early = julia_early(julia, jflags_early, stoch_env) if julia else None
     pp_thread.start()
     while pp_thread.is_alive() and not os.path.exists(pj):
         pp_thread.join(0.5)
@@ -2212,6 +2307,7 @@ def one_case(folder, out_root, o, case=None):
             print(f"[{case}] Julia: threads {used['threads']}, garbage collector threads {used['gc_threads']}, "
                   f"at most {used['families_at_once']} equation families at once" + (f"  ({jnote})" if jnote else ""), flush=True)
             jnote and notes.append(jnote)
+            jenv.update(stoch_env)
             if db3_mode == "after":
                 jenv["TIMESEQ_DB3_GO"] = go
             cmd = [julia] + jflags + ["--startup-file=no", f"--project={JULIA_ENV}", os.path.join(ROOT, "times_eq", "tools", "run_case.jl"), os.path.join(out, "model.db3"), jj,
@@ -2925,6 +3021,8 @@ def check_case(out, o):
     if G.get("solution_file") or (G.get("matrix_file") and not G.get("matrix_pq")):
         print(f"[{case}] building the model again in Julia and comparing it with GAMS ...", flush=True)
         jflags, jenv, _, _ = julia_threads(os.path.join(out, "model.tjb"))
+        if (R.get("input") or {}).get("stochastic_addon") and stochastic_installed():
+            jenv["TIMESEQ_STOCHASTIC"] = "1"
         cmd = [julia] + jflags + ["--startup-file=no", f"--project={JULIA_ENV}", os.path.join(ROOT, "times_eq", "tools", "run_case.jl"),
                                   os.path.join(out, "model.db3"), jj, "--no-solve"]
         if G.get("matrix_file") and not G.get("matrix_pq"):

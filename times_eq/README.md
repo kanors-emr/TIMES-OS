@@ -78,7 +78,9 @@ end
   (`gams/solve_lp.gms`, or a program by TIMES's names with `--lp-names`) and reads the solution back;
   `solvers/gurobilp.py`: Gurobi through its Python interface;
 - `src/stochastic.jl`: stochastic TIMES (`STAGES`): every equation and variable by state of the world, and the
-  expected cost as the objective;
+  expected cost as the objective; `addons/TimesEqStochastic`: a package with no model code, which compiles the
+  equations ahead for the stochastic variable families (`STAGES`, `SPINES`). `TIMES.py setup` compiles it, or the
+  first run of such a model where it is missing; `tools/run_case.jl` loads it for those runs;
 - `src/negishi.jl`: TIMES-MACRO MLF, the calibration of MACRO (an NLP solved with Ipopt) and the Negishi iterations
   around the linearised model (`equations/mlf.jl`).
 

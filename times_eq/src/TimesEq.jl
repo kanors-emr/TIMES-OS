@@ -289,8 +289,11 @@ direct!(eq!, m::Model) = m.sw === nothing ? eq!(m) : foreach(w -> (sow!(m.sw, w)
 
 # The task of a family or a piece (of the rows of SOW w in a stochastic run): it waits for a slot, then computes into a
 # recording view of the model; `timed`: with the slot's time, the seconds of the compute and its end (BuildStats),
-# else zeros.
-@noinline piece_task(f, m::Model, sem::Base.Semaphore, timed::Bool, w = nothing) = Threads.@spawn begin
+# else zeros.  The family goes through a box, so that one compiled task serves all families (compiled for each family,
+# the task costs seconds each: it moves the model by value); the family itself is then one dynamic call in its task.
+@noinline piece_task(@nospecialize(f), m::Model, sem::Base.Semaphore, timed::Bool, w = nothing) = piece_task_boxed(Ref{Any}(f), m, sem, timed, w)
+@noinline piece_task_boxed(fr::Base.RefValue{Any}, m::Model, sem::Base.Semaphore, timed::Bool, w) = Threads.@spawn begin
+    f = fr[]
     Base.acquire(sem)
     try
         a = timed ? time() : 0.0
@@ -333,15 +336,9 @@ isfile(WORKLOAD_TXT) && include_dependency(WORKLOAD_TXT)
 const WHOLE_CASE = !(isfile(WORKLOAD_TXT) && occursin(r"(?m)^mode: dev", read(WORKLOAD_TXT, String)))
 PrecompileTools.@compile_workload begin
     build(Data("", Labels(), Dict{Symbol,Any}(), Dict{Symbol,Any}(), Dict{Symbol,Any}(), Dict{Symbol,Int}()); names = true)
-    # the equation functions for the variable families of stochastic TIMES (STAGES: VarsST): an empty model with one
-    # state of the world (SOW '1' in SW_TSW), so that a stochastic run does not wait for the compiler either
-    let L = Labels(), w = id!(L, "1"), t = id!(L, "2020")
-        sw = Dict{Symbol,Any}(:SW_TSW => Table{NTuple{3,Id}}([(w, t, w)], Set([(w, t, w)])), :SOW => Table{Id}([w], Set([w])),
-                              :SW_T => Table{NTuple{2,Id}}([(t, w)], Set([(t, w)])))
-        build(Data("", L, sw, Dict{Symbol,Any}(), Dict{Symbol,Any}(), Dict{Symbol,Int}()); names = true)
-        # the same in threads (build_parallel!): its tasks and commits for these variable families
-        build(Data("", L, sw, Dict{Symbol,Any}(), Dict{Symbol,Any}(), Dict{Symbol,Int}()); names = true, parallel = true)
-    end
+    # (The equation functions for the variable families of stochastic TIMES, STAGES and SPINES: VarsST, are compiled
+    # ahead by a package of their own, addons/TimesEqStochastic: about as much again as all of this workload, which
+    # only the models with one of the two switches need. `TIMES.py setup` compiles it, or the first such run.)
     # deleting variables (drop_unused!): models/DemoS_012 has no unused variable, so without this MOI's deletion code
     # was compiled in every run of a model that has one (on a model of 10 M rows, far longer than the deletion itself)
     let jm = JuMP.Model()

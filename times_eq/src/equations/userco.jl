@@ -367,13 +367,12 @@ function uc_dynamic(::Type{E}, m::Model, uc, r, t, slices) where {E}
     attr(sd, grp, name) = (r, uc, sd, grp, name) in UC_ATTR
     grps = (m.K.FLO, m.K.IRE, m.K.ACT, m.K.COMPRD, m.K.COMNET, m.K.COMCON, CAP, m.K.NCAP, m.K.UCN)
     nl = any(grp -> attr(LHS, grp, m.K.N), grps)
-    e = nl ? uc_terms(E, m, uc, r, t, slices; side = LHS, years, only = grp -> !attr(LHS, grp, m.K.N), nested = true, cumsum = true) :
+    e = nl ? uc_terms(E, m, uc, r, t, slices; side = LHS, years, only = UCOnly(UC_NOT_N_LHS), nested = true, cumsum = true) :
              uc_terms(E, m, uc, r, t, slices; side = LHS, years, nested = true, cumsum = true)
-    sync(grp) = attr(RHS, grp, SYNC)
-    prev(grp) = !attr(RHS, grp, m.K.N)
+    sync, prev = UCOnly(UC_SYNC_RHS), UCOnly(UC_NOT_N_RHS)
     add!(e, -1.0, uc_terms(E, m, uc, r, t, slices; side = RHS, years, only = sync, nested = true, cumsum = true))
     for grp in grps
-        one = ==(grp)
+        one = UCOnly(UC_ONE, grp)
         # CUMSUM on the LHS: the periods before t (new capacity: inside the N term, unless N is given there)
         if attr(LHS, grp, m.K.CUMSUM) && (grp != m.K.NCAP || attr(LHS, grp, m.K.N))
             for tt in m.T[1:i-1]
@@ -436,7 +435,46 @@ t (RVPT), and for a lifetime shorter than the period every repetition of the inv
 ANNUL; LL of equserco.mod line 83, %7 / %6 of the uc_*.mod files), `t` that of the variables and of everything else
 (TT, %4): they differ only for the terms that a dynamic constraint takes from other periods (CUMSUM, CUM+).
 """
-function uc_terms(::Type{E}, m::Model, uc, r, t, slices; side = m.K.LHS, years = nothing, per_hour = false, only = grp -> true, cumulative = false, nested = false, cumsum = false, tc = t) where {E}
+uc_terms(::Type{E}, m::Model, uc, r, t, slices; side = m.K.LHS, years = nothing, per_hour = false, only = UCOnly(UC_ALL), cumulative = false, nested = false, cumsum = false, tc = t) where {E} =
+    uc_terms_of(E, m, uc, r, t, UCSlices(slices), side, years === nothing ? 0.0 : Float64(years), years !== nothing, per_hour, only, cumulative, nested, cumsum, tc)
+
+# The timeslices `uc_terms` sums over, as one type: the callers give one timeslice, (s,), or the list of a constraint
+# (uc_ts_sum); they are taken in the order given.
+struct UCSlices
+    one::Id
+    many::Vector{Id}
+end
+const UC_ONE_SLICE = Id[]                                    # `many` of a single timeslice: this very vector
+UCSlices(s::Tuple{Id}) = UCSlices(s[1], UC_ONE_SLICE)
+UCSlices(v::Vector{Id}) = UCSlices(Id(0), v)
+Base.iterate(x::UCSlices, i::Int = 1) = x.many === UC_ONE_SLICE ? (i == 1 ? (x.one, 2) : nothing) : iterate(x.many, i)
+
+# The groups of terms `uc_terms` takes (its `only`), as one type for every selection a caller makes:
+#   UC_ALL        every group
+#   UC_NOT_N_LHS  the groups without the N attribute on the left-hand side
+#   UC_SYNC_RHS   the groups with SYNC on the right-hand side
+#   UC_NOT_N_RHS  the groups without N on the right-hand side
+#   UC_ONE        the group `grp` alone
+const UC_ALL, UC_NOT_N_LHS, UC_SYNC_RHS, UC_NOT_N_RHS, UC_ONE = Int8(0), Int8(1), Int8(2), Int8(3), Int8(4)
+struct UCOnly
+    kind::Int8
+    grp::Id
+end
+UCOnly(kind::Int8) = UCOnly(kind, Id(0))
+@inline function uc_takes(o::UCOnly, m::Model, r, uc, grp)
+    o.kind == UC_ALL && return true
+    o.kind == UC_ONE && return grp == o.grp
+    o.kind == UC_NOT_N_LHS && return !((r, uc, m.K.LHS, grp, m.K.N) in m.d.UC_ATTR)
+    o.kind == UC_SYNC_RHS && return (r, uc, m.K.RHS, grp, m.K.SYNC) in m.d.UC_ATTR
+    return !((r, uc, m.K.RHS, grp, m.K.N) in m.d.UC_ATTR)
+end
+
+# The terms themselves. Each argument has one type whatever the caller gives (`dynamic`: `years` is given; `sel`: the
+# groups taken), so that this function is compiled once for each kind of expression and of `slices`, and not once more
+# for every combination of options and selections the callers make.
+@noinline function uc_terms_of(::Type{E}, m::Model, uc, r, t, slices, side, years::Float64, dynamic::Bool, per_hour::Bool,
+                               sel::UCOnly, cumulative::Bool, nested::Bool, cumsum::Bool, tc) where {E}
+    only(grp) = uc_takes(sel, m, r, uc, grp)
     (; RS_FR, RS_BELOW, RHS_COMPRD, RHS_COMBAL, RTP, RTP_VARA, UC_FLO, UC_IRE, UC_COM, UC_CAP, UC_ACT, UC_NCAP, UC_ATTR, COM_IE, RVPT, RTP_OFF, COEF_RPTI, G_YRFR, UC_DT, D) = m.d
     (; uc_map_flo, uc_map_ire, uc_gmap_c, uc_gmap_p, vintages, flow_s, varc_ts, prc_ts, rvpt_v, ts_frac) = m.ix
     (; VAR_COMPRD, VAR_COMNET, VAR_CAP, VAR_ACT, VAR_NCAP) = m.v
@@ -459,8 +497,8 @@ function uc_terms(::Type{E}, m::Model, uc, r, t, slices; side = m.K.LHS, years =
     # a quantity at ts counts in s fully, unless s lies below ts: then with the share of s
     share(c, s, ts) = (r, ts, s) in RS_BELOW ? frac(m, r, t, c, s, ts) : 1.0
     # growth factor per year -> factor over the years between the two periods of a dynamic constraint
-    power = years === nothing ? 0.0 : years * (side == LHS ? 1 : -1) - 1
-    grow(k, grp) = (years === nothing || plain(k) == 0 || !((r, uc, side, grp, GROWTH) in UC_ATTR)) ? k : k * abs(k)^power
+    power = dynamic ? years * (side == LHS ? 1 : -1) - 1 : 0.0
+    grow(k, grp) = (!dynamic || plain(k) == 0 || !((r, uc, side, grp, GROWTH) in UC_ATTR)) ? k : k * abs(k)^power
 
     # a constraint summing the periods (mode 2 of equcwrap.mod): the flow, activity, commodity and trade terms of a
     # cumulative constraint (UC_DT) are weighted by the length of the period (FPD = D); capacity terms are not.
@@ -522,7 +560,7 @@ function uc_terms(::Type{E}, m::Model, uc, r, t, slices; side = m.K.LHS, years =
                 tss = m.ix.rpcs_s[r, p, c]
                 kb = sum((RS_FR(r, ts, s) * plain(UC_FLO(uc, side, r, tc, p, c, ts)) for ts in tss); init = 0.0)
                 iszero(kb) && continue
-                if years !== nothing && (r, uc, side, FLO, GROWTH) in UC_ATTR
+                if dynamic && (r, uc, side, FLO, GROWTH) in UC_ATTR
                     kb *= sum((RS_FR(r, ts, s) * abs(plain(UC_FLO(uc, side, r, tc, p, c, ts)))^power for ts in tss); init = 0.0)
                 end
                 (r, uc, side, FLO, PERIOD) in UC_ATTR && (kb *= plain(D(t)))
