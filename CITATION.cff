@@ -6,8 +6,8 @@ authors:
   - family-names: Kanudia
     given-names: Amit
     affiliation: KanORS-EMR
-version: 1.0.1
-date-released: "2026-11-12"
+version: 1.0.2
+date-released: "2026-11-13"
 license: GPL-3.0-or-later
 repository-code: "https://github.com/kanors-emr/TIMES-OS"
 keywords:

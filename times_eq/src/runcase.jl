@@ -297,21 +297,31 @@ function myopic(d, res, opt, args, save)
         res["steps"] = Any[]
         sol = TimesEq.Solution(d.L)
         R = nothing
-        for (k, yr) in TimesEq.steps(d.source)
-            ds = TimesEq.load_step(d, k)
-            R === nothing && (R = TimesEq.Relax(ds))
-            m = prof(() -> TimesEq.build(ds))
-            pt = TimesEq.load_point(d, k)
-            lev = isempty(pt) ? sol : pt
-            TimesEq.fix_window!(m, lev)
-            TimesEq.relax!(R, m, lev)
-            TimesEq.apply_relax!(R, m)
-            push!(res["steps"], Dict("step" => k, "year" => yr, "rows" => sum(values(TimesEq.row_counts(m)); init = 0),
-                "columns" => num_variables(m.jump), "nonzeros" => TimesEq.nonzeros(m)))
-            TimesEq.reset_capacity!(R, m)           # as solve_steps does after each step: the next step starts from its own bounds
+        built = nothing
+        timed("steps") do
+            for (k, yr) in TimesEq.steps(d.source)
+                ds = TimesEq.load_step(d, k)
+                R === nothing && (R = TimesEq.Relax(ds))
+                m = built = prof(() -> TimesEq.build(ds))
+                pt = TimesEq.load_point(d, k)
+                lev = isempty(pt) ? sol : pt
+                TimesEq.fix_window!(m, lev)
+                TimesEq.relax!(R, m, lev)
+                TimesEq.apply_relax!(R, m)
+                push!(res["steps"], Dict("step" => k, "year" => yr, "rows" => sum(values(TimesEq.row_counts(m)); init = 0),
+                    "columns" => num_variables(m.jump), "nonzeros" => TimesEq.nonzeros(m)))
+                TimesEq.reset_capacity!(R, m)       # as solve_steps does after each step: the next step starts from its own bounds
+            end
         end
         last = res["steps"][end]
         res["rows"], res["columns"], res["nonzeros"] = last["rows"], last["columns"], last["nonzeros"]
+        # a run with FIXBOH is one model (one step): its matrix for the check, as the solving path below writes it
+        mout = opt("--matrix-out", "")
+        if mout != "" && length(res["steps"]) == 1 && built !== nothing
+            res["matrix_out"], t = timed(() -> TimesEq.write_matrix(built, mout), "matrix out")
+            res["matrix_out_seconds"] = round(t; digits = 1)
+            println("matrix written for the check: ", res["matrix_out"], " (", res["matrix_out_seconds"], " s)"); flush(stdout)
+        end
         note_profile(res)
         return
     end
@@ -425,7 +435,7 @@ function gamslp_steps!(res, lps)
         (lps[end].optfile == "" ? "options" : basename(lps[end].optfile)) * ": " * join(info["option_lines"], ", ")
     res["solver"] = uppercase(lps[end].solver) * (haskey(info, "solver_version") ? " " * info["solver_version"] : "") *
         (lps[end].direct == "" ? " through GAMS" : " through Python") * (haskey(info, "gams_version") ? " " * info["gams_version"] : "") *
-        " (" * opts * "; " * string(length(lps)) * " steps)"
+        " (" * opts * (length(lps) == 1 ? "" : "; " * string(length(lps)) * " steps") * ")"
     g = Dict{String,Any}(k => v for (k, v) in info if !(v isa Real))
     for o in lps, (k, v) in o.info
         (v isa Real && !(k in ("modelstat", "solvestat"))) && (g[k] = get(g, k, 0) + v)

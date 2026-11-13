@@ -14,19 +14,15 @@ from __future__ import annotations
 
 # (option item, option index) -> what GAMS writes when it is set
 UNPORTED_OPT = {
-    ("FLO", "7"): "topology, PAR_TOP / PAR_Top (solsetv.v3 FINISHUP)",
 }
 UNVERIFIED_OPT = {
     ("CAP", "5"): "cumulative retirements, PAR_CUMRET (rptmisc.rpt 37)",
-    ("COMPRD", "4"): "market-share constraint levels, PAR_UCMRK (rptmisc.rpt 159-162); compared on a model without FLO_MARK",
 }
 # The same as GDX2VEDA writes (the option set Veda writes for most models): NCAP.1 = 1 (PAR_NCAPR
 # LEVCOST), FLO.3 (VAL_FLO), OBJ.1 (CST_PVP / CST_PVC), ELC.1 with ELC.3 = 2 (P_OUT), FLO.5 (PAR_EOUT), FLO.1
 # (flows and production at the commodity timeslices), COMPRD.1, ACT.2 = -1 and the *.9 thresholds.
 # $SET switches of the run file
 UNPORTED_ENV = {
-    "BENCOST": ("YES", "benefit-cost ratios, PAR_NCAPR (rpt_objc.rpt 90-125)"),
-    "RPT_TOP": ("YES", "topology, PAR_TOP / PAR_Top (solsetv.v3 FINISHUP)"),
 }
 # The report parameters an option of UNPORTED_OPT / UNPORTED_ENV changes although the port writes them: they are left
 # out of the VD file (write.py), so that the numbers of the ordinary path are not taken for the option's.  None now:
@@ -65,24 +61,19 @@ def check(db):
     #   UNCD1 = commodity types with RPT_OPT(type,'3') and energy types with RPT_OPT(type,'1'); when it is not
     #   empty, flows are reported at the commodity timeslices (ported, rptmisc.py _flow_timeslices); then
     #   P_OUT for each energy type with '1' (ELC.3 = 2 makes it net of inputs), and a fall-back to ANNUAL for
-    #   each type in UNCD1 whose '3' is negative.
-    nrg, com = _members(db, "NRG_TYPE"), _members(db, "COM_TYPE")
-    uncd1 = {u for (u, j), v in opt.items() if v and ((j == "3" and u in com) or (j == "1" and u in nrg))}
-    ncap1 = opt.get(("NCAP", "1")) or 0
-    if ncap1 and ncap1 != 1:
-        unported.append(f"RPT_OPT('NCAP','1') = {ncap1:g}: only 1 is ported; the ENV credit (< 0) and the peak "
-                        f"capacity term (> 1) of the levelized cost are not (rptmisc.rpt 214-236)")
-    for u in sorted(uncd1):
-        if (opt.get((u, "3")) or 0) < 0:
-            unported.append(f"RPT_OPT('{u}','3') = {opt[(u, '3')]:g}: flows of {u} reported at ANNUAL (rptmisc.rpt 267-280)")
+    #   each type in UNCD1 whose '3' is negative (ported, rptmisc.py _annual_fallback).  $SET RPT_FLOTS ANNUAL
+    #   (rptmisc.rpt 110: every flow at ANNUAL, without RPT_OPT('FLO','1')) is ported too (_flow_timeslices).
+    # $SET BENCOST YES is ported (rptobjc.py _bencost) but for the capacity-related flow costs in its cost
+    # coefficient (rpt_objc.rpt 63-73), which a model with NCAP_ICOM, NCAP_OCOM or NCAP_COM flows has
+    if env.get("BENCOST") == "YES" and env.get("STAGES") != "YES" and "RPC_CAPFLO" in db.sym and db.card("RPC_CAPFLO"):
+        unported.append("$SET BENCOST YES: the costs of the capacity-related flows (NCAP_ICOM, NCAP_OCOM, NCAP_COM) "
+                        "are not in the COST of the benefit-cost indicators (rpt_objc.rpt 63-73)")
     for k, (val, what) in UNPORTED_ENV.items():
         if env.get(k) == val:
             unported.append(f"$SET {k} {val}: {what}")
     for k, (val, what) in UNVERIFIED_ENV.items():
         if env.get(k) == val:
             unverified.append(f"$SET {k} {val}: {what}")
-    if env.get("RPT_FLOTS"):
-        unported.append(f"$SET RPT_FLOTS {env['RPT_FLOTS']}: flows reported at ANNUAL (rptmisc.rpt 110)")
     return unported, unverified
 
 

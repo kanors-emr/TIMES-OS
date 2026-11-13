@@ -30,8 +30,15 @@ switches in `preprocess.json` (the file `times_pp --audit` writes), which is opt
 
 **What is written.** The attributes of a plain run, and those of the report options most Veda models set (`FLO.5`,
 `NCAP.1`, `FLO.3`, `COMPRD.1`, `ELC.1`, `ACT.2`, `ELC.3`, `COMPRD.4`, `OBJ.1`, and the levelized annual costs of
-`OBJ.2` and `$SET ANNCOST LEV`), are written as GDX2VEDA writes them.
-A report option whose block is not covered yet is named in the run report; nothing is written for it.
+`OBJ.2` and `$SET ANNCOST LEV`), are written as GDX2VEDA writes them. So are those of the other report options:
+the topology (`FLO.7`, or `$SET RPT_TOP YES`: `PAR_Top`), flows at ANNUAL (`$SET RPT_FLOTS ANNUAL`, or a negative
+`RPT_OPT(<commodity type>,'3')`), the levelized cost with the credit of the ENV commodities (`NCAP.1` below 0) or
+with the peak capacity credit (`NCAP.1` above 1), and the cost-benefit indicators of new capacity
+(`$SET BENCOST YES`: `VAR_NcapR` COST, CGAP, GGAP, RATIO, GRATIO; without the ranging information of the solver,
+and without the costs of capacity-related flows, which the run report names when a model has them). The cost of
+elastic demands is `Cost_Els`. A run with `FIXBOH` reports its fixed periods from the solution point it loads, as
+TIMES does (`timesrpt/loadedpoint.py`). Not written: the damage costs (`Cost_Dam`).
+A report option whose block is not covered is named in the run report; nothing is written for it.
 
 **A solution from HiGHS.** The objective is that of TIMES in GAMS. Where the LP has more than one optimum, the flows
 and marginals are those of the optimum HiGHS found, which can differ from the one another solver finds; and a zero

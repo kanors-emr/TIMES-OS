@@ -42,13 +42,115 @@ def coef_objinv(db):
     db.x("create or replace temp table coef_rtp_cnt as select '' as r, '' as y, '' as p, 0.0 as value where false")
     if cnt(db):
         _cost_coefficient(db)
+    if bencost(db):
+        _bencost(db)
+
+
+def bencost(db):
+    """$SET BENCOST YES, other than in stochastic TIMES (line 20: $IF %STAGES%==YES $SET BENCOST NO)."""
+    env = {k.upper(): str(v).strip("'\"").upper() for k, v in getattr(db, "env", {}).items()}
+    return env.get("BENCOST") == "YES" and env.get("STAGES") != "YES"
 
 
 def cnt(db):
-    """CNT = RPT_OPT('NCAP','1') (line 9); BENCOST YES would also set it, and is refused (switches.py)."""
+    """CNT = RPT_OPT('NCAP','1') (line 9); $IFI '%BENCOST%'==YES CNT = 1; (line 21)."""
+    if bencost(db):
+        return 1
     if "RPT_OPT" not in db.sym:
         return 0
     return db.q1("select value from RPT_OPT where u = 'NCAP' and j = '1'") or 0
+
+
+def _bencost(db):
+    """Lines 90-125 with $SET BENCOST YES: the cost-benefit indicators of new capacity, PAR_NCAPR(R,T,P,item).
+
+      PAR_NCAPR(RTP(R,T,P),'COST') $= COEF_RTP(R,T,P)+PASTSUM(R,T,P);
+      PASTSUM(R,T,P)$PAR_NCAPR(R,T,P,'COST') = VAR_NCAP.M(R,T,P)+EPS;
+      PASTSUM(RTP(R,T,P))$((VAR_NCAPRNG(RTP,'LO') GT -9E9)$(ABS(VAR_NCAP.L(RTP)) LT MICRO)$PASTSUM(RTP)) = MAX(PASTSUM(RTP),-VAR_NCAPRNG(RTP,'LO'));
+      OPTION RVP < PASTSUM;
+      PAR_NCAPR(RTP(R,T,P),'CGAP')$PAR_NCAPR(RTP,'COST') = PASTSUM(RTP)+EPS;
+      PAR_NCAPR(RVP(R,T,P),RNGLIM) = SUM(RNGMAP(RNGLIM,BD),VAR_NCAPRNG(R,T,P,BD));
+      BC_INVACT(RTP_VINTYR(R,V,T,P),S)$(PRC_TS(R,P,S)$RVP(R,V,P)) =
+        -ROUND(VAR_ACT.M(R,V,T,P,S)+SMIN(RPC_PG(R,P,C),VAR_FLO.M(R,V,T,P,C,S)*PRC_ACTFLO(R,V,P,C)),7);
+      BC_INVTOT(RVP(R,V,P))$(NOT PRC_VINT(R,P)) = PRC_CAPACT(R,P) *
+        SUM((RTP_CPTYR(R,V,T,P),PRC_TS(R,P,S),BDUPX(BD))$COEF_AF(R,V,T,P,S,BD), COEF_CPT(R,V,T,P) * COEF_AF(R,V,T,P,S,BD) *
+           G_YRFR(R,S) * MAX(-INF$BDLOX(BD),BC_INVACT(R,T,T,P,S)));
+      BC_INVTOT(RVP(R,V,P))$PRC_VINT(R,P) = ... the same over RTP_VINTYR(R,V,T,P), with BC_INVACT(R,V,T,P,S);
+      BC_INVTOT(RVP(R,T,P)) = BC_INVTOT(R,T,P) - VAR_NCAP.M(R,T,P) - SUM(TT$COEF_CPT(R,T,TT,P), COEF_CPT(R,T,TT,P) * VAR_CAP.M(R,TT,P)) +EPS;
+      PAR_NCAPR(RVP(R,T,P),'GGAP') = MAX(-BC_INVTOT(R,T,P),(PASTSUM(R,T,P)-INF$(PASTSUM(R,T,P) LE MICRO)));
+      PAR_NCAPR(RTP(R,T,P),SYSUC)$PAR_NCAPR(R,T,P,SYSUC) = PAR_NCAPR(R,T,P,SYSUC)/COEF_OBJINV(R,T,P);
+      PAR_NCAPR(RVP(R,T,P),'GRATIO') = 1-ROUND(PAR_NCAPR(R,T,P,'GGAP')/PAR_NCAPR(R,T,P,'COST'),7)+EPS;
+      PAR_NCAPR(R,T,P,'RATIO')$COEF_RTP(R,T,P) = 1-ROUND(PAR_NCAPR(R,T,P,'CGAP')/PAR_NCAPR(R,T,P,'COST'),6)+EPS;
+
+    COEF_RTP is the cost coefficient of _cost_coefficient (coef_rtp_cnt).  Two inputs are taken as empty here:
+    the ranging information VAR_NCAPRNG (lines 92-98: read from timesrng.gdx, which only a ranging run of the
+    solver leaves; without it the range rule is MAX(PASTSUM,0) where no capacity is built, and there are no RNGLO /
+    RNGUP records), and the capacity-related flow costs in PASTSUM (lines 63-73, RPC_CAPFLO), which the run report
+    names when the model has them (switches.py)."""
+    db.declare("PAR_NCAPR", "par", ["R", "ALLYEAR", "P", "ITEM"])
+    if not db.q1("select count(*) from coef_rtp_cnt"):
+        return
+    mar = lambda n, args: f"v_M_{n}({args})" if f"M_{n}" in db.sym else "0"
+    lev = "v_L_VAR_NCAP(c.r, c.y, c.p)" if "L_VAR_NCAP" in db.sym else "0"
+    # COST, and PASTSUM = VAR_NCAP.M + EPS; where no capacity is built, MAX(PASTSUM, 0): a negative marginal gives 0,
+    # which leaves no record (an EPS stays: MAX(EPS,0) is EPS)
+    db.x(f"""create or replace temp table bc_cost as
+             select c.r, c.y, c.p, c.value as cost, {mar('VAR_NCAP', 'c.r, c.y, c.p')} as past, abs({lev}) < 1e-6 as idle
+             from coef_rtp_cnt c where in_RTP(c.r, c.y, c.p) and c.value <> 0""")
+    db.x("create or replace temp table bc_rvp as select r, y, p, past from bc_cost where not (idle and past < 0)")
+    # BC_INVACT
+    vr, vv, vt, vp = db.cols("RTP_VINTYR")[:4]
+    tr, tp, ts = db.cols("PRC_TS")[:3]
+    gr, gp, gc = db.cols("RPC_PG")[:3]
+    flo = (f"(select min({mar('VAR_FLO', 'k.r, k.v, k.t, k.p, g.' + gc + ', k.s')} * v_PRC_ACTFLO(k.r, k.v, k.p, g.{gc})) "
+           f"from RPC_PG g where g.{gr} = k.r and g.{gp} = k.p)")
+    db.x(f"""create or replace temp table bc_invact as
+             select k.r, k.v, k.t, k.p, k.s, -round({mar('VAR_ACT', 'k.r, k.v, k.t, k.p, k.s')} + {flo}, 7) as value
+             from (select x.{vr} as r, x.{vv} as v, x.{vt} as t, x.{vp} as p, s.{ts} as s
+                   from RTP_VINTYR x join PRC_TS s on s.{tr} = x.{vr} and s.{tp} = x.{vp}
+                   join bc_rvp q on q.r = x.{vr} and q.y = x.{vv} and q.p = x.{vp}) k""")
+    # BC_INVTOT
+    ar, av, at, ap, as_, abd = db.cols("COEF_AF")[:6]
+    vint = "in_PRC_VINT(q.r, q.p)" if "PRC_VINT" in db.sym else "false"
+    lox = "in_BDLOX(a.{0})".format(abd)
+    cr, cv, ct, cp = db.cols("RTP_CPTYR")[:4]
+    kc = db.cols("COEF_CPT")
+    db.x(f"""create or replace temp table bc_act as
+             select q.r, q.y, q.p,
+                    sum(v_COEF_CPT(q.r, q.y, a.{at}, q.p) * a.value * v_G_YRFR(q.r, a.{as_}) *
+                        case when {lox} then coalesce(i.value, 0) else greatest(0, coalesce(i.value, 0)) end) as value
+             from bc_rvp q
+             join COEF_AF a on a.{ar} = q.r and a.{av} = q.y and a.{ap} = q.p
+             left join bc_invact i on i.r = q.r and i.t = a.{at} and i.p = q.p and i.s = a.{as_}
+                                  and i.v = case when {vint} then q.y else a.{at} end
+             where in_BDUPX(a.{abd}) and a.value <> 0 and in_PRC_TS(q.r, q.p, a.{as_})
+               and case when {vint} then in_RTP_VINTYR(q.r, q.y, a.{at}, q.p) else in_RTP_CPTYR(q.r, q.y, a.{at}, q.p) end
+             group by q.r, q.y, q.p""")
+    db.x(f"""create or replace temp table bc_capm as
+             select k.{kc[0]} as r, k.{kc[1]} as y, k.{kc[3]} as p, sum(k.value * {mar('VAR_CAP', 'k.' + kc[0] + ', k.' + kc[2] + ', k.' + kc[3])}) as value
+             from COEF_CPT k group by 1, 2, 3""")
+    db.x(f"""create or replace temp table bc_invtot as
+             select q.r, q.y, q.p, q.past,
+                    v_PRC_CAPACT(q.r, q.p) * coalesce(a.value, 0) - {mar('VAR_NCAP', 'q.r, q.y, q.p')} - coalesce(m.value, 0) as tot
+             from bc_rvp q
+             left join bc_act a on a.r = q.r and a.y = q.y and a.p = q.p
+             left join bc_capm m on m.r = q.r and m.y = q.y and m.p = q.p""")
+    # the items before the division by COEF_OBJINV: COST; CGAP = PASTSUM+EPS; GGAP = MAX(-BC_INVTOT, PASTSUM or -INF)
+    div = "v_COEF_OBJINV(x.r, x.y, x.p)"
+    db.x(f"""create or replace temp table bc_items as
+             select x.r, x.y, x.p, x.cost / {div} as cost,
+                    coalesce(q.past, 0) / {div} as cgap,
+                    case when q.r is null then null
+                         else (case when q.past <= 1e-6 then -t.tot else greatest(-t.tot, q.past) end) / {div} end as ggap,
+                    q.r is not null as rvp
+             from bc_cost x
+             left join bc_rvp q on q.r = x.r and q.y = x.y and q.p = x.p
+             left join bc_invtot t on t.r = x.r and t.y = x.y and t.p = x.p""")
+    db.put("PAR_NCAPR", "select r, y, p, 'COST' as u, cost as value from bc_items where cost <> 0")
+    db.put("PAR_NCAPR", "select r, y, p, 'CGAP' as u, cgap as value from bc_items", zero="eps")
+    db.put("PAR_NCAPR", "select r, y, p, 'GGAP' as u, ggap as value from bc_items where rvp and ggap <> 0")
+    db.put("PAR_NCAPR", "select r, y, p, 'GRATIO' as u, 1 - round(coalesce(ggap, 0) / cost, 7) as value from bc_items where rvp", zero="eps")
+    db.put("PAR_NCAPR", "select r, y, p, 'RATIO' as u, 1 - round(cgap / cost, 6) as value from bc_items", zero="eps")
 
 
 def _cost_coefficient(db):

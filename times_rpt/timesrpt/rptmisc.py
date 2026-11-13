@@ -106,13 +106,15 @@ def _misc(db):
     _constraints(db)
     _par_eout(db)
     _levcost(db)
+    _annual_fallback(db)
+    _par_top(db)
     return ["R_DF", "PAR_ACTL", "PAR_ACTM",
             "PAR_CAPL", "PAR_PASTI", "PAR_CAPM", "PAR_CAPBD", "PAR_NCAPL", "PAR_NCAPM", "PAR_CUMRET",
             "PAR_COMPRDL", "PAR_COMPRDM", "PAR_COMNETL", "PAR_COMNETM", "AGG_OUT",
             "PAR_COMBALEM", "PAR_COMBALGM", "PAR_PEAKM",
             "F_IN", "F_OUT", "P_OUT", "VAL_FLO", "PAR_EOUT",
             "PAR_CUMFLOL", "PAR_CUMFLOM", "PAR_CUMCST", "PAR_UCRTP", "PAR_UCMRK",
-            "PAR_UCSL", "PAR_UCSM", "PAR_UCMAX"]
+            "PAR_UCSL", "PAR_UCSM", "PAR_UCMAX", "PAR_TOP"]
 
 
 def _rpt_opt_defaults(db):
@@ -864,11 +866,11 @@ def _flow_timeslices(db):
     db.declare("P_OUT", "par", ["R", "T", "P", "C", "S"])
     db.declare("VAL_FLO", "par", ["R", "ALLYEAR", "LL", "PRC", "C"])
     flo1 = _opt(db, "FLO", "1") or 0
-    # --- UNCD1(U2(COM_TYPE))$RPT_OPT(U2,'3')=YES; UNCD1(U2(NRG_TYPE))$RPT_OPT(U2,'1')=YES;
+    # --- UNCD1(U2(COM_TYPE))$RPT_OPT(U2,'3')=YES; UNCD1(U2(NRG_TYPE))$RPT_OPT(U2,'1')=YES; UNCD1(U2(NRG_TYPE))$RPT_OPT(U2,'3')=YES;
     #     RPT_OPT('FLO','1')$CARD(UNCD1)=YES;    (rptmisc.rpt 100-102: power levels or a fall-back need COM_TS)
     if "RPT_OPT" in db.sym and db.card("RPT_OPT"):
         types = []
-        for name, j in (("COM_TYPE", "3"), ("NRG_TYPE", "1")):
+        for name, j in (("COM_TYPE", "3"), ("NRG_TYPE", "1"), ("NRG_TYPE", "3")):
             if name in db.sym and db.card(name):
                 t = db.cols(name)[0]
                 types.append(f"""select 1 from RPT_OPT o join "{name}" m on upper(m.{t}) = upper(o.u)
@@ -883,6 +885,95 @@ def _flow_timeslices(db):
         _redistribute(db, "F_IN")
         _redistribute(db, "F_OUT")
         db.clear("RCS")
+    elif flo1 < 1 and str(getattr(db, "env", {}).get("RPT_FLOTS", "")).strip("'\"").upper() == "ANNUAL" and "RC" in db.sym:
+        # --- IF(RPT_OPT('FLO','1')<1,
+        #     $ IFI %RPT_FLOTS%==ANNUAL RCS(RC,ANNUAL)=YES;        (rptmisc.rpt 109-110: every flow at ANNUAL)
+        db.declare("RCS", "set", ["R", "C", "S"])
+        r, c = db.cols("RC")[:2]
+        db.assign("RCS", f"select {r} as r, {c} as c, 'ANNUAL' as s from RC")
+        db.rcs_on = bool(db.card("RCS"))
+        _redistribute(db, "F_IN")
+        _redistribute(db, "F_OUT")
+        db.clear("RCS")
+
+
+def _par_top(db):
+    """solsetv.v3 203-209 (FINISHUP), the topology of the processes, with RPT_OPT('FLO','7') or $SET RPT_TOP YES:
+      $IFI %RPT_TOP%==YES SET ADESC / PAR_Top 'Process topology indicator' /; RPT_OPT('FLO','7')=1;
+      IF(RPT_OPT('FLO','7'),
+        PAR_TOP(R,T(MIYR_1),P,C,IO)$TOP(R,P,C,IO) = EPS;
+        PAR_TOP(R,T(MIYR_1),P,C,'OUT')$RPC_IRE(R,P,C,'IMP') = EPS;
+        PAR_TOP(R,T(MIYR_1),P,C,'IN')$RPC_IRE(R,P,C,'EXP')  = EPS;
+        PAR_TOP(R,T-(ORD(T)-1),P,C,IO)$NCAP_COM(R,T,P,C,IO) = EPS;
+    Every record is an EPS at the first period: the flows of each process, the imports as outputs and the exports
+    as inputs of a trade process, and the commodities tied to the capacity of a process (NCAP_COM)."""
+    db.declare("PAR_TOP", "par", ["R", "T", "P", "C", "IO"])
+    db.clear("PAR_TOP")
+    env = {k.upper(): str(v).strip("'\"").upper() for k, v in getattr(db, "env", {}).items()}
+    if not (_opt(db, "FLO", "7") or env.get("RPT_TOP") == "YES") or "TOP" not in db.sym:
+        return
+    first = db.q1(f'select min({db.cols("MILESTONYR")[0]}) from MILESTONYR')
+    sels = ["select r, p, c, io from TOP"]
+    if "RPC_IRE" in db.sym and db.card("RPC_IRE"):
+        r, p, c, ie = db.cols("RPC_IRE")[:4]
+        sels.append(f"select {r}, {p}, {c}, case when {ie} = 'IMP' then 'OUT' else 'IN' end from RPC_IRE where {ie} in ('IMP', 'EXP')")
+    if "NCAP_COM" in db.sym and db.card("NCAP_COM"):
+        r, y, p, c, io = db.cols("NCAP_COM")[:5]
+        sels.append(f"select {r}, {p}, {c}, {io} from NCAP_COM where in_MILESTONYR({y})")
+    k = db.cols("PAR_TOP")
+    db.put("PAR_TOP", f"""select distinct u.r as {k[0]}, '{first}' as {k[1]}, u.p as {k[2]}, u.c as {k[3]}, u.io as {k[4]}, 0 as value
+                          from ({' union all '.join(sels)}) u(r, p, c, io)
+                          where u.r in (select {db.cols("RTP")[0]} from RTP)""", zero="eps")       # (R: the regions of the model)
+
+
+def _annual_fallback(db):
+    """rptmisc.rpt 266-279, the last statements of the file: the flows of the commodity types whose RPT_OPT(type,'3')
+    is negative fall back to ANNUAL.
+      LOOP(ANNUAL(TS)$CARD(UNCD1),
+        LOOP(UNCD1(COM_TYPE(CG)),TRACKC(R,C)$COM_TMAP(R,COM_TYPE,C)=RPT_OPT(CG,'3')<0);
+        LOOP(UNCD1(NRG_TYPE(U2))$RPT_OPT(U2,'3'),TRACKC(R,C)$NRG_TMAP(R,NRG_TYPE,C)=RPT_OPT(U2,'3')<0);
+        RVTPC(R,V,T,P,C)$TRACKC(R,C) $= SUM(S$F_IN(R,V,T,P,C,S),STOA(S));
+        F_IOS(RVTPC,TS) = SUM(S$F_IN(RVTPC,S),F_IN(RVTPC,S));
+        F_IN(RVTPC,S) = 0;  F_IN(RVTPC,S) $= F_IOS(RVTPC,S);
+        ... the same for F_OUT ...
+    UNCD1 (lines 103-105): the commodity types with RPT_OPT(type,'3') and the energy types with RPT_OPT(type,'1') or
+    RPT_OPT(type,'3').  STOA(S) is the number of levels from S up to ANNUAL: a flow with a record on a timeslice below
+    ANNUAL is summed over its timeslices onto ANNUAL (the sum of EPS records is EPS; a sum that cancels leaves none).
+    The energy types are assigned after the commodity types, so theirs is the last word for a commodity of both."""
+    if "RPT_OPT" not in db.sym or not db.card("RPT_OPT"):
+        return
+    opt = {(str(u).upper(), str(j)): v for u, j, v in db.q("select u, j, value from RPT_OPT")}
+    track = []
+    for types, tmap, in_uncd1 in (("COM_TYPE", "COM_TMAP", lambda u: opt.get((u, "3"))),
+                                 ("NRG_TYPE", "NRG_TMAP", lambda u: opt.get((u, "1")) or opt.get((u, "3")))):
+        if types not in db.sym or tmap not in db.sym or not db.card(types):
+            continue
+        r, t, c = db.cols(tmap)[:3]
+        for (u,) in db.q(f'select upper({db.cols(types)[0]}) from "{types}" order by 1'):
+            o3 = opt.get((u, "3")) or 0
+            if not in_uncd1(u) or (types == "NRG_TYPE" and not o3):
+                continue
+            track.append((f'select {r} as r, {c} as c from "{tmap}" where upper({t}) = \'{u}\'', o3 < 0))
+    if not track:
+        return
+    db.x("create or replace temp table trackc (r VARCHAR, c VARCHAR)")
+    for sel, yes in track:
+        db.x(f"delete from trackc k where exists (select 1 from ({sel}) m where m.r = k.r and m.c = k.c)")
+        if yes:
+            db.x(f"insert into trackc select distinct r, c from ({sel})")
+    if not db.q1("select count(*) from trackc"):
+        return
+    for name in ("F_IN", "F_OUT"):
+        if name not in db.sym or not db.card(name):
+            continue
+        db.x(f"""create or replace temp table f_ann as
+                 select f.r, f.y, f.y2, f.p, f.c, sum(f.value) as value, bool_and(f.value = 0) as all_eps
+                 from "{name}" f join trackc k on k.r = f.r and k.c = f.c
+                 group by f.r, f.y, f.y2, f.p, f.c
+                 having bool_or(f.s <> 'ANNUAL')""")
+        db.x(f"""delete from "{name}" f where exists (select 1 from f_ann a
+                   where a.r = f.r and a.y = f.y and a.y2 = f.y2 and a.p = f.p and a.c = f.c)""")
+        db.put(name, "select r, y, y2, p, c, 'ANNUAL' as s, value from f_ann where value <> 0 or all_eps", zero="eps")
 
 
 def _eps_sum(db, name, select, keys, mode):
@@ -1000,12 +1091,19 @@ def _levcost(db):
       RP_GRP(RPC_PG(RP_PRC,C))$(NOT TRACKPC) (F=1): main outputs, not credited;
       PAR_RTCS (peak marginal / (1+reserve) by timeslice) and TRACKPG for the outputs of a peak commodity;
       PAR_NCAPR(NCAP_YES(R,TT(V),P),'LEVCOST') = (vintaged / non-vintaged formula) / MAX(MICRO, main output).
-    Taken only for F = 1 (RPT_OPT('NCAP','1') = 1). F < 0 (the ENV credit and the COEF_CAP aux share) and
-    F > 1 (the peak capacity term on RPC_PKC processes) are not ported: nothing is written, and the run report
-    names the option (switches.py)."""
-    f = _opt(db, "NCAP", "1") or 0
-    if f != 1:
+    The other values (line 213: Z=F<0; F=1-Z+(F>1), so F is 0, 1 or 2):
+      RPT_OPT('NCAP','1') < 0 (Z, F=0): no output is credited; the inputs are valued with the ENV credit VDA_EMCB
+        (lines 216-224: the marginals of the ENV commodities with a lower balance, passed to the energy outputs of
+        the PRE processes that emit them) and are reduced by the share COEF_CAP of the auxiliary energy outputs
+        (line 229); the inputs of those ENV commodities are not valued, and the auxiliary outputs carry no flow cost;
+      RPT_OPT('NCAP','1') > 1 (F=2): every output is credited, the main one too (RP_GRP is not set, line 230), and
+        the processes with a peak contribution (RPC_PKC) get the credit of their capacity instead of that of their
+        main output (lines 235, 252)."""
+    f0 = _opt(db, "NCAP", "1") or 0
+    if not f0:
         return
+    z = f0 < 0                                  # Z=F<0;
+    f = 1 - z + (f0 > 1)                        # F=1-Z+(F>1);
     coef = "coef_rtp_cnt"
     if not db.q1(f"select count(*) from information_schema.tables where table_name = '{coef}'"):
         return
@@ -1022,23 +1120,107 @@ def _levcost(db):
             select c.r, c.y, c.p, c.value + coalesce((select sum(pp.value) from PAR_PASTI pp
                    where pp.r = c.r and pp.y = c.y and pp.p = c.p), 0) as value
             from PAR_CAPL c""")
+    # --- the ENV credit (lines 216-224), with Z only:
+    #   LOOP(COM_LIM(ENV(R,C),'LO')$Z,TRACKC(R,C)=YES;TRACKP(R,P)$(PRC_MAP(R,'PRE',P)$TOP(R,P,C,'OUT'))=YES);
+    #   TRACKPC(TRACKP(R,P),C)$(NRG(R,C)$TOP(R,P,C,'OUT'))=YES; TRACKC(R,C)$SUM(TRACKPC(R,P,C),1)=YES;
+    #   VDA_EMCB(R,T,C,C)$(NRG(R,C)$TRACKC(R,C)) =
+    #    MIN(SUM(TRACKC(ENV(R,COM)),MIN(0,COM_AGG(R,T,C,COM)*PAR_COMBALEM(R,T,COM,SL))),
+    #     SUM(P$TRACKPC(R,P,C),
+    #      SUM((VNT(V,T),S)$F_OUT(R,V,T,P,C,S),F_OUT(R,V,T,P,C,S))/MAX(MICRO,SUM((TRACKPC(R,P,COM2),VNT(V,T),S)$F_OUT(R,V,T,P,COM2,S),F_OUT(R,V,T,P,COM2,S))) *
+    #      SUM((VNT(V,T),TRACKC(ENV(R,COM)))$F_OUT(R,V,T,P,COM,SL),F_OUT(R,V,T,P,COM,SL)*MIN(0,PAR_COMBALEM(R,T,COM,SL)))) /
+    #     MAX(MICRO,SUM((VNT(V,T),P,S)$F_OUT(R,V,T,P,C,S),F_OUT(R,V,T,P,C,S))+SUM(S$AGG_OUT(R,T,C,S),AGG_OUT(R,T,C,S))));
+    #   OPTION CLEAR=TRACKP,CLEAR=TRACKPC,CLEAR=COEF_CAP; TRACKC(NRG)=NO;
+    # lev_envc: the ENV commodities (TRACKC after the last statement); lev_emcb: VDA_EMCB(R,T,C,C)
+    db.x("create or replace temp table lev_envc as select '' r, '' c where false")
+    db.x("create or replace temp table lev_emcb as select '' r, '' y, '' c, 0.0 as value where false")
+    if z and all(n in db.sym for n in ("COM_LIM", "ENV", "PRC_MAP", "F_OUT")):
+        lr, lc, ll = db.cols("COM_LIM")[:3]
+        db.x(f"""create or replace temp table lev_envc as
+                 select distinct l.{lr} as r, l.{lc} as c from COM_LIM l where l.{ll} = 'LO' and in_ENV(l.{lr}, l.{lc})""")
+        mr, mg, mp = db.cols("PRC_MAP")[:3]
+        db.x(f"""create or replace temp table lev_envpc as
+                 select distinct x.r, x.p, x.c from TOP x
+                 where x.io = 'OUT' and in_NRG(x.r, x.c)
+                   and exists (select 1 from PRC_MAP m where m.{mr} = x.r and upper(m.{mg}) = 'PRE' and m.{mp} = x.p)
+                   and exists (select 1 from TOP e join lev_envc k on k.r = e.r and k.c = e.c
+                               where e.r = x.r and e.p = x.p and e.io = 'OUT')""")
+        db.x("""create or replace temp table lev_fo as
+                select r, y2 as t, p, c, sum(value) as value from F_OUT where in_VNT(y, y2) group by r, y2, p, c""")
+        db.x("""create or replace temp table lev_foenv as
+                select o.r, o.y2 as t, o.p, sum(o.value * least(0, v_PAR_COMBALEM(o.r, o.y2, o.c, 'ANNUAL'))) as value
+                from F_OUT o join lev_envc k on k.r = o.r and k.c = o.c
+                where o.s = 'ANNUAL' and in_VNT(o.y, o.y2) group by o.r, o.y2, o.p""")
+        agg = ("coalesce((select sum(least(0, a.value * v_PAR_COMBALEM(a.r, a.y, a.c2, 'ANNUAL'))) from lev_agg a "
+               "where a.r = d.r and a.y = d.t and a.c = d.c), 0)")
+        if "COM_AGG" in db.sym and db.card("COM_AGG"):
+            ar, ay, ac, ac2 = db.cols("COM_AGG")[:4]
+            db.x(f"""create or replace temp table lev_agg as
+                     select a.{ar} as r, a.{ay} as y, a.{ac} as c, a.{ac2} as c2, a.value from COM_AGG a
+                     join lev_envc k on k.r = a.{ar} and k.c = a.{ac2}""")
+        else:
+            agg = "0"
+        ago = ("coalesce((select sum(g.value) from AGG_OUT g where g.r = d.r and g.y = d.t and g.c = d.c), 0)"
+               if "AGG_OUT" in db.sym else "0")
+        my = db.cols("MILESTONYR")[0]
+        db.x(f"""create or replace temp table lev_emcb as
+                 select d.r, d.t as y, d.c,
+                        least({agg},
+                              coalesce((select sum(fo.value / greatest(1e-6, (select sum(f2.value) from lev_fo f2
+                                                     join lev_envpc k2 on k2.r = f2.r and k2.p = f2.p and k2.c = f2.c
+                                                     where f2.r = fo.r and f2.t = fo.t and f2.p = fo.p)) * fe.value)
+                                        from lev_fo fo
+                                        join lev_envpc k on k.r = fo.r and k.p = fo.p and k.c = fo.c
+                                        join lev_foenv fe on fe.r = fo.r and fe.t = fo.t and fe.p = fo.p
+                                        where fo.r = d.r and fo.t = d.t and fo.c = d.c), 0)
+                              / greatest(1e-6, coalesce((select sum(fa.value) from lev_fo fa
+                                                         where fa.r = d.r and fa.t = d.t and fa.c = d.c), 0) + {ago})) as value
+                 from (select distinct k.r, k.c, m.{my} as t from lev_envpc k, MILESTONYR m) d""")
+        db.x("delete from lev_emcb where value = 0")
+        db.x("delete from lev_envc e where in_NRG(e.r, e.c)")
     # NRGELC (solsetv.v3 150): NRG commodities mapped to the ELC energy type
     nt = db.cols("NRG_TMAP")[1] if "NRG_TMAP" in db.sym else None
     nrgelc = (f"(in_NRG(x.r, x.c) and exists (select 1 from NRG_TMAP m where m.r = x.r and upper(m.{nt}) = 'ELC' and m.c = x.c))"
               if nt else "false")
     # RP_PRC < NCAP_YES; TRACKP = ELE+CHP+HPL; TRACKPC: their NRG outputs, not (PG and (NRGELC or not CHP))
-    kinds = " or ".join(f"in_{k}(n.r, n.p)" for k in ("ELE", "CHP", "HPL") if k in db.sym) or "false"
-    chp = "in_CHP(x.r, x.p)" if "CHP" in db.sym else "false"
+    # ELE, CHP and HPL are the report sets of solsetv.v3 121-123 (ELE(RP(R,P)) $= PRC_MAP(R,'ELE',P); ...), set before
+    # the reports (rptmain.mod 19): read from PRC_MAP, the model's tables hold ELE and HPL as declared, without members
+    if "PRC_MAP" in db.sym:
+        gr, gg, gp = db.cols("PRC_MAP")[:3]
+        grp = lambda a, names: (f"exists (select 1 from PRC_MAP m_ where m_.{gr} = {a}.r and m_.{gp} = {a}.p "
+                                f"and upper(m_.{gg}) in ({', '.join(repr(x) for x in names)}))")
+        kinds, chp = grp("n", ("ELE", "CHP", "HPL")), grp("x", ("CHP",))
+    else:
+        kinds, chp = "false", "false"
     db.x(f"""create or replace temp table lev_trackpc as
              select distinct x.r, x.p, x.c from TOP x
              join (select distinct n.r, n.p from NCAP_YES n where {kinds}) k on k.r = x.r and k.p = x.p
              where x.io = 'OUT' and in_NRG(x.r, x.c)
                and not (in_RPC_PG(x.r, x.p, x.c) and ({nrgelc} or not {chp}))""")
     # RP_GRP(RPC_PG(RP_PRC,C))$(NOT TRACKPC): the main outputs of the processes still in NCAP_YES
-    db.x("""create or replace temp table lev_grp as
+    # (IF(F=1, ...): with F = 0 or 2 RP_GRP stays empty)
+    db.x(f"""create or replace temp table lev_grp as
             select distinct g.r, g.p, g.c from RPC_PG g
             join (select distinct r, p from NCAP_YES) n on n.r = g.r and n.p = g.p
-            where not exists (select 1 from lev_trackpc t where t.r = g.r and t.p = g.p and t.c = g.c)""")
+            where {'true' if f == 1 else 'false'}
+              and not exists (select 1 from lev_trackpc t where t.r = g.r and t.p = g.p and t.c = g.c)""")
+    # IF(Z,COEF_CAP(RTP_VINTYR(R,V,T,P))$TRACKP(R,P)=1-1/(1+SUM(RPCS_VAR(TRACKPC(R,P,C),S),PAR_FLO(R,V,T,P,C,S))
+    #        /MAX(MICRO,SUM(RPCS_VAR(RPC_PG(R,P,C),S)$(NOT TRACKPC(R,P,C)),PAR_FLO(R,V,T,P,C,S)))));     (line 229)
+    db.x("create or replace temp table lev_coefcap as select '' r, '' fv, '' t, '' p, 0.0 as value where false")
+    if z:
+        db.x("""create or replace temp table lev_coefcap as
+                select a.r, a.fv, a.t, a.p,
+                       1 - 1 / (1 + a.value / greatest(1e-6, coalesce((
+                           select sum(pf.value) from PAR_FLO pf
+                           join RPC_PG g on g.r = pf.r and g.p = pf.p and g.c = pf.c
+                           join RPCS_VAR rv on rv.r = pf.r and rv.p = pf.p and rv.c = pf.c and rv.s = pf.s
+                           where pf.r = a.r and pf.y = a.fv and pf.y2 = a.t and pf.p = a.p
+                             and not exists (select 1 from lev_trackpc k where k.r = pf.r and k.p = pf.p and k.c = pf.c)), 0))) as value
+                from (select pf.r, pf.y as fv, pf.y2 as t, pf.p, sum(pf.value) as value from PAR_FLO pf
+                      join lev_trackpc k on k.r = pf.r and k.p = pf.p and k.c = pf.c
+                      join RPCS_VAR rv on rv.r = pf.r and rv.p = pf.p and rv.c = pf.c and rv.s = pf.s
+                      where in_RTP_VINTYR(pf.r, pf.y, pf.y2, pf.p)
+                      group by pf.r, pf.y, pf.y2, pf.p) a""")
+        db.x("delete from lev_coefcap where value = 0")
     # peak credit: TRACKPG(RP_PRC,C)$TOP OUT for each C of a peak commodity group, and PAR_RTCS
     db.x("create or replace temp table lev_rtcs as select '' r, '' y, '' c, '' s, 0.0 as value where false")
     db.x("create or replace temp table lev_trackpg as select '' r, '' p, '' c where false")
@@ -1071,25 +1253,60 @@ def _levcost(db):
                  join RTCS_VARC d on d.r = g.r and d.c = g.c
                  left join lev_pk p on p.r = d.r and p.y = d.y and p.c = d.c and p.s = d.s and p.cg = k.cg
                  group by d.r, d.y, d.c, d.s""")
+    # OPTION RP_PRC < RPC_PKC; RP_PRC(RP)$(F<2)=NO; TRACKPG(RPC_PG(RP_PRC,C))=NO;                         (line 235)
+    db.x("create or replace temp table lev_pkprc as select '' r, '' p where false")
+    if f == 2 and "RPC_PKC" in db.sym and db.card("RPC_PKC"):
+        kr, kp = db.cols("RPC_PKC")[:2]
+        db.x(f"create or replace temp table lev_pkprc as select distinct {kr} as r, {kp} as p from RPC_PKC")
+        db.x("""delete from lev_trackpg t where exists (select 1 from lev_pkprc k where k.r = t.r and k.p = t.p)
+                  and in_RPC_PG(t.r, t.p, t.c)""")
     # the bracket of lines 242-252, set by set. fv is the vintage of the flows and costs (V when the process is
     # vintaged, T when not); the peak credit also needs the capacity vintage, so its part is kept by timeslice.
     ie = "v_COM_IE(o.r, o.y2, o.c, ct.s)" if "COM_IE" in db.sym else "1"
     parts = []
     if "CST_ACTC" in db.sym:
         parts.append("select r, y as fv, y2 as t, p, value from CST_ACTC")
+    # the inputs, times (1-COEF_CAP(R,V,T,P)): their flow costs, and their value at the commodity marginal.
+    # COEF_CAP, VDA_EMCB and TRACKC exist only with Z: without it the queries are the plain inner joins (the flows of a
+    # large model are millions of rows, and an outer join here multiplies them by the timeslices first)
+    ccj = "left join lev_coefcap q on q.r = {0}.r and q.fv = {0}.y and q.t = {0}.y2 and q.p = {0}.p" if z else ""
+    cc = "(1 - coalesce(q.value, 0))" if z else "1"
     for tab in ("CST_FLOC", "CST_FLOX"):
         if tab in db.sym:
+            parts.append(f"""select z.r, z.y, z.y2, z.p, z.value * {cc} from {tab} z
+                             join TOP x on x.r = z.r and x.p = z.p and x.c = z.c and x.io = 'IN'
+                             {ccj.format('z')}""")
+            # SUM(TOP(R,P,C,'OUT')$(NOT TRACKPC(R,P,C)$Z), CST_FLOC+CST_FLOX - ...)
             parts.append(f"""select z.r, z.y, z.y2, z.p, z.value from {tab} z
-                             join TOP x on x.r = z.r and x.p = z.p and x.c = z.c and x.io in ('IN', 'OUT')""")
-    # inputs at the commodity marginal: SUM((COM_TS(R,C,S),RS_TREE(R,S,TS))$F_IN, PAR_COMBALEM(R,T,C,S)*F_IN(..TS)*RS_FR(R,S,TS))
-    parts.append("""select o.r, o.y, o.y2, o.p, m.value * o.value * v_RS_FR(o.r, ct.s, o.s)
-                    from F_IN o
+                             join TOP x on x.r = z.r and x.p = z.p and x.c = z.c and x.io = 'OUT'
+                             where not ({'true' if z else 'false'} and exists (select 1 from lev_trackpc k
+                                        where k.r = z.r and k.p = z.p and k.c = z.c))""")
+    # SUM((COM_TS(R,C,S),RS_TREE(R,S,TS))$F_IN, (PAR_COMBALEM(R,T,C,S)+VDA_EMCB(R,T,C,C))*F_IN(..TS)*RS_FR(R,S,TS))$(NOT TRACKC(R,C))
+    fin = """from F_IN o
                     join TOP x on x.r = o.r and x.p = o.p and x.c = o.c and x.io = 'IN'
                     join COM_TS ct on ct.r = o.r and ct.c = o.c
-                    join RS_TREE tr on tr.r = o.r and tr.s = ct.s and tr.s2 = o.s
+                    join RS_TREE tr on tr.r = o.r and tr.s = ct.s and tr.s2 = o.s"""
+    if not z:
+        parts.append(f"""select o.r, o.y, o.y2, o.p, m.value * o.value * v_RS_FR(o.r, ct.s, o.s)
+                    {fin}
                     join PAR_COMBALEM m on m.r = o.r and m.y = o.y2 and m.c = o.c and m.s = ct.s""")
-    # outputs other than the main ones, credited at the marginal times COM_IE
-    parts.append(f"""select o.r, o.y, o.y2, o.p, -m.value * {ie} * o.value * v_RS_FR(o.r, ct.s, o.s)
+    else:
+        # the marginal, with the credit where there is one; then the credit alone where the commodity has no marginal
+        parts.append(f"""select o.r, o.y, o.y2, o.p, (m.value + coalesce(e.value, 0)) * o.value * v_RS_FR(o.r, ct.s, o.s) * {cc}
+                    {fin}
+                    join PAR_COMBALEM m on m.r = o.r and m.y = o.y2 and m.c = o.c and m.s = ct.s
+                    left join lev_emcb e on e.r = o.r and e.y = o.y2 and e.c = o.c
+                    {ccj.format('o')}
+                    where not exists (select 1 from lev_envc k where k.r = o.r and k.c = o.c)""")
+        parts.append(f"""select o.r, o.y, o.y2, o.p, e.value * o.value * v_RS_FR(o.r, ct.s, o.s) * {cc}
+                    {fin}
+                    join lev_emcb e on e.r = o.r and e.y = o.y2 and e.c = o.c
+                    {ccj.format('o')}
+                    where not exists (select 1 from PAR_COMBALEM m where m.r = o.r and m.y = o.y2 and m.c = o.c and m.s = ct.s)
+                      and not exists (select 1 from lev_envc k where k.r = o.r and k.c = o.c)""")
+    # outputs other than the main ones, credited at the marginal times COM_IE: ...$(NOT RP_GRP(R,P,C))$F
+    if f:
+        parts.append(f"""select o.r, o.y, o.y2, o.p, -m.value * {ie} * o.value * v_RS_FR(o.r, ct.s, o.s)
                      from F_OUT o
                      join TOP x on x.r = o.r and x.p = o.p and x.c = o.c and x.io = 'OUT'
                      join COM_TS ct on ct.r = o.r and ct.c = o.c
@@ -1110,7 +1327,8 @@ def _levcost(db):
              join COM_TS ct on ct.r = o.r and ct.c = o.c
              join RS_TREE tr on tr.r = o.r and tr.s = ct.s and tr.s2 = o.s
              join lev_rtcs rc on rc.r = o.r and rc.y = o.y2 and rc.c = o.c and rc.s = ct.s
-             where not exists (select 1 from lev_grp q where q.r = o.r and q.p = o.p and q.c = o.c)
+             where {'true' if f else 'false'}
+               and not exists (select 1 from lev_grp q where q.r = o.r and q.p = o.p and q.c = o.c)
              group by o.r, o.y, o.y2, o.p, ct.s, {pkf}""")
     # main output: SUM(RPCS_VAR(RPC_PG(R,P,C),S)$(NOT TRACKPC), PAR_FLO(R,fv,T,P,C,S))
     db.x("""create or replace temp table lev_out as
@@ -1121,16 +1339,27 @@ def _levcost(db):
             where not exists (select 1 from lev_trackpc k where k.r = pf.r and k.p = pf.p and k.c = pf.c)
             group by pf.r, pf.y, pf.y2, pf.p""")
     pkcnt = "v_NCAP_PKCNT(k.r, k.v, k.p, q.s)" if "NCAP_PKCNT" in db.sym else "0"
+    # F = 2, the capacity credit of the processes with a peak contribution (line 252; PASTSUM for VAR_NCAP.L when not vintaged):
+    #   SUM((RPC_PG(RP_PRC(R,P),C),COM_TS(R,C,S)),NCAP_PKCNT(R,V,P,S)*PAR_RTCS(R,T,C,S)*VAR_NCAP.L(R,V,P)*G_YRFR(R,S)*PRC_CAPACT(R,P)*PRC_ACTFLO(R,V,P,C))
+    pkcap = "0"
+    if f == 2 and db.q1("select count(*) from lev_pkprc") and "NCAP_PKCNT" in db.sym:
+        pkcap = """coalesce((select sum(v_NCAP_PKCNT(k.r, k.v, k.p, rc.s) * rc.value * v_G_YRFR(k.r, rc.s)
+                                         * v_PRC_CAPACT(k.r, k.p) * v_PRC_ACTFLO(k.r, k.v, k.p, g.c))
+                             from lev_pkprc pp
+                             join RPC_PG g on g.r = pp.r and g.p = pp.p
+                             join COM_TS ct on ct.r = g.r and ct.c = g.c
+                             join lev_rtcs rc on rc.r = g.r and rc.y = k.t and rc.c = g.c and rc.s = ct.s
+                             where pp.r = k.r and pp.p = k.p), 0) * k.cap"""
     # (period, capacity vintage, flow vintage) of each sum: vintaged RTP_VINTYR / RTP_CPTYR with fv = V,
     # non-vintaged RTP_CPTYR with fv = T and the weight COEF_CPT/PASTSUM
     vint = "in_PRC_VINT(t.r, t.p)" if "PRC_VINT" in db.sym else "false"
     db.x(f"""create or replace temp table lev_keys as
-             select t.r, t.y as v, t.y2 as t, t.p, t.y as fv, 1.0 as w, 'num' as part
+             select t.r, t.y as v, t.y2 as t, t.p, t.y as fv, 1.0 as w, 'num' as part, v_L_VAR_NCAP(t.r, t.y, t.p) as cap
              from RTP_VINTYR t where {vint}
              union all
-             select t.r, t.y, t.y2, t.p, t.y, 1.0, 'den' from RTP_CPTYR t where {vint}
+             select t.r, t.y, t.y2, t.p, t.y, 1.0, 'den', 0.0 from RTP_CPTYR t where {vint}
              union all
-             select t.r, t.y, t.y2, t.p, t.y2, v_COEF_CPT(t.r, t.y, t.y2, t.p) / ps.value, 'both'
+             select t.r, t.y, t.y2, t.p, t.y2, v_COEF_CPT(t.r, t.y, t.y2, t.p) / ps.value, 'both', ps.value
              from RTP_CPTYR t join lev_pastsum ps on ps.r = t.r and ps.y = t.y2 and ps.p = t.p
              where not {vint} and ps.value <> 0""")
     db.x(f"""create or replace temp table lev_terms as
@@ -1138,7 +1367,8 @@ def _levcost(db):
                     sum(case when k.part <> 'den' then v_COEF_PVT(k.r, k.t) * k.w * (
                           coalesce(c.value, 0)
                           - coalesce((select sum(case when q.raised then {pkcnt} else 1 end * q.value)
-                                      from lev_pkc q where q.r = k.r and q.fv = k.fv and q.t = k.t and q.p = k.p), 0))
+                                      from lev_pkc q where q.r = k.r and q.fv = k.fv and q.t = k.t and q.p = k.p), 0)
+                          - {pkcap})
                         else 0 end) as num,
                     sum(case when k.part <> 'num' then v_COEF_PVT(k.r, k.t) * k.w * coalesce(o.value, 0) else 0 end) as den
              from lev_keys k

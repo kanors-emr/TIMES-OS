@@ -178,6 +178,15 @@ them, with no GAMS and no GDX library on the machine.
 
 `<run>` is the run file's `RUN_NAME`. Each file carries the name and folder of the run that wrote it.
 
+**Comparing such a run with a run of TIMES in GAMS.** The later run starts from the results this implementation
+wrote for the earlier run; a GAMS run of the later model started from those GAMS wrote. When the earlier run has
+several optimal solutions (most large models have: capacity that costs nothing, equal trade routes, the same
+activity split differently over timeslices), the two solvers end at different ones with the same objective, and the
+later runs, fixed at them, are two different models whose objectives differ a little. That is not a difference of
+this implementation: the report then says `SOLVED`, with both objectives and the reason. `--check` (and `--gams
+run`) makes this implementation read what GAMS reads, and the two then agree entry by entry. The Veda result files
+of a run with `FIXBOH` hold the fixed periods as the earlier run had them, as in TIMES.
+
 **Where a later run looks** is where TIMES looks, from the later run's own folder: `GAMSSAVE` of that folder (or the
 folder itself when it has none) for `LPOINT <name>` and `TIMESED <name>`, and the folder itself for `com_bprice`. The
 name may carry a path, as in TIMES: `$SET LPOINT ..\BaseCase\GAMSSAVE\base3`. So two runs in one folder find each

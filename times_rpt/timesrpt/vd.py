@@ -57,11 +57,11 @@ PORTED = {
     "eqg_combal.l", "par_combalem", "eqe_combal.l", "par_combalgm",
     "eq_peak.l", "par_peakm",
     "par_cumflol", "par_cumflom", "par_cumcst",
-    "par_capbd", "par_cumret", "Cap_New",
+    "par_capbd", "par_cumret", "par_top", "Cap_New",
     "ObjZ.l", "reg_wobj", "cst_pvp", "cst_pvc", "par_ncapr",
     "par_ucsl", "par_ucsm", "par_ucmrk", "par_ucrtp", "par_ucmax",
     "cst_invc", "cst_invx", "cst_decc", "cst_salv", "cst_fixc", "cst_fixx",
-    "cst_actc", "cst_floc", "cst_flox", "cst_comc", "cst_comx", "cst_irec",
+    "cst_actc", "cst_floc", "cst_flox", "cst_comc", "cst_comx", "cst_come", "cst_irec",
     "cst_time", "par_ipric", "reg_irec", "reg_acost", "reg_obj",
     "TM_RESULT",                    # TIMES-MACRO MLF (rpt_ext.mlf, mlf.py)
     "CM_RESULT", "CM_MAXC_M",

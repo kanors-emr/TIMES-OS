@@ -1,5 +1,60 @@
 # Changelog
 
+## 1.0.2 (November 2026): a run with FIXBOH reports its fixed periods; the remaining report options
+
+#### The Veda result files
+- The Veda result files of a run with `FIXBOH` lacked most of the fixed periods: activities and flows that are in
+  none of the equations of the run, and every equation level and marginal of those periods (commodity balances,
+  user constraints, peak). TIMES keeps for them the levels and marginals of the solution point the run loads, and
+  reports them. They are now put under the solution before the Veda files and the solution point for later runs
+  (`<run>_p`) are written, less what TIMES clears of the loaded point (`times_rpt/timesrpt/loadedpoint.py`,
+  `TIMES.py`). On a FIXBOH run of the DemoS_012 example, the solution of GAMS cut down to the model and completed
+  this way gives the Veda file of GAMS, every attribute, row and value.
+- The cost of elastic demands is written to the Veda files (`Cost_Els`): it was computed and counted in `Cost_NPV`,
+  `Reg_wobj` and `Reg_ACost`, and left out of the file (`times_rpt/timesrpt/vd.py`). On three elastic runs of the
+  DemoS_012 example the file written from the solution of GAMS has the rows and values of the Veda file of GAMS.
+- The report options that were named as not covered are written: the topology (`RPT_OPT('FLO','7')` or
+  `$SET RPT_TOP YES`: `PAR_Top`); flows at ANNUAL (`$SET RPT_FLOTS ANNUAL`, and a negative
+  `RPT_OPT(<commodity type>,'3')`; an energy type with only its option `'3'` set now also reports its flows at the
+  commodity timeslices, as TIMES does); the levelized cost with the credit of the ENV commodities
+  (`RPT_OPT('NCAP','1')` below 0) and with the peak capacity credit (above 1); the cost-benefit indicators of new
+  capacity (`$SET BENCOST YES`: COST, CGAP, GGAP, RATIO and GRATIO of `VAR_NcapR`), without the ranging information
+  of the solver and without the costs of capacity-related flows, which the run report names when a model has them
+  (`times_rpt/timesrpt/rptmisc.py`, `rptobjc.py`, `switches.py`). Each is compared with the Veda file of GAMS on
+  the DemoS_012 example with the option set. Damage costs (`Cost_Dam`) are not written.
+- The levelized cost (`RPT_OPT('NCAP','1')`) took no account of the second energy outputs of electricity and
+  heating plants: the sets of those plants were read empty. They are read from `PRC_MAP`, as TIMES sets them before
+  its reports (`times_rpt/timesrpt/rptmisc.py`).
+
+#### Runs and the comparison with TIMES in GAMS
+- `run <folder> --no-solve --check` on a run with `FIXBOH` built the model and did not compare its matrix with the
+  one of GAMS (the report said the check was skipped, as for a myopic run). The matrix is now written and compared,
+  as it is when the run is solved (`times_eq/src/runcase.jl`).
+- The run report: the verdict `BUILT` is explained with the others; a myopic run of several steps is told to use
+  `--check inline`, the only way its matrices are compared; a run with `FIXBOH` is no longer called "a myopic run:
+  1 steps"; a model built and not solved reads "built, not solved"; the build of a run in steps with `--no-solve` is
+  timed as "steps", not under "other"; the compile seconds are said to be summed over the threads; the time limit
+  of the solves and `highs.log` are left out when nothing was solved (`TIMES.py`).
+- A solved run with `FIXBOH` that is compared with a GAMS run already in its folder was called `DIFFERENT` for its
+  rows, although every check agreed: the result file of GAMS also holds the rows of the fixed periods, loaded with
+  the solution point, and they were counted as missing here. They are now named as what they are, and the run is
+  `SAME` (`TIMES.py`).
+- A run that reads the results of an earlier run (`FIXBOH`, `LPOINT`, `TIMESED`) reads those this implementation
+  wrote, while a GAMS run already in the folder read those GAMS wrote. Where the earlier run has several optimal
+  solutions, the two are different points, and the periods fixed at them make two different models: the objectives
+  then differ without any difference in the model. Such a run is no longer called `DIFFERENT`: its verdict is
+  `SOLVED`, with the two objectives and the reason in the report. `--check` compares the two on the same results
+  (`TIMES.py`).
+- The verdict names the solver that solved (`CPLEX finds the GAMS objective`), not always HiGHS; the sizes of a step
+  no longer run together in the report; a run of one step no longer speaks of "1 steps" (`TIMES.py`,
+  `times_eq/src/runcase.jl`).
+- With its output sent to a file on Windows, `setup` (or a run) stopped with `UnicodeEncodeError` when a message it
+  printed held a character the file's encoding lacks, hiding the message itself (a failed Julia step, for one). Such
+  a character is now replaced (`TIMES.py`).
+
+- The models built are the same as in 1.0.1: the 17 cases of the open reference models are `SAME` against TIMES in
+  GAMS, entry by entry.
+
 ## 1.0.1 (November 2026): a shorter setup
 
 #### Setup

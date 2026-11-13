@@ -2385,8 +2385,18 @@ def one_case(folder, out_root, o, case=None):
     sol = os.path.join(out, "solution.db3")
     # (a SENSIS run: the solution of each solve in solution~<w>.db3, which the report reads SOW by SOW)
     sensis_sols = J and J.get("steps") and J["steps"][0].get("sow") and all(s.get("solution_file") for s in J["steps"])
+    # a run with FIXBOH: the levels and marginals of the loaded point that the model of the run does not have (the
+    # equations of the fixed periods, the variables in none of its rows) stay as loaded in TIMES, and its reports and
+    # its solution point have them. Here they are put under the solution before both are written (loadedpoint.py)
+    fixed = [e for e in R.get("earlier_results_read") or [] if str(e.get("read_for", "")).startswith("FIXBOH")]
+    if fixed and J and J.get("objective") is not None and os.path.exists(sol):
+        code, _, t = call([pp_exe, os.path.join(ROOT, "times_rpt", "timesrpt", "loadedpoint.py"), sol, fixed[-1]["file"], model_tables(out)],
+                          cwd=ROOT, log=os.path.join(out, "loadedpoint.log"), timeout=o["pp_limit"], echo="    ")
+        R["timings"]["loaded_point"] = round(t, 1)
+        code and notes.append("the loaded point was not put under the solution (loadedpoint.log): the Veda result files "
+                              "and the solution point written for later runs lack most of the fixed periods")
     if o["report"] and J and J.get("objective") is not None and (os.path.exists(sol) or sensis_sols):
-        scen = os.path.splitext(os.path.basename(run_file))[0] + "_julia"
+        scen =os.path.splitext(os.path.basename(run_file))[0] + "_julia"
         print(f"[{case}] writing the Veda result files ({scen}.vd, .vde, .vds) ...", flush=True)
         code, _, t = call([pp_exe, os.path.join(ROOT, "times_rpt", "timesrpt", "write.py"), model_tables(out), sol,
                            out, scen, "-", pj], cwd=ROOT, log=os.path.join(out, "report.log"), timeout=o["pp_limit"], echo="    ")
@@ -2550,6 +2560,11 @@ def judge(R, o):
                          "barrier with crossover in the solver option file)")
             C["same_duals"] or diffs.append("reduced costs")
     ST = (J or {}).get("steps")
+    several = bool(ST) and len(ST) > 1 and not ST[0].get("sow")    # a myopic run of several steps: no one matrix to compare afterwards
+    read = R.get("earlier_results_read") or []                     # the results of earlier runs this run read (FIXBOH, LPOINT, TIMESED)
+    fixboh = any(str(e.get("read_for", "")).startswith("FIXBOH") for e in read)
+    # results written by this implementation, while the GAMS run compared with (one already in the folder) read GAMS's
+    own_start = [e for e in read if str(e.get("written_by", "")).startswith("this implementation")] if G and G.get("mode") == "existing run of the folder" else []
     if ST:                                                   # a myopic run (TIMESTEP): one model per step
         sizes, objs = (G or {}).get("step_sizes") or [], (G or {}).get("step_objectives") or []
         for i, st in enumerate(ST):
@@ -2576,14 +2591,20 @@ def judge(R, o):
             diffs.append("number of steps")
         CS = J.get("compare_steps")
         if CS:
-            R["checks"].append(["1", "rows of every equation over all steps", "same" if CS["same_rows"] else "DIFFERENT", f"{CS['row_families']} equations",
-                                "" if CS["same_rows"] else f"{CS['row_families_differ']} differ: {CS['rows_missing']} rows missing, {CS['rows_extra']} extra"])
-            CS["same_rows"] or diffs.append("rows of the steps")
+            # a run with FIXBOH: GAMS's file also holds the rows of the fixed periods, loaded with the solution point and
+            # not generated; with the model's row count that of GAMS and no row here that GAMS lacks, the rows are the same
+            loaded = (fixboh and not CS["same_rows"] and not CS["rows_extra"] and G and G.get("rows") is not None
+                      and J.get("rows") == G.get("rows"))
+            rows_same = CS["same_rows"] or loaded
+            R["checks"].append(["1", "rows of every equation over all steps", "same" if rows_same else "DIFFERENT", f"{CS['row_families']} equations",
+                                (f"and {CS['rows_missing']:,} rows of the fixed periods in the GAMS file, from the loaded point" if loaded else "") if rows_same
+                                else f"{CS['row_families_differ']} differ: {CS['rows_missing']} rows missing, {CS['rows_extra']} extra"])
+            rows_same or diffs.append("rows of the steps")
             other = not any(x.startswith("objective of step") for x in diffs)
             R["checks"].append(["3", "levels of the merged solution", "same" if CS["same_levels"] else ("other optimum" if other else "DIFFERENT"),
                                 f"{CS['columns_compared']:,} columns",
                                 f"largest relative difference {CS['level_worst']:.1e}" + ("" if CS["same_levels"] else f"; {CS['levels_off']} columns above {CS['tolerance']:.0e}")])
-            if not CS["same_levels"]:
+            if not CS["same_levels"] and other:
                 who = (J.get("solver") or "HiGHS").split()[0] if (J or {}).get("gamslp") else "HiGHS"
                 notes.append("the levels of the merged solution differ from those of GAMS while every step has the GAMS objective: a step with several optimal "
                              f"solutions, where {who} and the GAMS solver chose different ones; the steps after it are then fixed at another point")
@@ -2605,10 +2626,11 @@ def judge(R, o):
                             "" if not M["bounds_different"] else f"{M['bounds_different']:,} differ"])
         M["same_model"] or diffs.append("matrix")
     elif timing:
-        R["checks"].append(["4", "matrix, entry by entry", "not yet", "", "after the timing: --check, or python TIMES.py verify <result folder>"])
+        R["checks"].append(["4", "matrix, entry by entry", "not yet", "", "a myopic run: compared step by step while it runs, with --check inline" if several else
+                            "after the timing: --check, or python TIMES.py verify <result folder>"])
     else:
         R["checks"].append(["4", "matrix, entry by entry", "not made", "", "needs the GAMS matrix (--gams run, or gams_matrix.db3 in a reference folder)" if not (G and G.get("matrix_file")) else ""])
-    pending = "; the matrix is not checked yet (--check, or python TIMES.py verify)"
+    pending = "; the matrix is not checked yet (" + ("a myopic run: --check inline" if several else "--check, or python TIMES.py verify") + ")"
 
     if P.get("status") == "unsupported":
         n = len(P["unsupported"])
@@ -2636,11 +2658,11 @@ def judge(R, o):
         elif J.get("objective") is None:
             tail = f"; {solver_name(J)} did not solve it ({J.get('termination')}), which says nothing about the model"
         elif "objective" in diffs:
-            tail = f"; HiGHS ends at another objective (relative difference {R.get('objective_relative_difference', 0):.1e}): a matter of the solver"
+            tail = f"; {solver_name(J)} ends at another objective (relative difference {R.get('objective_relative_difference', 0):.1e}): a matter of the solver"
         elif gobj is None:
-            tail = f"; HiGHS objective {J['objective']:.6f}" + ("" if J.get("termination") == "OPTIMAL" else f" (feasible point, status {J.get('termination')})") + " (GAMS did not solve: --check)"
+            tail = f"; {solver_name(J)} objective {J['objective']:.6f}" + ("" if J.get("termination") == "OPTIMAL" else f" (feasible point, status {J.get('termination')})") + " (GAMS did not solve: --check)"
         else:
-            tail = "; HiGHS finds the GAMS objective" + ("" if J.get("termination") == "OPTIMAL" else f" (feasible point, status {J.get('termination')})")
+            tail = f"; {solver_name(J)} finds the GAMS objective" + ("" if J.get("termination") == "OPTIMAL" else f" (feasible point, status {J.get('termination')})")
         other = [x for x in diffs if x != "objective"]
         if not other:
             return "SAME: the same linear program as GAMS, every coefficient, right-hand side and bound" + tail
@@ -2668,6 +2690,18 @@ def judge(R, o):
                 + (pending if timing else ""))
     if G.get("objective") is None:
         return f"ERROR: the GAMS run gave no objective ({gams_summary(G)}; {'; '.join(G.get('errors', [])[:2]) or 'see the listing'}); Julia objective {J['objective']:.6f}"
+    if diffs and own_start and all(d == "objective" or d.startswith("objective of step") for d in diffs):
+        # not a difference of the model: the two runs start from two solutions of the earlier run
+        for c in R["checks"]:
+            if c[0] == "2" and c[2] == "DIFFERENT":
+                c[2] = "another start"
+        what = ", ".join(sorted({str(e.get("read_for", "")).split(":")[0] for e in own_start}))
+        notes.append(f"the objective is not that of the GAMS run in the folder (relative difference {R.get('objective_relative_difference', 0):.1e}), and that says "
+                     f"nothing about the model: this run read the results of the earlier run as this implementation wrote them ({what}), the GAMS run read "
+                     "those GAMS wrote. Where the earlier run has several optimal solutions the two are different points, and the periods fixed at them and "
+                     "the base prices taken from them make two different models. To compare this model with TIMES in GAMS on the same results: --check")
+        return (f"SOLVED: objective {J['objective']:.6f}; not compared with the GAMS run in the folder, which started from GAMS's results of the earlier run "
+                f"and this run from its own (see NOTES; --check compares the two on the same results)")
     if diffs:
         if timing and diffs == ["objective"]:
             return f"DIFFERENT OBJECTIVE: relative difference {R.get('objective_relative_difference', 0):.1e}; rows, columns and non-zeros agree" + pending
@@ -2676,7 +2710,8 @@ def judge(R, o):
         return f"SAME: all {len(ST)} models of the SENSIS run agree with GAMS (model size and objective of every solve)"
     if ST:
         CS = J.get("compare_steps")
-        return (f"SAME: all {len(ST)} steps of the myopic run agree with GAMS (model size and objective of every step"
+        return (("SAME: the run with FIXBOH agrees with GAMS (model size and objective" if len(ST) == 1 and fixboh else
+                 f"SAME: all {len(ST)} steps of the myopic run agree with GAMS (model size and objective of every step")
                 + (", rows of all steps" + (", levels" if CS["same_levels"] else "; the levels differ, see NOTES") if CS else "") + ")")
     if C:
         return ("SAME: model size, rows, objective, GAMS solution and reduced costs all agree" if C["gams_has_duals"]
@@ -2977,9 +3012,11 @@ def check_case(out, o):
         return skip("checked already")
     if P.get("status") != "ok" or J.get("stage") != "done":
         return skip("skipped: the run itself did not complete (" + R["verdict"].split(":")[0] + ")")
-    if J.get("steps") and not ((len(J["steps"]) == 1 or J["steps"][0].get("sow")) and J.get("matrix_out")):
-        # (FIXBOH: one model, its matrix written; SENSIS: the matrix of the first solve, the one GAMS's CONVERT run writes)
+    if J.get("steps") and not (len(J["steps"]) == 1 or J["steps"][0].get("sow")):
         return skip("skipped: a myopic run is compared step by step only while it runs (--check inline)")
+    if J.get("steps") and not J.get("matrix_out"):
+        # (FIXBOH: one model, its matrix written; SENSIS: the matrix of the first solve, the one GAMS's CONVERT run writes)
+        return skip("skipped: the run did not write its matrix (run it with --check, or compare while it runs with --check inline)")
     if not same_reduce(R, G):
         return skip("skipped: the GAMS run had REDUCE " + str(G.get("REDUCE")) + ", another level than the model built here")
     missing = [f for f in ("model.db3", "model.tjb") if not os.path.exists(os.path.join(out, f))
@@ -3290,7 +3327,7 @@ def julia_time_lines(J, wall):
             peak += f", {J['maxrss_gb']:.1f} GB for the whole run"
     elif J.get("maxrss_gb") is not None:   # a result written before maxrss_build_gb was recorded
         peak = f"; peak memory {J['maxrss_gb']:.1f} GB" + (" (with the comparison)" if checks else "")
-    line2 = (f"          compiling {comp}; garbage collection {gc:.1f} s; allocated {gb:.1f} GB{peak}"
+    line2 = (f"          compiling (summed over the threads) {comp}; garbage collection {gc:.1f} s; allocated {gb:.1f} GB{peak}"
              + (f"; the comparison with GAMS: garbage collection {gc_c:.1f} s, allocated {gb_c:.1f} GB" if checks else ""))
     return [line1, line2]
 
@@ -3309,8 +3346,8 @@ def report_text(R):
         add("NOT WRITTEN  " + "; ".join(R["files_not_written"]))
     add(f"model    {R['case']}    ({R['folder']})")
     add(f"when     {R['started']}    total {R['timings'].get('total', '-')} s")
-    if R.get("time_limit"):
-        add(f"limit    {R['time_limit']['seconds']:g} s for each solve    ({R['time_limit']['from']})")
+    if R.get("time_limit") and (R.get("run_options") or {}).get("solve", True):
+        add(f"limit   {R['time_limit']['seconds']:g} s for each solve    ({R['time_limit']['from']})")
     add("")
     add("This file is written by TIMES.py. It is complete in itself: everything needed to understand")
     add("the result is below; the files it names are in the same folder.")
@@ -3319,7 +3356,7 @@ def report_text(R):
     if R.get("gams"):
         add(f"  {'':3}{'check':40}{'result':20}{'Julia':24}GAMS")
         for lvl, what, res, a, b in R["checks"]:
-            add(f"  {lvl:3}{what:40}{res:20}{a:24}{b}".rstrip())
+            add(f"  {lvl:3}{what:40}{res:20}{a + '   ' if len(a) >= 24 else a:24}{b}".rstrip())
     else:                                       # nothing to compare with: the checks made on the model alone
         for lvl, what, res, a, b in R["checks"]:
             if res != "not made":
@@ -3429,7 +3466,9 @@ def report_text(R):
             + ("not run" if g is None else f"{g} GB" + (" (to its solver)" if MM.get("gams_stopped_at_solver") else " (the whole run)"))
             + (f"; in the open chain's, GAMS of --lp {MM['port_gams_gb']} GB" if MM.get("port_gams_gb") is not None else ""))
     if J and J.get("rows") is not None:
-        add(f"  Julia   {J.get('solver', 'not solved')}; {J.get('termination', '-')}; objective {J.get('objective')}; rows {num(J['rows'])}, columns {num(J['columns'])}, non-zeros {num(J['nonzeros'])}")
+        solved = (f"{J.get('solver', 'solver not named')}; {J['termination']}; objective {J.get('objective') if J.get('objective') is not None else 'none'}"
+                  if "termination" in J else "built, not solved")
+        add(f"  Julia   {solved}; rows {num(J['rows'])}, columns {num(J['columns'])}, non-zeros {num(J['nonzeros'])}")
         X = J.get("gamslp")
         if X:
             if "python_seconds" in X:
@@ -3445,7 +3484,8 @@ def report_text(R):
               add(f"          through GAMS: the LP taken from JuMP {H['copy']:.1f} s, to a GDX {H['gdx']:.1f} s, GAMS {X.get('gams_seconds', 0):.1f} s "
                   f"(to the solver's start {H['to_solver']:.1f} s, of it generation {X.get('generation_seconds', 0):.1f} s; solver {X.get('solver_seconds', 0):.1f} s, "
                   f"{X.get('iterations', 0):,} iterations; after it {H['after_solver']:.1f} s), read back {X.get('read_seconds', 0):.1f} s: "
-                  f"the hand-over {H['total']:.1f} s; " + (f"the {X['steps']} steps summed; GAMS's logs: gamslp_step1.log ... gamslp_step{X['steps']}.log"
+                  f"the hand-over {H['total']:.1f} s; " + ("GAMS's log: gamslp_step1.log" if X.get("steps") == 1 else
+                                                            f"the {X['steps']} steps summed; GAMS's logs: gamslp_step1.log ... gamslp_step{X['steps']}.log"
                                                             if X.get("steps") else "GAMS's log: gamslp.log"))
             if X.get("infeasibility"):
                 add(f"          optimal, with infeasibilities after unscaling: {X['infeasibility']}")
@@ -3455,8 +3495,11 @@ def report_text(R):
         L.extend(solve_lines(J, R.get("highs") or {}))
         if J.get("steps") and J["steps"][0].get("sow"):
             add(f"          a SENSIS run: {len(J['steps'])} models, one for each state of the world of the first period, each solved on its own")
+        elif J.get("steps") and len(J["steps"]) == 1:
+            add("          one model, with its first periods fixed at the solution point the run loads (FIXBOH)" if (R.get("input", {}).get("switches") or {}).get("FIXBOH")
+                else "          a run in steps with one step: one model")
         elif J.get("steps"):
-            add(f"          a myopic run: {len(J['steps'])} steps, each solved with the periods before its window fixed at the solution of the steps before")
+            add(f"          a myopic run: {len(J['steps'])} steps, each {'solved' if 'termination' in J else 'built'} with the periods before its window fixed at the solution of the steps before")
         if J.get("solution_file"):
             add(f"          solution: {os.path.basename(J['solution_file'])} (levels, marginals and bounds of every column and row, by GAMS name"
                 + (", merged over the steps" if J.get("steps") else "") + ")")
@@ -3520,7 +3563,8 @@ def report_text(R):
     add(f"  report_{R['case']}.json   all of the above and more, for a program")
     add("  preprocess.log    the Python preprocessor;  preprocess.json: its result, with every switch of the run file")
     add("  gams_listing.lst  the GAMS listing of the run made here;  gams_log.txt: its log;  work/matrix_jacobian.gdx: the GAMS matrix")
-    add("  julia.log         model build and the comparison with GAMS equation by equation;  highs.log: the solver log")
+    add("  julia.log         model build and the comparison with GAMS equation by equation"
+        + (";  highs.log: the solver log" if J and "termination" in J else ""))
     if J and J.get("profile"):
         add(f"  julia_profile.txt  samples of the Julia table load and the equation build ({J.get('profile_mode', 'cpu')})")
     if V and not V.get("error"):
@@ -3533,12 +3577,16 @@ def report_text(R):
     add("  SAME OBJECTIVE  the optimum is the one published; no more was published to compare with.")
     add("  DIFFERENT       the model runs and something does not agree with the published result: a defect. DIFFERENCES above says where to look.")
     add("  UNSUPPORTED     the model uses TIMES features this implementation does not have yet; they are all listed above. Not a defect.")
+    add("  BUILT           the model was built and not solved (--no-solve, or too large for HiGHS); its rows, columns and non-zeros are those")
+    add("                  of GAMS. The matrix is not compared entry by entry yet: the first line says how to have that done.")
     add("  NOT SOLVED      the model was built and the solver did not reach an optimum (time limit, or a failure of the solver). julia.log has the solver log.")
     add("  ERROR           a step failed. If it is the preprocessor or Julia, it is a defect; the message is above.")
     add("  INFEASIBLE      the model's data cannot be met: rows left with no column whose constant does not satisfy them")
     add("                  (0 = 2.685), on which TIMES in GAMS stops too (equation infeasible due to rhs value). Not a defect.")
     add("  SOLVED          the open chain solved the model; there was no published GAMS result to compare with (--jacobian writes the matrix")
     add("                  in the layout of GAMS's CONVERT jacobian, to compare with GAMS's own).")
+    add("                  Also when the GAMS run at hand started from other results of an earlier run (FIXBOH, LPOINT, TIMESED) than this")
+    add("                  run: the two objectives are then those of two models, and NOTES says so (--check compares on the same results).")
     add("  To report or to work on a result, hand over this file (or the bundle made with --bundle, which adds the input files).")
     return "\n".join(L) + "\n"
 
@@ -3908,6 +3956,13 @@ def summary_text(reports, how=None, total=None):
 
 
 def main(argv):
+    for stream in (sys.stdout, sys.stderr):
+        # a character the console or a redirected file cannot encode (Julia's messages have some) is replaced: a
+        # message must not stop the run that prints it
+        try:
+            stream.reconfigure(errors="replace")
+        except (AttributeError, ValueError):
+            pass
     if not argv or argv[0] in ("-h", "--help", "help"):
         print(__doc__)
         return 0
