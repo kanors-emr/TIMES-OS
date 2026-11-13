@@ -251,7 +251,8 @@ def prep_ext(db: DB, interp):
     dynamic_bounds.prep_ext(db, interp)
     dynamic_bounds.t_succ(db)
     # --- FLO_FUNCX(R,LL,P,C,CG)$(NOT PRC_VINT(R,P)) = 0;
-    db.zap("FLO_FUNCX", "not in_PRC_VINT(r,p)")
+    #     (the first group a commodity only: a group such as CAPFLO or ACT stays for a process that is not vintaged)
+    db.zap("FLO_FUNCX", "not in_PRC_VINT(r,p) and in_COM(cg)")
     residual_capacity(db)
     # --- COM_LIM(RC,BDNEQ)$COM_LIM(RC,'FX')=NO;
     db.remove("COM_LIM", where="l in ('LO','UP') and in_RC(r,c) and in_COM_LIM(r,c,'FX')")

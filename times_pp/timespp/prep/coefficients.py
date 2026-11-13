@@ -476,10 +476,14 @@ def coef_shp(db: DB):
     db.add("OPYEAR", f"""select a.age, b.age as age2 from AGE a, AGE b
                          where cast(b.age as INTEGER) <= cast(a.age as INTEGER) and cast(a.age as INTEGER) <= {z}""")
     if db.card("FLO_FUNCX"):
-        flo_shape(db)
+        flo_shape(db, z)
     clag_shape(db)
     cpx_shape(db, z)
-    # (the overriding COEF_OCOM / COEF_RCOM of RPC_CONLY need FLO_FUNCX(R,'0',P,'CAPFLO',C) = 3, which stops in flo_shape)
+    # --- RPC_CONLY(RTP(R,V,P),C)$((FLO_FUNCX(R,'0',P,'CAPFLO',C)=3)$NCAP_OCOM(RTP,C))=YES;  LOOP(AGEJ(J,AGE)$CARD(RPC_CONLY), ..
+    #     (the overriding COEF_OCOM / COEF_RCOM of the capacity transfer: not here yet)
+    if db.card("FLO_FUNCX") and db.q1("""select count(*) from FLO_FUNCX f join NCAP_OCOM o on o.r=f.r and o.p=f.p and o.c=f.cg2
+                                           where f.y='0' and f.cg='CAPFLO' and f.value=3 and in_RTP(o.r,o.y,o.p)"""):
+        unsupported(db, "FLO_FUNCX(r,'0',p,'CAPFLO',c) = 3 with NCAP_OCOM: the capacity transfer of COEF_OCOM (coef_shp.mod)")
     # --- Filter off RCOMs by age:
     #     COEF_OCOM(R,VNT(V,T),P,C)$RCAP_OCAP(R,V,P,C) = (COEF_OCOM(R,V,T,P,C)+EPS$COEF_RCOM(R,V,T,P,C))$
     #       (SIGN(RCAP_OCAP(R,V,P,C))*(B(T)-(B(V)+NCAP_ILED(R,V,P)+1/PI**9))<RCAP_OCAP(R,V,P,C));
@@ -502,25 +506,27 @@ def clag_shape(db: DB):
     """coef_shp.mod, 'Shapes for capacity-related commodity flows': NCAP_CLAG delays (> 0) or ends early (< 0) the flow
     NCAP_COM of a vintage.  COEF_CIO is the share of the period in which the flow runs, less 1; cal_cap.mod multiplies the
     NCAP_COM term of the commodity balance by 1 + COEF_CIO.  (The CAPFLO shapes of FLO_FUNCX, the other source of COEF_CIO,
-    stop in flo_shape.)"""
+    are written before, in flo_shape; this overwrites them.)"""
     # --- COEF_CIO(RTP_CPTYR(R,V,T,P),C,IO)$NCAP_CLAG(R,V,P,C,IO) = SIGN(NCAP_CLAG(R,V,P,C,IO)) *
     #       (MAX(0, E(T)+1-MAX(B(V)+NCAP_ILED(R,V,P)+ABS(NCAP_CLAG(R,V,P,C,IO)),B(T))) /
     #        MAX(.1,E(T)+1-MAX(B(V)+NCAP_ILED(R,V,P),B(T)))-1)-1$(NCAP_CLAG(R,V,P,C,IO)<0);
-    #     (NCAP_ILED is not rounded here; B(V) of a past vintage is its year)
+    #     (NCAP_ILED is not rounded here; B(V) of a past vintage is its year; an EPS NCAP_CLAG gives 0: it removes a
+    #      COEF_CIO of a CAPFLO shape)
     db.put("COEF_CIO", """
         select c.r, c.y, c.y2, c.p, l.c, l.io,
                sign(l.value) * (greatest(0, v_E(c.y2) + 1 - greatest(v_B(c.y) + v_NCAP_ILED(c.r,c.y,c.p) + abs(l.value), v_B(c.y2)))
                                 / greatest(0.1, v_E(c.y2) + 1 - greatest(v_B(c.y) + v_NCAP_ILED(c.r,c.y,c.p), v_B(c.y2))) - 1)
                - (case when l.value < 0 then 1 else 0 end) as value
-        from RTP_CPTYR c join NCAP_CLAG l on l.r=c.r and l.y=c.y and l.p=c.p
-        where l.value <> 0""")
+        from RTP_CPTYR c join NCAP_CLAG l on l.r=c.r and l.y=c.y and l.p=c.p""")
     db.zap("COEF_CIO", "value = 0")
 
 
-def flo_shape(db: DB):
+def flo_shape(db: DB, z):
     """coef_shp.mod, 'Shaping of COEF_PTRAN': FLO_FUNCX points to a SHAPE curve by age that multiplies the transformation
     and emission factors of a vintage (FLO_FUNC / FLO_SUM).  Per period the curve is averaged over the years of the period
-    in which the vintage operates; RTP_FFCX holds that average less 1, and the equations multiply by 1 + RTP_FFCX."""
+    in which the vintage operates; RTP_FFCX holds that average less 1, and the equations multiply by 1 + RTP_FFCX.
+    A vintage invested in more than once within its period (COEF_RPTI > 1) takes the average over its whole lifetime.
+    FLO_FUNCX(r,v,p,'CAPFLO',c) shapes the capacity-related flow NCAP_COM of c the same way, through COEF_CIO."""
     q = db.q
     # --- RTP_CGC(RTP(R,V,P),CG,CG2)$((FLO_FUNCX(RTP,CG,CG2)<=0)$FLO_FUNCX(RTP,CG,CG2))=PRC_VINT(R,P);
     db.tmp("t_cgc", """select r, y, p, cg, cg2 from FLO_FUNCX where value <= 0 and in_RTP(r,y,p) and in_PRC_VINT(r,p)""")
@@ -531,12 +537,7 @@ def flo_shape(db: DB):
     # --- OPTION RP_GRP <= FLO_FUNCX, PRC_YMIN < RP_GRP, CLEAR=PRC_YMAX;
     #     TRACKP(RP)$PRC_YMIN(RP) $= PRC_VINT(RP)+RP_GRP(RP,'CAPFLO');   RTP_CAPYR(RTP_CPTYR(R,V,T,P)) $= TRACKP(R,P);
     db.tmp("t_trk", "select distinct r, p from FLO_FUNCX where in_PRC_VINT(r,p) or cg = 'CAPFLO'")
-    if db.q1("select count(*) from FLO_FUNCX where cg = 'CAPFLO'"):
-        unsupported(db, "FLO_FUNCX on capacity-related flows (CAPFLO: COEF_CIO, coef_shp.mod)")
     db.add("RTP_CAPYR", "select c.r, c.y, c.y2, c.p from RTP_CPTYR c join t_trk k on k.r=c.r and k.p=c.p")
-    # --- RVPRL(RTP(R,T,P))$((COEF_RPTI(RTP)>1)$TRACKP(R,P)) = ...   (repeated investments: the average over the lifetime)
-    if db.q1("select count(*) from COEF_RPTI a join t_trk k on k.r=a.r and k.p=a.p where a.value > 1"):
-        unsupported(db, "FLO_FUNCX on a process with repeated investments within a period (COEF_RPTI > 1, coef_shp.mod)")
     # --- LOOP(AGEJ(J,AGE) = (1,1), LOOP(V,
     #       PRC_YMIN(TRACKP(R,P)) = B(V)+ROUND(NCAP_ILED(R,V,P));  PRC_YMAX(TRACKP(R,P)) = PRC_YMIN(R,P)+ROUND(NCAP_TLIFE(R,V,P))-1;
     #       RTP_FFCX(RTP_CAPYR(R,V,T,P),CG1,CG2)$FLO_FUNCX(R,V,P,CG1,CG2) =
@@ -552,20 +553,32 @@ def flo_shape(db: DB):
     eoh = {}
     for t, y in q("select p.y, p.y2 from PERIODYR p where in_EOHYEARS(p.y2) and in_MILESTONYR(p.y) order by yv(p.y2)"):
         eoh.setdefault(t, []).append(int(y))
+    # --- For repeated investments, use the average SHAPE over lifetime:
+    #     RVPRL(RTP(R,T,P))$((COEF_RPTI(RTP)>1)$TRACKP(R,P)) = ROUND(NCAP_TLIFE(RTP)-1)+EPS;
+    #     RTP_FFCX(RTP_CAPYR(R,TT,T,P),CG1,CG2)$(RVPRL(R,TT,P)$FLO_FUNCX(R,TT,P,CG1,CG2)) =
+    #         SUM(OPYEAR(AGE+RVPRL(R,TT,P),LIFE),SHAPE(J+(FLO_FUNCX(R,TT,P,CG1,CG2)-1),LIFE)) / (RVPRL(R,TT,P)+1) -1;
+    #     (the vintages of RTP that are milestone years; OPYEAR holds the lifetimes up to Z = SMAX(T,MAX(IPD(T),D(T))))
+    rvprl = {(r, y, p) for r, y, p in q("""select a.r, a.y, a.p from COEF_RPTI a join t_trk k on k.r=a.r and k.p=a.p
+                                           where a.value > 1 and in_RTP(a.r,a.y,a.p) and in_MILESTONYR(a.y)""")}
     rows = []
     for r, v, t, p, cg1, cg2, fx, iled, tlife in q("""
             select c.r, c.y, c.y2, c.p, f.cg, f.cg2, f.value, v_NCAP_ILED(c.r,c.y,c.p), v_NCAP_TLIFE(c.r,c.y,c.p)
             from RTP_CAPYR c join FLO_FUNCX f on f.r=c.r and f.y=c.y and f.p=c.p"""):
-        ymin = B.get(v, 0.0) + rnd(iled)
-        ymax = ymin + rnd(tlife) - 1
         j = rnd(fx)
-        tot = 0.0
-        for y in eoh.get(t, ()):
-            if y <= max(B[t], ymax):
-                age = 1 + min(y, ymax) - ymin
-                if age >= 1 and int(age) in ages:
-                    tot += shp.get((j, int(age)), 0.0)
-        val = tot / max(1, min(E[t], ymax) - max(B[t], ymin) + 1) - 1
+        if (r, v, p) in rvprl:
+            n = rnd(tlife - 1)
+            tot = sum(shp.get((j, a), 0.0) for a in range(1, int(n) + 2)) if n + 1 <= z else 0.0
+            val = tot / (n + 1) - 1
+        else:
+            ymin = B.get(v, 0.0) + rnd(iled)
+            ymax = ymin + rnd(tlife) - 1
+            tot = 0.0
+            for y in eoh.get(t, ()):
+                if y <= max(B[t], ymax):
+                    age = 1 + min(y, ymax) - ymin
+                    if age >= 1 and int(age) in ages:
+                        tot += shp.get((j, int(age)), 0.0)
+            val = tot / max(1, min(E[t], ymax) - max(B[t], ymin) + 1) - 1
         if val:
             rows.append((r, v, t, p, cg1, cg2, val))
     # --- Option for non-vintaged FLO_FUNC multipliers:
@@ -573,6 +586,14 @@ def flo_shape(db: DB):
     #       FLO_FUNC(R,T,P,CG,CG2,'ANNUAL')/FLO_FUNC(R,V,P,CG,CG2,'ANNUAL')-1;
     db.x("create or replace temp table t_ffcx (r VARCHAR, y VARCHAR, y2 VARCHAR, p VARCHAR, cg VARCHAR, cg2 VARCHAR, value DOUBLE)")
     db.insert_rows("t_ffcx", rows)
+    # --- Shapes for capacity-related commodity flows:
+    #     COEF_CIO(RTP_CAPYR(R,V,T,P),C,IO)$NCAP_COM(R,V,P,C,IO) $= RTP_FFCX(R,V,T,P,'CAPFLO',C);
+    #     RTP_FFCX(RTP_CAPYR,'CAPFLO',CG) = 0;
+    #     (clag_shape, next, overwrites with NCAP_CLAG's share where the flow is lagged)
+    db.put("COEF_CIO", """select f.r, f.y, f.y2, f.p, n.c, n.io, f.value from t_ffcx f
+                          join NCAP_COM n on n.r=f.r and n.y=f.y and n.p=f.p and n.c=f.cg2
+                          where f.cg='CAPFLO'""", zero="skip")
+    db.x("delete from t_ffcx where cg='CAPFLO'")
     db.put("RTP_FFCX", "select r, y, y2, p, cg, cg2, value from t_ffcx")
     db.put("RTP_FFCX", """select k.r, k.y, k.y2, k.p, g.cg, g.cg2,
                                  v_FLO_FUNC(k.r,k.y2,k.p,g.cg,g.cg2,'ANNUAL') / v_FLO_FUNC(k.r,k.y,k.p,g.cg,g.cg2,'ANNUAL') - 1 as value

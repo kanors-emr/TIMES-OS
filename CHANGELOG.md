@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.0.3 (November 2026): FLO_FUNCX shapes on capacity flows and with repeated investments
+
+#### Model features
+- `FLO_FUNCX` with the group `CAPFLO` (a shape by age on a capacity-related flow `NCAP_COM`) is supported: the
+  shape averaged over each period scales the flow (`COEF_CIO`), and `NCAP_CLAG` on the same flow takes precedence,
+  as in TIMES (`coef_shp.mod`; `times_pp/timespp/prep/coefficients.py`, `flo_shape` and `clag_shape`). Before, a
+  model with it stopped as UNSUPPORTED.
+- `FLO_FUNCX` on a process invested in more than once within a period (a lifetime shorter than the period,
+  `COEF_RPTI` > 1) is supported: such a vintage takes the shape averaged over its whole lifetime, as in TIMES
+  (`times_pp/timespp/prep/coefficients.py`, `flo_shape`). Before, a model with it stopped as UNSUPPORTED.
+
+#### Agreement fixes
+- `FLO_FUNCX` given on a group that is not a commodity (`CAPFLO`, `ACT`) is kept for a process that is not
+  vintaged, as TIMES keeps it (`prep_ext.vda`); only a shape whose first index is a commodity is dropped there
+  (`times_pp/timespp/prep/extensions.py`). Before, every `FLO_FUNCX` of such a process was dropped.
+
+#### Still not supported
+- The capacity transfer of `NCAP_OCOM` asked for by `FLO_FUNCX(r,'0',p,'CAPFLO',c)` = 3 stops with its own message
+  (`times_pp/timespp/prep/coefficients.py`, `coef_shp`).
+
+Each was compared with TIMES in GAMS on the DemoS_012 example with such shapes added: the same preprocessed tables
+and the same matrix.
+
 ## 1.0.2 (November 2026): a run with FIXBOH reports its fixed periods; the remaining report options
 
 #### The Veda result files
