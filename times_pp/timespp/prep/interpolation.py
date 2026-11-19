@@ -3,7 +3,7 @@
 currency conversion (curex.gms), retirement controls (prepret.dsc PREP), shape pointers (preshape.gms)."""
 from ..engine import DB
 from .extensions import _need_empty
-from . import extensions, simv, stochastic
+from . import damage, extensions, simv, stochastic
 from .. import interp
 
 
@@ -36,7 +36,8 @@ _stg_chrg_ctrl.key_free = True              # the same years for every series (t
 CUREX_ATTR = ["NCAP_COST", "NCAP_ITAX", "NCAP_ISUB", "NCAP_DCOST", "NCAP_DLAGC", "NCAP_FOM", "NCAP_FSUB", "NCAP_FTAX", "ACT_COST",
               "FLO_COST", "FLO_DELIV", "FLO_TAX", "FLO_SUB", "NCAP_VALU", "IRE_PRICE", "COM_BPRICE", "COM_CSTNET", "COM_TAXNET",
               "COM_SUBNET", "COM_CSTPRD", "COM_TAXPRD", "COM_SUBPRD", "REG_BNDCST", "REG_CUMCST", "BL_VAROMC", "BL_DELIVC",
-              "ACT_CSTUP", "ACT_CSTSD", "ACT_CSTRMP", "ACT_CSTPL"]
+              "ACT_CSTUP", "ACT_CSTSD", "ACT_CSTRMP", "ACT_CSTPL",
+              "DAM_COST"]                      # curex.gms 67: $IF DEFINED DAM_COST $BATINCLUDE curex DAM_COST RYCSM R LL ',C' ",'ANNUAL'"
 
 
 CUREX_INPLACE = {"REG_BNDCST", "REG_CUMCST", "BL_VAROMC", "BL_DELIVC", "ACT_CSTUP", "ACT_CSTSD", "ACT_CSTRMP"}
@@ -44,7 +45,7 @@ CUREX_INPLACE = {"REG_BNDCST", "REG_CUMCST", "BL_VAROMC", "BL_DELIVC", "ACT_CSTU
 
 def curex(db: DB):
     """curex.gms : convert cost attributes to the main currency of each region."""
-    _need_empty(db, ["DAM_COST", "TL_CT_COST"], "currency conversion of damage / ETL costs")
+    _need_empty(db, ["TL_CT_COST"], "currency conversion of ETL costs")
     # --- R_CUREX(R,CUR,CUR) = 0;
     db.zap("R_CUREX", "in_REG(r) and cur = cur2")
     rate = {(r, a, b): v for r, a, b, v in db.q("select r, cur, cur2, value from R_CUREX where in_REG(r)")}
@@ -254,7 +255,11 @@ def interpolate_costs(db: DB):
     P(db, "OBJ_COMPD", "T", None, 0)
     for n in ("ACT_COST", "FLO_COST", "FLO_DELIV", "FLO_SUB", "FLO_TAX", "IRE_PRICE"):
         P(db, n, "V", RTP, 0)
-    _need_empty(db, ["DAM_COST"], "damage costs")
+    # --- $IF DEFINED DAM_COST $BATINCLUDE prepparm DAM_COST R 'C,CUR' ",'0','0','0'" T 1 EPS 3
+    #     (%7 = EPS: a number 0 where it is compared or a maximum, non-zero as a condition; %8 = 3: inter- and
+    #     extrapolated by default; prep/damage.py has what DAM_COST does to the model)
+    damage.check(db)
+    P(db, "DAM_COST", "T", None, "EPS", def_iebd=3)
 
 
 def interpolate_attributes(db: DB):

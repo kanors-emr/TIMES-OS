@@ -1329,19 +1329,43 @@ def check(verbose=True):
 
 # ----------------------------------------------------------------------------------------------------------------
 # setup
+def gamsdata():
+    """The preprocessor's reader of GAMS files (timespp/gamsdata.py, plain Python), loaded once."""
+    m = sys.modules.get("tj_gamsdata")
+    if m is None:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("tj_gamsdata", os.path.join(ROOT, "times_pp", "timespp", "gamsdata.py"))
+        m = importlib.util.module_from_spec(spec)
+        sys.modules["tj_gamsdata"] = m               # (before it runs: its dataclasses look their module up there)
+        try:
+            spec.loader.exec_module(m)
+        except Exception:
+            del sys.modules["tj_gamsdata"]
+            raise
+    return m
+
+
+_DOLLAR = {}
+
+
+def dollar_text(text):
+    """The dollar control lines of a run file as GAMS reads them, one per line: its comments taken out ($ONTEXT
+    blocks, end-of-line and in-line comments; gamsdata.dollar_lines), so that an include or a $SET inside a comment is
+    not taken. The text as it is if the reader cannot be loaded."""
+    if text not in _DOLLAR:
+        try:
+            _DOLLAR[text] = "\n".join(gamsdata().dollar_lines(text))
+        except Exception:
+            _DOLLAR[text] = text
+    return _DOLLAR[text]
+
+
 def reduce_of(run_text):
     """REDUCE as the run file sets it, without quotes, as TIMES compares it (case and all); None when the run file does
     not set it.  Read as the preprocessor reads the run file (timespp/gamsdata.py: $IF NOT SET ... $SET, several SETs
     on one line, $ONTEXT blocks), so that what is reported is what is built."""
     try:
-        import importlib.util
-        spec = importlib.util.spec_from_file_location("tj_gamsdata", os.path.join(ROOT, "times_pp", "timespp", "gamsdata.py"))
-        m = sys.modules.get("tj_gamsdata")
-        if m is None:
-            m = importlib.util.module_from_spec(spec)
-            sys.modules["tj_gamsdata"] = m           # (before it runs: its dataclasses look their module up there)
-            spec.loader.exec_module(m)
-        rd = m.Reader()
+        rd = gamsdata().Reader()
         rd.read_text(run_text, src="run")
         v = rd.env.get("REDUCE")
         return None if v is None else str(v).strip().strip("'\"")
@@ -1815,7 +1839,7 @@ def dd_list(run_file):
     """DD files of the run file, in order: (name as written, path or None).  Veda puts them in the run folder or its parent."""
     folder = os.path.dirname(os.path.abspath(run_file))
     out = []
-    for m in re.finditer(r"(?im)^\s*\$\s*(?:BAT)?INCLUDE\s+(\S+)", read(run_file)):
+    for m in re.finditer(r"(?im)^\s*\$\s*(?:BAT)?INCLUDE\s+(\S+)", dollar_text(read(run_file))):
         name = m.group(1).strip("'\"")
         if not name.lower().endswith(".dd"):             # (no file of TIMES or Veda has .dds; the preprocessor refuses it)
             continue
@@ -1833,19 +1857,19 @@ def dd_list(run_file):
 
 def switch(text, name):
     """Value of $SET name in a run file (the last one that is not commented out)."""
-    m = re.findall(rf"(?im)^\s*\$\s*SET(?:GLOBAL|LOCAL)?\s+{name}\s+(\S+)", text)
+    m = re.findall(rf"(?im)^\s*\$\s*SET(?:GLOBAL|LOCAL)?\s+{name}\s+(\S+)", dollar_text(text))
     return m[-1].strip("'\"").upper() if m else None
 
 
 def run_name(text):
     """RUN_NAME of a run file as written (the names of the results it writes: <RUN_NAME>_p, <RUN_NAME>_DP)."""
-    m = re.findall(r"(?im)^\s*\$\s*SET(?:GLOBAL|LOCAL)?\s+RUN_NAME\s+(\S+)", text)
+    m = re.findall(r"(?im)^\s*\$\s*SET(?:GLOBAL|LOCAL)?\s+RUN_NAME\s+(\S+)", dollar_text(text))
     return m[-1].strip("'\"") if m else None
 
 
 def raw_switch(text, name):
-    """Value of $SET name in a run file as written (case and path kept), or None."""
-    m = re.findall(rf"(?im)^\s*\$\s*SET(?:GLOBAL|LOCAL)?\s+{name}\s+(\S+)", text)
+    """Value of $SET name in a run file as written (case and path kept), or None; comments taken out."""
+    m = re.findall(rf"(?im)^\s*\$\s*SET(?:GLOBAL|LOCAL)?\s+{name}\s+(\S+)", dollar_text(text))
     return m[-1].strip("'\"") if m else None
 
 
@@ -2540,7 +2564,7 @@ def one_case(folder, out_root, o, case=None):
 
     P = read_json(pj) if os.path.exists(pj) else {"status": "error", "unsupported": [], "stopped_in": "start",
                                                        "error": "time limit" if pp.get("code", 0) is None else read(os.path.join(out, "preprocess.log"))[-2000:]}
-    R["preprocess"] = {k: P.get(k) for k in ("status", "unsupported", "stopped_in", "error", "symbols_written", "seconds", "tjb_seconds", "duckdb_threads", "heap", "parallel_stages")}
+    R["preprocess"] = {k: P.get(k) for k in ("status", "unsupported", "stopped_in", "error", "input_error", "symbols_written", "seconds", "tjb_seconds", "duckdb_threads", "heap", "parallel_stages")}
     # the results of earlier runs the run read (TIMESED, LPOINT, FIXBOH): which file, Parquet or GDX, written by whom
     for e in P.get("earlier_results") or []:
         if os.path.normcase(e["file"]).startswith(os.path.normcase(os.path.abspath(work)) + os.sep):
@@ -2846,6 +2870,9 @@ def one_case(folder, out_root, o, case=None):
                 born = st.st_ctime if WIN else getattr(st, "st_birthtime", None)
                 if born:
                     R["timings"]["to_highs"] = round(born - t_start, 1)
+            if J.get("built_unix") and R["timings"].get("to_highs") is None:   # no solver started: the start of the run to
+                # the model built in memory (a solved run shows its time to the solver, as before)
+                R["timings"]["to_built"] = round(J["built_unix"] - t_start, 1)
 
     end_early()                                       # (a Julia started early and not given a run)
     # --- the Veda result files of the Julia solution: <run>_julia.vd, .vde, .vds (times_rpt), unless --no-report
@@ -3121,6 +3148,8 @@ def judge(R, o):
     if P.get("status") == "unsupported":
         n = len(P["unsupported"])
         return f"UNSUPPORTED: the model uses {n} thing{'s' if n != 1 else ''} this implementation does not have yet" + ("" if not G else f" (GAMS: {gams_summary(G)})")
+    if P.get("input_error"):                        # a line of the run file or a DD file that cannot be read
+        return f"ERROR: the input cannot be read: {P['input_error'][:400]}"
     if P.get("status") != "ok":
         return f"ERROR: the preprocessor failed in '{P.get('stopped_in')}'"
     if not J:
@@ -3483,11 +3512,17 @@ def drop_work(out, keep):
 def against_gams(R):
     """Time to the solver and peak memory, here and in GAMS, and their ratio, from what the report already holds
     (timings.to_highs; GAMS's seconds_to_solver; memory). GAMS's only when this run ran and timed GAMS; a number that
-    was not measured is left out. -> {"time_to_solver": {"here", "gams", "ratio"}, "peak_memory_gb": {...}} (may be empty)"""
-    G, MM = R.get("gams") or {}, R.get("memory") or {}
+    was not measured is left out. When no solver was started here, the time to the built model instead
+    (timings.to_built), beside GAMS's time to the start of CONVERT when GAMS ran with --no-solve.
+    -> {"time_to_solver" or "time_to_built": {"here", "gams", "ratio"}, "peak_memory_gb": {...}} (may be empty)"""
+    G, MM, T = R.get("gams") or {}, R.get("memory") or {}, R["timings"]
     ran = G.get("mode") == "run now"
     out = {}
-    for key, here, gams in (("time_to_solver", R["timings"].get("to_highs"), G.get("seconds_to_solver") if ran else None),
+    if T.get("to_highs") is not None:
+        time_key, here, gams = "time_to_solver", T["to_highs"], G.get("seconds_to_solver") if ran else None
+    else:
+        time_key, here, gams = "time_to_built", T.get("to_built"), G.get("seconds_to_solver") if ran and G.get("matrix_only") else None
+    for key, here, gams in ((time_key, here, gams),
                             ("peak_memory_gb", MM.get("port_gb"), MM.get("gams_gb") if ran else None)):
         if here is None:
             continue
@@ -3503,14 +3538,22 @@ def against_gams_lines(R):
     if not A:
         return []
     both = any("gams" in v for v in A.values())
-    L = ["TIME AND MEMORY", (f"  {'':22}{'here':13}" + (f"{'GAMS':13}here / GAMS" if both else "")).rstrip()]
-    for key, what, fmt in (("time_to_solver", "time to the solver", "{:.1f} s"), ("peak_memory_gb", "peak memory", "{:.2f} GB")):
+    w = 24 if "time_to_built" in A else 22            # the width of the first column ("time to the built model")
+    L = ["TIME AND MEMORY", (f"  {'':{w}}{'here':13}" + (f"{'GAMS':13}here / GAMS" if both else "")).rstrip()]
+    for key, what, fmt in (("time_to_solver", "time to the solver", "{:.1f} s"), ("time_to_built", "time to the built model", "{:.1f} s"),
+                           ("peak_memory_gb", "peak memory", "{:.2f} GB")):
         if key in A:
             v = A[key]
-            L.append((f"  {what:22}{fmt.format(v['here']):13}" + (f"{fmt.format(v['gams']):13}{v['ratio']:.2f}" if "gams" in v else "")).rstrip())
+            L.append((f"  {what:{w}}{fmt.format(v['here']):13}" + (f"{fmt.format(v['gams']):13}{v['ratio']:.2f}" if "gams" in v else "")).rstrip())
     lp = (R.get("memory") or {}).get("port_gams_gb") is not None
-    L.append("  time to the solver: from the start of the run to the solver's start; peak memory: the peak working set of the")
-    L.append("  processes of each run, summed" + (" (here: the GAMS that solves, --lp, included)" if lp else ""))
+    if "time_to_built" in A:
+        L.append("  time to the built model (no solver was started): here, from the start of the run to the model built in memory,")
+        L.append("  nothing handed to a solver" + ("; GAMS, from the start of its run to the start of CONVERT, its hand-over included"
+                                                 if "gams" in A["time_to_built"] else ""))
+        L.append("  peak memory: the peak working set of the processes of each run, summed")
+    else:
+        L.append("  time to the solver: from the start of the run to the solver's start; peak memory: the peak working set of the")
+        L.append("  processes of each run, summed" + (" (here: the GAMS that solves, --lp, included)" if lp else ""))
     return L + [""]
 
 
@@ -3919,7 +3962,10 @@ def report_text(R):
             last = (x["error"].strip().splitlines() or [""])[-1][:160]
             add(f"  The step '{x['step']}' could not complete with this input (most likely because of the above; {last});")
             add("  its remaining statements were skipped, so input that only they look at may be missing from the list.")
-        if P.get("error"):
+        if P.get("input_error"):
+            add("  The input cannot be read (the file, the line, what was expected there):")
+            add("    " + P["input_error"])
+        elif P.get("error"):
             add("  Error of the preprocessor (this is a defect of this implementation or an input it does not expect, not a listed limitation):")
             L.extend("    " + x for x in P["error"].strip().splitlines()[-12:])
     JU = R.get("equations_unsupported")
@@ -3991,6 +4037,10 @@ def report_text(R):
                 add("  and the profile lines of its listing, OPTION PROFILE=1 of the run file)")
                 L.extend(tab)
                 add("")
+        elif R["timings"].get("to_highs") is None and R["timings"].get("to_built") is not None and G.get("matrix_only")                 and G.get("seconds_to_solver"):
+            add(f"          time to the built model: the port {R['timings']['to_built']} s (start of the run to the model built in memory,"
+                f" no solver started), GAMS {G['seconds_to_solver']} s (to the start of CONVERT):"
+                f" {R['timings']['to_built'] / G['seconds_to_solver']:.2f} times GAMS's")
         if G.get("objective") is None and not G.get("stopped_at_solver"):   # (with --no-solve: only when the matrix was not written)
             for e in G.get("errors", [])[-8:]:
                 add(f"          GAMS said: {e}")
@@ -4687,10 +4737,13 @@ def summary_text(reports, how=None, total=None):
     L.append("")
     L.append(f"{'model':32}{'verdict':21}{'rows':>10}{'objective (Julia)':>22}{'objective (GAMS)':>22}{'rel. diff.':>12}{'seconds':>9}"
              f"{'to solver':>10}{'GAMS to solver':>16}{'port GB':>9}{'GAMS GB':>9}  matrix check")
+    built = False
     for r in reports:
         J, G = r.get("julia") or {}, r.get("gams") or r.get("gams_existing") or {}
         rel = r.get("objective_relative_difference")
         th = r["timings"].get("to_highs")
+        if th is None and r["timings"].get("to_built") is not None:      # no solver started: to the built model, marked
+            th, built = f"{r['timings']['to_built']}*", True
         MM = r.get("memory") or {}
         chk = r.get("check_status") or ("pending" if r.get("phase") == "timing" else "-")
         L.append(f"{r['case'][:31]:32}{r['verdict'].split(':')[0]:21}{num(J.get('rows')):>10}"
@@ -4699,6 +4752,9 @@ def summary_text(reports, how=None, total=None):
                  f"{(format(rel, '.1e') if rel is not None else '-'):>12}{r['timings'].get('total', 0):>9}"
                  f"{(th if th is not None else '-'):>10}{(G.get('seconds_to_solver') if G.get('seconds_to_solver') is not None else '-'):>16}"
                  f"{(MM.get('port_gb') if MM.get('port_gb') is not None else '-'):>9}{(MM.get('gams_gb') if MM.get('gams_gb') is not None else '-'):>9}  {chk}")
+    if built:
+        L += ["", "* to solver: no solver was started; the time from the start of the run to the model built in memory (GAMS to",
+              "  solver: GAMS's run with --no-solve, to the start of CONVERT)"]
     both = [(r, port_phases(r), (r.get("gams") or {}).get("phases") or {}) for r in reports]
     both = [(r, O, G) for r, O, G in both if O and G.get("execution") is not None]
     if both:

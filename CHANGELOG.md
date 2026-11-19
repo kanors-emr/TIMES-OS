@@ -1,5 +1,61 @@
 # Changelog
 
+## 1.3.0 (November 2026): DD files kept by hand: comments, assignments, damage costs with DAMAGE NO
+
+What a large model with DD files written and kept by hand needed to be read and built as TIMES in GAMS builds it.
+Models written by Veda are read as before, record for record.
+
+#### Input files
+
+- **Every form of comment GAMS allows** is read in the run file and the DD files as GAMS reads it: end-of-line
+  (`$ONEOLCOM`, `$EOLCOM`), in-line (`$ONINLINE`, `$INLINECOM`, `$ONNESTCOM`), `$COMMENT`, `$HIDDEN`, `$ONTEXT`, with
+  the scope GAMS gives them (`$ONGLOBAL`) and several options on one `$` line. Before, such a comment stopped the
+  run with an error of Python, or was read as data; an include inside a `$ONTEXT` block of the run file was read; an
+  unclosed `$ONTEXT` was passed over (`times_pp/timespp/gamsdata.py`, `load.py`, `ddpar.py`).
+- **Ctrl-Z ends a file**, as in GAMS: what follows it is not read (DD files written on Windows may end with one;
+  before, the run stopped on it). A data block still open at the end of a file is an error with the file and the
+  line where it opens. A key written with blanks before its dots (`AT      .CO2_BND .0`) is read as GAMS reads
+  it: `.0` is the next label while the key has fewer labels than its domain, and a value once it has them all.
+- **Assignments in DD files run after all data is read**, as GAMS runs them: GAMS enters the data of every file first
+  and then the assignments, in their order, so a statement sees the data of the files included after it too. Before,
+  each was applied to the data read so far (`times_pp/timespp/gamsdata.py`, `load.py`).
+- **Sets are assigned too**: `COM_PEAK(REG,'ELC') = YES;`, `COM_PKTS(REG,'ELC',TS) = NO;`,
+  `UC_ATTR(R,'UC1','RHS','CAP','GROWTH') = YES;`, over sets, aliases and labels, as GAMS does (a member made by an
+  assignment has no text). Before, the run stopped as unsupported on them (`ddexec.py`).
+- **Assignments in the run file** before the driver of TIMES (`PRC_NOFF(REG,'P1','2010','2059') = YES;`,
+  `G_DYEAR = 2010;`) run in their place among those of the DD files. Before, they stopped the run as unsupported; a
+  statement after the driver still does.
+- **A run file without `$SET DATAGDX YES` is taken as TIMES takes it**: TIMES removes records whose labels are outside
+  their domains (GAMS error 170, reported as warnings) only with `DATAGDX YES` (or `DATAGDXI YES`); without it, GAMS
+  keeps them. Before, a run file without the line was read as if it had it. Now, when the input has such records and
+  the line is missing, the run stops as unsupported, names the records and says to add `$SET DATAGDX YES`, as Veda
+  writes it (`times_pp/timespp/domfilter.py`).
+
+#### Features
+
+- **Damage costs (`DAM_COST`) with `$SET DAMAGE NO`**: interpolated, converted between currencies, and their effect on
+  the model as TIMES has it without the damage equations: the balance of each commodity with a damage cost is an
+  equality with its net variable. The damage equations (`DAMAGE` not `NO`) and the other `DAM_` inputs are still
+  refused (`times_pp/timespp/prep/damage.py`, `interp.py`, `prep/interpolation.py`).
+
+#### Runs and the report
+
+- **A DD file GAMS would refuse stops the run with the file and the line**: the verdict is
+  `ERROR: the input cannot be read: <file>, line <n>: <what was expected>: <the line>`, in the report without a
+  traceback, also when the files are read in parallel. New with it, as in GAMS: a record without a value or with
+  words after it, a key of another length than its declared domain, and a label with a character GAMS does not allow
+  are errors. `$DOLLAR`, `$MINCOL`, `$MAXCOL` and a `$` not in column 1 are refused with the file and the line
+  (`gamsdata.py`, `__main__.py`, `TIMES.py`). Models that GAMS reads are read as before, record for record.
+- **The time to the built model** when nothing is solved (`--no-solve`, with or without `--check`): TIME AND MEMORY
+  shows it, beside GAMS's time to the start of CONVERT when GAMS ran with `--no-solve`, with the ratio; also in THE TWO
+  RUNS, in `report_<case>.json` (`against_gams.time_to_built`) and in `summary.txt` (marked `*`). Before, only
+  GAMS's time was shown. A solved run's report is unchanged (`times_eq/src/runcase.jl`, `TIMES.py`, `against_gams`).
+
+#### Setup
+
+- Windows, Miniconda: the preprocessor runs on the Segment Heap there too (1.2.0 had tried the fix with Miniforge
+  only).
+
 ## 1.2.0 (November 2026): GAMS only when asked, time and memory in the report, conda Pythons on Windows
 
 Fixes and changes from what the first users of 1.1.0 sent. One of them changes what a run does by default: a GAMS

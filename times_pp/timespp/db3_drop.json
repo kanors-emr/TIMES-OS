@@ -686,7 +686,7 @@
 "sides": []
 },
 "DAM_COST": {
-"after": "preppm.mod (inter-/extrapolation): cost parameters",
+"after": "eqdamage.mod (damage costs, DAMAGE NO)",
 "sides": []
 },
 "DAM_ELAST": {

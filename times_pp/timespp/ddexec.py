@@ -1,14 +1,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Assignment statements in DD files.
 
-Veda models sometimes end a DD file with GAMS assignments that clean up the data read so far, e.g. (from a model's
+Veda models sometimes end a DD file with GAMS assignments that clean up the data read, e.g. (from a model's
 zz_modelfix.dd):
 
     ACT_BND(R,DATAYEAR,P,S,BD)$((ACT_BND(R,DATAYEAR,P,S,BD)<3E-5)$ACT_BND(R,DATAYEAR,P,S,BD)) = EPS;
     UC_COMPRD(UC_N('TUC_UP_IOIHET-INDCO'),SIDE,R,DATAYEAR,C,S)$((ABS(UC_COMPRD(UC_N,SIDE,R,DATAYEAR,C,S))<1E-4)
         $UC_COMPRD(UC_N,SIDE,R,DATAYEAR,C,S)) = -1E-4;
 
-GAMS executes them where they stand, on the data read before them. This module applies the form
+GAMS enters the data of every file first (at compile time) and then executes the statements in their order: the
+reader keeps them and runs them when every file is read (gamsdata.Reader.run_statements). This module applies the
+form
 
     SYM(i1,..,in)$(condition) = value;
 
@@ -352,7 +354,8 @@ def _members(reader, setname):
 # Read here: LOOP(set or (set,set,..) [$condition], statements), and assignments SYM(i1,..,in)[$condition] = value
 # whose indices are sets, labels or names a LOOP controls; the expressions of _P with SAMEAS(a,b), SUM, PROD, SMAX
 # and SMIN(set or (sets) [$condition], expression), references to any set (a member: 1, else 0) or parameter read
-# so far, scalars by name, YES and NO.  An assignment runs over the records of SYM when it can only change those (its
+# so far, scalars by name, YES and NO.  SYM is a parameter or a set (a set: a non-zero value makes the member, without
+# text, as GAMS does; 0 removes it).  An assignment runs over the records of SYM when it can only change those (its
 # condition needs SYM's own record, or the value is 0); else over every combination of the members of its index
 # sets, up to MAX_SPACE of them.  Sets are run through in the order of their labels' entry, as GAMS does.  Anything
 # else is Unsupported, and a statement refused halfway is undone.
@@ -657,8 +660,19 @@ class _Run:
                     ix.setdefault(rec[pos], []).append(rec)
         return ix.get(lab, ())
 
-    def put(self, data, key, v):
+    def put(self, data, key, v, is_set=False):
         old = data.get(key, _NONE)
+        if is_set:                                   # a set: a non-zero value makes the member, without text (GAMS
+            if _nz(v):                               # 54: `k(i) = yes` drops the text a member had); 0 removes it
+                if old == "":
+                    return False
+                data[key] = ""
+            elif old is _NONE:
+                return False
+            else:
+                del data[key]
+            self.log.append((data, key, old))
+            return True
         if v is None or (v != EPS and v == 0):
             if old is _NONE:
                 return False
@@ -674,8 +688,8 @@ class _Run:
         _, name, idx, cond, rhs = st
         name = self.name(name)
         s = self.rd.sym.get(name)
-        if s is None or s.kind != "par":
-            raise Unsupported(f"{name} is not a parameter read so far")
+        if s is None or s.kind not in ("par", "set"):
+            raise Unsupported(f"{name} is not a set or parameter read so far")
         dom = s.domain or []
         fixed, free = {}, {}
         for k, it in enumerate(idx):
@@ -731,7 +745,7 @@ class _Run:
                 continue
             if cond is not None and not _nz(self.ev(cond, nb)):
                 continue
-            if self.put(s.data, rec, self.ev(rhs, nb)):
+            if self.put(s.data, rec, self.ev(rhs, nb), s.kind == "set"):
                 self.changed += 1
 
     def _over_space(self, s, idx, cond, rhs, b, fixed, free):
@@ -751,5 +765,5 @@ class _Run:
             key = tuple(fixed[k] if k in fixed else nb[it[1]] for k, it in enumerate(idx))
             if cond is not None and not _nz(self.ev(cond, nb)):
                 continue
-            if self.put(s.data, key, self.ev(rhs, nb)):
+            if self.put(s.data, key, self.ev(rhs, nb), s.kind == "set"):
                 self.changed += 1

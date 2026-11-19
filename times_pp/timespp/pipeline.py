@@ -11,7 +11,8 @@ one step. `dump` labels the point in the GAMS source right after the step.
 from dataclasses import dataclass
 from typing import Callable, Optional
 from .prep import (extensions, stochastic, periods, interpolation, sets, timeslices, capacity, flows, defaults, commodities, trade,
-                   bounds, storage, userconstraints, veda_attributes, coefficients, veda_coefficients, objective, myopic, mlf, cli)
+                   bounds, storage, userconstraints, veda_attributes, coefficients, veda_coefficients, objective, myopic, mlf, cli,
+                   damage)
 
 
 @dataclass(frozen=True)
@@ -69,6 +70,7 @@ PHASES = [
     ("mod_vars.cli (the climate module)", [Step(cli.mod_vars, "the bounds of the climate variables")]),
     ("retirement and refit controls", [Step(capacity.retirement_controls, "retirement and refit controls")]),
     ("objective coefficients", [Step(objective.objective_coefficients, "objective coefficients")]),
+    ("eqdamage.mod (damage costs, DAMAGE NO)", [Step(damage.eqdamage, "the balances of the commodities with damage costs")]),
     ("equ_ext.mlf (TIMES-MACRO MLF)", [Step(mlf.equ_ext, "the calibration of MACRO, presolve.mlf, the bounds of MACRO")]),
     ("recurrin.stc SPINES (eqmain.mod 30)", [Step(stochastic.spines_sets, "the sets of SOW '1' of the spines")]),
     ("bounds, AFS, UC maps", [Step(bounds.variable_bounds, "bounds, AFS, UC maps", "64")]),

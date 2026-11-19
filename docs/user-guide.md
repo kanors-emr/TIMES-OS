@@ -55,6 +55,17 @@ powershell -ExecutionPolicy Bypass -File .\setup.ps1
   workbooks by Veda or by another VedaTL parser (VedaTL, the Veda Tag Language, is how TIMES model workbooks are
   written). The input files are only read; a run writes the results that later runs read into the folder's `GAMSSAVE` (or the
   folder itself), as TIMES does, and everything else into its result folder.
+- **Comments in the run file and the DD files** are read as GAMS reads them: `*` in column 1 (or the character of
+  `$COMMENT`), `$ONTEXT` ... `$OFFTEXT`, `$HIDDEN`, end-of-line comments (`$ONEOLCOM`, `$EOLCOM`), in-line comments
+  (`$ONINLINE`, `$INLINECOM`, nested with `$ONNESTCOM`), with their scope: a switch set in an included file ends with
+  it, unless the including file has `$ONGLOBAL`. Several options may share one `$` line. Comment characters set on
+  GAMS's command line or in `gamsconfig.yaml` (`eolCom`, `inlineCom`) are not seen: set them in the files. `$DOLLAR`,
+  `$MINCOL`, `$MAXCOL` are not read: the run stops on them, naming the file and the line.
+- **What GAMS refuses in a DD file stops the run** with the file, the line, what was expected there and the line
+  itself (cut to 120 characters): a comment character where comments are not switched on, a record without its value
+  or with words after it, a key with more or fewer labels than the declared domain, a label with a character GAMS
+  does not allow, an in-line comment or `$ONTEXT` still open at the end of a file. The verdict is
+  `ERROR: the input cannot be read: <file>, line <n>: ...`.
 - When a folder holds several run files, give the one you want: `python TIMES.py run <run folder>/<run file>.run`. The
   `.run` may be left out when no folder has that name. The case takes the name of the run file, so each run file of a folder has its own result folder.
 - `python TIMES.py example <folder>` copies the example model, DemoS_012, into a new or empty folder and prints the
@@ -183,7 +194,7 @@ done, with exit status 2.
 
 | File | |
 |---|---|
-| `report_<case>.txt` | The verdict; TIME AND MEMORY (the time to the solver and the peak memory, and when the run ran GAMS, GAMS's and the ratio); the unsupported features or the differences, the input files with their hashes, the versions of everything. Complete in itself. |
+| `report_<case>.txt` | The verdict; TIME AND MEMORY (the time to the solver and the peak memory, and when the run ran GAMS, GAMS's and the ratio; with `--no-solve`, the time to the built model, beside GAMS's to the start of CONVERT); the unsupported features or the differences, the input files with their hashes, the versions of everything. Complete in itself. |
 | `report_<case>.json` | The same for a program (TIME AND MEMORY under `against_gams`). |
 | `preprocess.log`, `preprocess.json` | The preprocessor, and its result with every switch of the run file. |
 | `solution.db3` | Levels and marginals of every variable and equation. |

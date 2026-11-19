@@ -20,8 +20,10 @@ A domain is checked when it names a one-dimensional set (or an alias of one), al
 checks a label against the set as declared, so with an empty domain set every record of the symbol violates it (a
 blend without SET SPE: BL_TYPE, BL_SPEC, BL_COM over SPE are all removed, and no EQG_BLND is built).
 
-With $SET DATAGDX NO there is no filter (setglobs.gms 13: $ IF NOT %DATAGDX%==YES $GOTO SYSD), and GAMS keeps the
-records: that is not ported, so such a run stops when there are any.
+The filter runs only with DATAGDX YES (set in the run file, as Veda writes it, or by DATAGDXI YES: initmty.mod 489).
+Without it, DATAGDX NO or not set at all, there is no filter (setglobs.gms 13: $ IF NOT %DATAGDX%==YES $GOTO SYSD) and
+GAMS keeps the records, labels outside their domains included: that is not ported, so such a run stops when there are
+any, and adding $SET DATAGDX YES to the run file makes it run.
 """
 from .engine import DB
 
@@ -41,9 +43,10 @@ def _domain_sets(db: DB, sy):
 
 
 def filtered(db):
-    """The filter runs (DATAGDX not set to something other than YES in the run file: the default of this package)."""
-    v = str(getattr(db, "env", {}).get("DATAGDX", "YES")).strip().strip("'\"").upper()
-    return v == "YES"
+    """The filter runs: DATAGDX YES, or DATAGDXI YES (initmty.mod 489: $ IF %DATAGDXI%==YES $SETGLOBAL DATAGDX YES).
+    Not set, DATAGDX is not YES and setglobs.gms 13 skips the filter."""
+    env = getattr(db, "env", {})
+    return any(str(env.get(k, "")).strip().strip("'\"").upper() == "YES" for k in ("DATAGDX", "DATAGDXI"))
 
 
 def apply(db: DB, verbose=False):
@@ -71,8 +74,8 @@ def apply(db: DB, verbose=False):
                             + ("" if dropped else "   [one-dimensional symbol: kept]") for n, k, why, dropped in found]
     if found and not filtered(db):
         from .controls import unsupported
-        unsupported(db, "domain violations with $SET DATAGDX NO (GAMS keeps those records; they are filtered only with "
-                        "DATAGDX YES): " + "; ".join(f"{n} {'.'.join(map(str, k))}" for n, k, _, _ in found[:5])
+        unsupported(db, "domain violations without $SET DATAGDX YES in the run file (GAMS keeps those records; TIMES "
+                        "filters them only with DATAGDX YES, as Veda writes it): " + "; ".join(f"{n} {'.'.join(map(str, k))}" for n, k, _, _ in found[:5])
                     + (f" and {len(found) - 5} more" if len(found) > 5 else ""), sorted({n for n, _, _, _ in found}))
     elif found:
         db.log.insert(0, QA_LINE)

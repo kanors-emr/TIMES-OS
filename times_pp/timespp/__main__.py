@@ -349,7 +349,13 @@ def _main(argv, t0, work_db, memory):
             db = preprocess(argv[0], argv[1], audit=a, work_db=work_db, memory=memory, tjb_path=_tjb_path(argv[2]), db3_path=argv[2])
         except Exception as e:                      # reading the case itself failed
             import traceback
-            db, a["stopped_in"], a["error"] = None, "reading the run file and the DD files", "".join(traceback.format_exception(e))[-3000:]
+            from .gamsdata import InputError
+            db, a["stopped_in"] = None, "reading the run file and the DD files"
+            if isinstance(e, InputError):           # a line of the input that cannot be read: the line, no traceback
+                a["error"] = a["input_error"] = str(e)
+                print(f"  ERROR: the input cannot be read: {e}")
+            else:
+                a["error"] = "".join(traceback.format_exception(e))[-3000:]
         if a["unsupported"]:
             a["status"] = "unsupported"
         elif db is not None:

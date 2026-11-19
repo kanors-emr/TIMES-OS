@@ -10,8 +10,9 @@ process applies them in the include order of the run file.
 
 A worker parses with the state known when the files are handed out (the switches of the run file, the declarations of
 the TIMES source files).  What it assumed is returned with the result and checked against the real state when the
-file's turn comes: the value of every %name% it substituted, and the kind (set, parameter, scalar) as which it
-parsed every data block.  If
+file's turn comes: the value of every %name% it substituted, the comment switches in force at its start
+(gamsdata.Comments: those of the run file), and the kind (set, parameter, scalar) as which it parsed every data
+block.  If
 anything differs (a file that uses a switch set by an earlier DD file, or a symbol declared in two DD files with
 different domains), that file is read again by the serial reader at its turn.  So is a file whose parse failed
 (the serial reader then raises the error, as it would have) and one with a $IF NOT SET, whose effect depends on the
@@ -19,7 +20,7 @@ state.  The result is the state of the serial reader by construction; tests/test
 """
 from __future__ import annotations
 import os, re
-from .gamsdata import Reader, Symbol, decode_source
+from .gamsdata import Reader, Symbol, Comments, decode_source
 
 _DDNAMES = re.compile(r"(?im)^(PARAMETER|SET)[ \t]*\r?\n?[ \t]*\r?\n?([A-Za-z_]\w*)")
 _IFNOTSET = re.compile(r"(?i)IFI?\s+NOT\s+SET\s+(\w+)")
@@ -37,10 +38,11 @@ class _Fallback(Exception):
 class _Recorder(Reader):
     """A Reader that records operations instead of applying data."""
 
-    def __init__(self, env, view, include_dirs):
+    def __init__(self, env, view, include_dirs, cm=None):
         super().__init__(include_dirs=include_dirs)
         self.env = dict(env)
         self.env0 = dict(env)
+        self.cm = Comments(cm)
         self.view = {n: Symbol(n, k, list(d) if d is not None else None) for n, (k, d) in view.items()}
         self.sym = self.view                 # the parse looks at kinds and domains only
         self.ops = []
@@ -88,7 +90,7 @@ class _Recorder(Reader):
         m = _IFNOTSET.match(line.strip()[1:].strip())
         if m:
             raise _Fallback("$IF NOT SET")
-        env, nu = dict(self.env), len(self.dd_unsupported)
+        env, cm = dict(self.env), self.cm.state()
         self.oneps = None
         super()._directive(line, src)
         for k, v in self.env.items():
@@ -97,11 +99,15 @@ class _Recorder(Reader):
                 self._op("env", k, v)
         if self.oneps is not None:            # $ONEPS / $OFFEPS: applied in order (the parse does not depend on it)
             self._op("oneps", self.oneps)
-        for u in self.dd_unsupported[nu:]:
-            self._op("unsup", u)
+        if self.cm.state() != cm:             # comment switches: what the file leaves set (kept with $ONGLOBAL)
+            self._op("cm", self.cm.state())
 
-    def _dd_statement(self, toks, src):
-        self._op("stmt", toks, src)
+    def _refuse(self, src, text, why, line=None):
+        n = line if line is not None else self._line
+        self._op("unsup", (f"{src}, line {n}," if n else src, text, why))
+
+    def _dd_statement(self, toks, src, line=None):
+        self._op("stmt", toks, src, self._stmt_line())
 
     def _set_members(self, name):
         raise _Fallback("#set: the members of a set are known in the main process only")
@@ -120,20 +126,36 @@ class _Recorder(Reader):
 
     def _data(self, s, toks, scalar, parsed=None):
         parsed = parsed or self._parse_data(s, toks, scalar)
-        self._op("data", s.name, parsed, scalar)
+        self._op("data", s.name, parsed, scalar, key_lengths(parsed))
+
+    def _nd(self, s):
+        """No check of the length of a key here: the domain at the file's turn is known only there. The lengths
+        found go back with the result (key_lengths), and _valid checks them."""
+        return 0
 
 
-def parse_file(path, env, view, include_dirs):
-    """In a worker: the operations of one DD file, or None when it must be read by the serial reader."""
+def key_lengths(parsed):
+    """The numbers of labels of the keys of a parsed data block (an empty set for a scalar)."""
+    kind, items = parsed
+    if kind == "scalar":
+        return frozenset()
+    if type(items) is tuple:                       # from _parse_body: one key per record
+        return frozenset(map(len, items[0]))
+    return frozenset(len(k) for it in items if it[0] == "k" for k in it[1])
+
+
+def parse_file(path, env, view, include_dirs, cm=None):
+    """In a worker: the operations of one DD file, or None when it must be read by the serial reader (a parse that
+    fails: the serial reader then names the file and line)."""
     raw = open(path, "rb").read()
     text, enc = decode_source(raw)
-    r = _Recorder(env, view, include_dirs)
+    r = _Recorder(env, view, include_dirs, cm)
     try:
         r.read_text(text, src=os.path.basename(path))
     except Exception:
         return None
     r._op("end")
-    return {"ops": r.ops, "env": r.env_assumed,
+    return {"ops": r.ops, "env": r.env_assumed, "cm": Comments(cm).state(),
             "enc": None if text.isascii() else enc, "names": dd_names(text)}
 
 
@@ -144,6 +166,8 @@ def _valid(rd, res):
     for k, v in res["env"].items():
         if rd.env.get(k) != v:
             return False
+    if rd.cm.state() != res["cm"]:
+        return False
     st = {}
     for op in res["ops"]:
         if op[0] == "decl":
@@ -159,7 +183,9 @@ def _valid(rd, res):
         elif op[0] == "data":
             kind, dom = st[op[1]]
             mode = "scalar" if kind == "par" and (op[3] or dom == []) else kind
-            if mode != op[2][0]:
+            # the keys have the length of the domain declared at the file's turn (else the file is read here, and
+            # the reader names the record GAMS would refuse)
+            if mode != op[2][0] or (dom and op[4] and op[4] != {len(dom)}):
                 return False
     return True
 
@@ -184,7 +210,9 @@ def apply(rd, res, src):
         elif t == "oneps":
             rd.oneps = op[1]
         elif t == "stmt":
-            rd._dd_statement(op[1], op[2])
+            rd._dd_statement(op[1], op[2], op[3])
+        elif t == "cm":
+            rd.cm.load(op[1])
         elif t == "alias":
             rd._alias(op[1])
         elif t == "unsup":
@@ -225,6 +253,7 @@ class Pool:
         self.view = {n: (d["kind"], d["domain"]) for n, d in fallback_domains().items()}
         self.view.update({n: (s.kind, s.domain) for n, s in rd.sym.items()})
         self.inc = list(rd.include_dirs)
+        self.cm = rd.cm.state()              # the comment switches of the run file where the first DD file is included
         self.fut, self.next = {}, 0
         self.serial = []                     # the files read here after all (their assumptions did not hold)
 
@@ -232,11 +261,11 @@ class Pool:
         if self.ahead is None:
             if self.next == 0:
                 for k in sorted(range(len(self.paths)), key=lambda k: -os.path.getsize(self.paths[k])):
-                    self.fut[k] = self.ex.submit(parse_file, self.paths[k], self.env, self.view, self.inc)
+                    self.fut[k] = self.ex.submit(parse_file, self.paths[k], self.env, self.view, self.inc, self.cm)
                 self.next = len(self.paths)
             return
         while self.next < len(self.paths) and self.next <= upto:
-            self.fut[self.next] = self.ex.submit(parse_file, self.paths[self.next], self.env, self.view, self.inc)
+            self.fut[self.next] = self.ex.submit(parse_file, self.paths[self.next], self.env, self.view, self.inc, self.cm)
             self.next += 1
 
     def read(self, i):

@@ -570,6 +570,9 @@ function run_case(args; t_script = time(), using_seconds = 0.0, early_seconds = 
         # the peak memory of the process up to the built model, before the comparisons with GAMS (which need the GAMS
         # matrix in memory beside the model) and the solve: what running the model costs, without the checks
         res["maxrss_build_gb"] = round(Sys.maxrss() / 2^30; digits = 2)
+        # the moment the model stands built and counted (Unix seconds), solved or not: the runner's "to the built
+        # model" when no solver is started; what follows serves only the checks or the solve
+        res["built_unix"] = time()
         println("built: rows ", res["rows"], "  columns ", res["columns"], "  nonzeros ", res["nonzeros"], "  (", res["build_seconds"], " s)"); flush(stdout)
         note_profile(res)
         gams = opt("--gams", "")

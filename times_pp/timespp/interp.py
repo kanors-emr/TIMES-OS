@@ -411,13 +411,16 @@ BD_PARAMS = {"FLO_MARK", "PRC_MARK", "CAP_BND", "NCAP_BND", "COM_BNDNET", "COM_B
 def prepparm(db: DB, name, target, ctrl, typ, def_iebd=10, x=False, plus=False, fn=None, reset=0):
     """prepparm.gms : inter-/extrapolation of cost parameters (typ=0) and bounds (typ=1).
 
-    typ      : GAMS arg %7  (0 = costs: only series with an explicit option; 1 = bounds)
+    typ      : GAMS arg %7  (0 = costs: only series with an explicit option; 1 = bounds; "EPS" (DAM_COST): as GAMS
+               takes EPS, non-zero as a condition (CNT = ...$%7, NOT %7) and 0 as a number (DFUNC NE %7, MAX(%7,..)))
     def_iebd : GAMS arg %8  default option for bounds (10 = migrate within period only)
     plus     : GAMS arg %10 == '+'  (leave option records in place)
     fn       : GAMS arg %10 function applied to the option, e.g. -ABS
     """
     name = name.upper()
     s = db.s
+    tv = 0.0 if typ == "EPS" else typ          # %7 as a number
+    tt = typ == "EPS" or bool(typ)             # %7 as a condition (EPS is non-zero there)
     if s.get("G_NOINTERP"):
         db.x(f"delete from INT_DEFAULT where u='{name}'")
         return
@@ -430,7 +433,7 @@ def prepparm(db: DB, name, target, ctrl, typ, def_iebd=10, x=False, plus=False, 
     tgset = set(tg)
     ok = _ctrl(db, ctrl, cols)
     ie = db.q1(f"select count(*) from IE_DEFAULT where u='{name}'")
-    CNT0 = (def_iebd + ((3 - def_iebd) if ie else 0)) if typ else 0
+    CNT0 = (def_iebd + ((3 - def_iebd) if ie else 0)) if tt else 0
     fil2 = {int(y): v for y, v in db.q("select y, value from FIL2")}          # year -> milestone of its period
     myfil = sorted(int(y) for (y,) in db.q("select y from MY_FIL"))
     t1 = int(db.q1("select y from MIYR_1"))
@@ -455,7 +458,7 @@ def prepparm(db: DB, name, target, ctrl, typ, def_iebd=10, x=False, plus=False, 
         if opt is not None:
             if abs(opt) >= TINY and _rd(o) != 0:    # an EPS option leaves the default: DFUNC $= ROUND(EPS) assigns nothing
                 DF = _rd(o)                         # (RCAP_BND with only an EPS on year 0 gives no bounds)
-        if DF == 10 and not typ:
+        if DF == 10 and not tt:
             raise NotImplementedError(f"{name}: option 10 on a cost parameter")
         arr = dict(pts)
         f2 = {}
@@ -476,7 +479,7 @@ def prepparm(db: DB, name, target, ctrl, typ, def_iebd=10, x=False, plus=False, 
                 else:
                     F = Zy; FIRST = MY_F
                 LAST = MY_F; MYFY = Zy; Z = Zy
-        elif typ:
+        elif tt:
             # intra-period I/E: values given on non-milestone years move to the period's milestone year
             FIRST = 0.0; MYFY = 0.0
             for y in myfil:
@@ -490,8 +493,8 @@ def prepparm(db: DB, name, target, ctrl, typ, def_iebd=10, x=False, plus=False, 
                     if tt in tgset and tt not in arr:
                         f2[tt] = LAST + (MY_F - LAST) / (Z - MYFY) * (F - MYFY)
                 LAST = MY_F; MYFY = Z
-            DF = float(typ)
-        if typ and math.floor(DF / 10) == 1:
+            DF = float(tv)
+        if tt and math.floor(DF / 10) == 1:
             MYF = fil2.get(int(F), 0.0)
             if F and MYF and MYF < F and int(MYF) in tgset:
                 f2[int(MYF)] = FIRST
@@ -499,7 +502,7 @@ def prepparm(db: DB, name, target, ctrl, typ, def_iebd=10, x=False, plus=False, 
             if MYF > Z and int(MYF) in tgset:
                 f2[int(MYF)] = LAST
             DF = DF - 10
-        if DF != typ:
+        if DF != tv:
             if DF <= 2:
                 for t in tg:
                     if t not in f2 and t not in arr and t in okr:
@@ -513,7 +516,7 @@ def prepparm(db: DB, name, target, ctrl, typ, def_iebd=10, x=False, plus=False, 
                     v = (FIRST if t < F else 0.0) + (LAST if t > Z else 0.0)
                     if v != 0 and t in okr:
                         f2[t] = v
-                if (not typ) and LAST != 0:
+                if (not tt) and LAST != 0:
                     for t in tg:
                         if t not in f2 and t not in arr and t in okr:
                             f2[t] = EPS
@@ -529,7 +532,7 @@ def prepparm(db: DB, name, target, ctrl, typ, def_iebd=10, x=False, plus=False, 
     if not plus:
         bdonly = " and l <> 'N'" if name in BD_PARAMS and "l" in cols else ""
         if reset:
-            db.x(f'update "{name}" set value = {reset} where y=\'0\' and value - {max(typ, reset)} > 0{bdonly}')
+            db.x(f'update "{name}" set value = {reset} where y=\'0\' and value - {max(tv, reset)} > 0{bdonly}')
         else:
-            db.x(f'delete from "{name}" where y=\'0\' and value - {max(typ, 0)} > 0{bdonly}')
+            db.x(f'delete from "{name}" where y=\'0\' and value - {max(tv, 0)} > 0{bdonly}')
     db.x(f"""delete from "{name}" where y='EMPTY'""")

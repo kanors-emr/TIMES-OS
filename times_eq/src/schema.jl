@@ -723,5 +723,4 @@ these tables has rows, instead of producing a model that silently ignores them.
 """
 const UNSUPPORTED = Pair{String,Vector{Symbol}}[
     "flow shape multipliers by timeslice and state of the world (RTP_FFCS)" => [:RTP_FFCS],
-    "damage costs" => [:DAM_COST],
 ]

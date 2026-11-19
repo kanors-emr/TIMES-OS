@@ -64,7 +64,7 @@ PARAMETER ACT_BND ' ' /
 R1.2030.P1.ANNUAL.UP 0
 'R1'.'2040'.P2.'ANNUAL'.UP EPS
 'r2'.2020.'p.1'.'annual'.'lo' -2e3
-'R1'.2050.'P1'.'ANNUAL'.'UP'
+'R1'.2050.'P1'.'ANNUAL'.'UP' 3
 'R1'.2060.'P1'.'ANNUAL'.'FX' +INF
 'R1'.2070.'P1'.'ANNUAL'.'FX' 1_0
 /;
@@ -87,8 +87,7 @@ SET.REG
 /;
 PARAMETER P3
 /
-'R1' 1
-'R1'.'a' '2'
+'R1' 1, 'R2' 2
 /;
 SET S3
 /
@@ -107,7 +106,7 @@ PARAMETER P5
 /;
 PARAMETER P6
 /
-'R1'.'d' 1.5.0
+'R1'.D1*D2 1.5
 /;
 PARAMETER P7
 /

@@ -26,10 +26,10 @@ By area, as the TIMES declarations group them; each attribute with its domain an
 | | count |
 |---|---:|
 | attributes in all | 472 |
-| supported | 344 |
+| supported | 345 |
 | supported, refused in some uses | 36 |
 | refused | 7 |
-| not yet supported | 64 |
+| not yet supported | 63 |
 | not read | 1 |
 | not used by TIMES | 20 |
 
@@ -128,7 +128,7 @@ By area, as the TIMES declarations group them; each attribute with its domain an
 | attribute | kind | status |
 |---|---|---|
 | `DAM_BQTY`(REG,COM) Base quantity of emissions | parameter | not yet supported: damage costs (DAMAGE extension) |
-| `DAM_COST`(REG,ALLYEAR,COM,CUR) Marginal damage cost of emissions | parameter | not yet supported: damage costs (DAMAGE extension) |
+| `DAM_COST`(REG,ALLYEAR,COM,CUR) Marginal damage cost of emissions | parameter | supported with `$SET DAMAGE NO` (the balance of each commodity it costs is an equality, as in TIMES without the damage equations); not yet supported: the damage equations (DAMAGE not NO) |
 | `DAM_ELAST`(REG,COM,LIM) Elasticity of damage cost | parameter | not yet supported: damage costs (DAMAGE extension) |
 | `DAM_STEP`(REG,COM,LIM) Step number for emissions up to base | parameter | not yet supported: damage costs (DAMAGE extension) |
 | `DAM_VOC`(REG,COM,LIM) Variance of emissions | parameter | not yet supported: damage costs (DAMAGE extension) |

@@ -12,9 +12,9 @@ verified coefficient by coefficient, solves it with HiGHS (or with CPLEX or Guro
 writes the Veda result files. A model that needs a feature TIMES-OS does not have stops before anything is solved,
 and the report lists everything the model needs. Same input files, same LP, same output formats.
 
-It covers core TIMES and its main extensions, 380 of the 452 input attributes TIMES uses
+It covers core TIMES and its main extensions, 381 of the 452 input attributes TIMES uses
 ([`FEATURES.md`](https://github.com/kanors-emr/TIMES-OS/blob/main/FEATURES.md)). Not yet supported: endogenous technology learning (ETL), the IER extension, damage
-costs, and MACRO other than its linearised form (MLF). Verified on 17 cases of 9 open models, up to 8.2 million rows:
+costs other than with `DAMAGE NO`, and MACRO other than its linearised form (MLF). Verified on 17 cases of 9 open models, up to 8.2 million rows:
 [the evidence](https://github.com/kanors-emr/TIMES-OS-models).
 
 ![From model workbooks to results](https://raw.githubusercontent.com/kanors-emr/TIMES-OS/main/docs/img/open-chain.png)
@@ -49,7 +49,9 @@ python TIMES.py run <run folder>
 - The result is `runs/<case>/report_<case>.txt`; `--out <folder>` puts the results elsewhere. The last line of a run
   is `Output files available here: <folder>`. **The report's first line is the verdict**: `SOLVED`, `UNSUPPORTED`
   (with the list of what is missing), `NOT SOLVED`, `INFEASIBLE` or `ERROR`. A block TIME AND MEMORY follows the
-  opening lines: the time to the solver and the peak memory, and, when the run ran GAMS, GAMS's and the ratio.
+  opening lines: the time to the solver and the peak memory, and, when the run ran GAMS, GAMS's and the ratio. A run
+  that solves nothing (`--no-solve`) shows the time to the built model instead, beside GAMS's time to the start of
+  CONVERT when GAMS ran with `--no-solve` too.
 - Options you give to every run can go in a settings file, `times-os.toml`, beside your run folders or in your home
   folder (`python TIMES.py config` shows what is in force); see the [user guide](https://github.com/kanors-emr/TIMES-OS/blob/main/docs/user-guide.md#a-settings-file-for-the-options-of-run-times-ostoml).
 - Every commit on `main` is a release, checked against TIMES in GAMS before it is published, on a set of cases that

@@ -17,8 +17,9 @@ RUN = "demos_012.run"
 ASSIGN = "NCAP_AFA('REG1','2005','CAPEELC','UP') = 0.9;"
 
 
-def audit(tmp_path, line=None, extra=None):
-    """The audit of a copy of the model with `line` added. -> preprocess.json"""
+def audit(tmp_path, line=None, extra=None, after=None, without=None):
+    """The audit of a copy of the model with `line` added (and `after` at the end of the run file, the line `without`
+    taken out). -> preprocess.json"""
     case = tmp_path / "case"
     shutil.copytree(MODEL, case)
     for name, text in (extra or {}).items():
@@ -28,6 +29,11 @@ def audit(tmp_path, line=None, extra=None):
     if line:
         assert "* do the rest" in text
         text = text.replace("* do the rest", line + "\n* do the rest")
+    if after:
+        text = text.rstrip("\n") + "\n" + after + "\n"
+    if without:
+        assert without + "\n" in text
+        text = text.replace(without + "\n", "")
     run.write_text(text)
     out = tmp_path / "audit.json"
     code = subprocess.call([sys.executable, "-m", "timespp", str(run), "-", str(tmp_path / "model.db3"), "--audit", str(out)],
@@ -47,7 +53,14 @@ def test_the_plain_copy_goes_through(tmp_path):
 
 
 def test_an_assignment_in_the_run_file(tmp_path):
-    refused(audit(tmp_path, ASSIGN), "NCAP_AFA", "run file")
+    """Run as GAMS runs it: after all data is entered, in its place among the statements of the DD files."""
+    P = audit(tmp_path, ASSIGN)
+    assert P["status"] == "ok", P.get("unsupported") or P.get("error")
+
+
+def test_an_assignment_after_the_driver(tmp_path):
+    """After TIMES's driver: GAMS runs it after the solve; refused."""
+    refused(audit(tmp_path, after=ASSIGN), "NCAP_AFA", "run file", "after the driver")
 
 
 def test_an_include_of_a_gms_file_is_read(tmp_path):
@@ -100,6 +113,17 @@ def test_datagdx_no(tmp_path):
     assert P["status"] == "ok", P.get("unsupported") or P.get("error")
     bad = "PARAMETER NCAP_AFA /\n'REG1'.2005.'NOSUCHPRC'.'UP' 0.9\n/;\n"
     refused(audit(tmp_path / "b", "$SET DATAGDX NO\n$BATINCLUDE extra.dd", {"extra.dd": bad}), "domain violations", "NOSUCHPRC")
+
+
+def test_datagdx_not_set(tmp_path):
+    """DATAGDX not set is not YES: TIMES filters no domain violation (setglobs.gms 13), as with DATAGDX NO."""
+    P = audit(tmp_path, without="$SET DATAGDX YES")
+    assert P["status"] == "ok", P.get("unsupported") or P.get("error")
+    bad = "PARAMETER NCAP_AFA /\n'REG1'.2005.'NOSUCHPRC'.'UP' 0.9\n/;\n"
+    refused(audit(tmp_path / "b", "$BATINCLUDE extra.dd", {"extra.dd": bad}, without="$SET DATAGDX YES"),
+            "domain violations", "DATAGDX YES", "NOSUCHPRC")
+    P = audit(tmp_path / "c", "$BATINCLUDE extra.dd", {"extra.dd": bad})
+    assert P["status"] == "ok", P.get("unsupported") or P.get("error")
 
 
 def test_a_switch_in_a_dd_file(tmp_path):

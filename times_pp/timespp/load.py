@@ -27,53 +27,54 @@ def read_case(run_file: str, src_dir: str = None, workers=None):
     rd = Reader(include_dirs=[case_dir, src_dir])
     rd.case_dir = case_dir                     # (the results of earlier runs: refpoint.gdxpath)
     src_name = rd.run_src = os.path.basename(run_file)
+    rd.deferred = []                           # the statements run when every file is read (Reader.run_statements)
     dd_order = []
     dd_names = set()
     rd.input_files = []                        # the DD files and the model's code files read, in order
-    sysdone = False
     text = read_source(run_file)
-    buf = []
-    dd_paths = [_find(m.strip("'\""), [case_dir, os.path.dirname(case_dir)])
-                for m in re.findall(r"(?im)^\s*\$\s*(?:BAT)?INCLUDE\s+(\S+)", text) if m.strip("'\"").lower().endswith(".dd")]
+    # the DD files the run file names, to hand to the worker processes (a name in a comment too: it is then parsed
+    # and not used; one that does not exist is left to the include, which refuses it)
+    dd_paths = []
+    for m in re.findall(r"(?im)^\s*\$\s*(?:BAT)?INCLUDE\s+(\S+)", text):
+        if m.strip("'\"").lower().endswith(".dd"):
+            try:
+                dd_paths.append(_find(m.strip("'\""), [case_dir, os.path.dirname(case_dir)]))
+            except FileNotFoundError:
+                pass
+    dd_index = {}
+    for i, p in enumerate(dd_paths):
+        dd_index.setdefault(p, []).append(i)
     nw = workers or ddpar.workers_wanted(dd_paths)
-    pool, k = None, 0
+    pool = None
 
-    def flush():
-        if buf:
-            rd.read_text("\n".join(buf), src=src_name)
-            buf.clear()
-
-    for raw in text.splitlines():
+    def include(raw):
+        """An $INCLUDE / $BATINCLUDE line of the run file, its comments taken out (Reader.read_text).  GAMS: what an
+        included file sets ($ONEPS, the comment options) is undone when it returns, unless $ONGLOBAL is on in the
+        run file (GAMS 54; $ONEOLCOM in a DD file does not hold in the next one)."""
+        nonlocal pool, nw
         m = INCLUDE.match(raw)
-        if not m:
-            buf.append(raw)
-            continue
-        flush()
+        cm0, eps0 = rd.cm.state(), rd.oneps
         name = m.group(1).strip("'\"")
         low = name.lower()
         if low.endswith(".dd"):
             p = _find(name, [case_dir, os.path.dirname(case_dir)])
-            # $ONEPS / $OFFEPS are local to the included file: after it the setting is that of before (GAMS 54)
-            eps0 = rd.oneps
             if nw > 1 and pool is None:
                 try:
                     pool = ddpar.Pool(dd_paths, rd, nw)
                 except Exception:                     # no processes on this system: read here
                     nw = 1
-            if pool is not None and k < len(dd_paths) and dd_paths[k] == p:
-                names = pool.read(k)
+            if pool is not None and dd_index.get(p):
+                names = pool.read(dd_index[p].pop(0))
             else:
                 rd.read_file(p)
                 names = ddpar.dd_names(read_source(p))
-            rd.oneps = eps0
-            k += 1
             dd_order.append(os.path.basename(p))
             rd.input_files.append(p)
             # names of the sets and parameters the DD file gives data for (for controls.inputs_known)
             dd_names.update(names)
         elif low in ("initsys.mod", "initmty.mod") and m.group(2).strip():
             # initmty.mod 476: $BATINCLUDE main_ext.mod initmty %EXTEND%: its arguments are extensions
-            rd.dd_unsupported.append((src_name, raw.strip(), "arguments that this implementation does not read"))
+            rd._refuse(src_name, raw.strip(), "arguments that this implementation does not read")
         elif low == "initsys.mod":
             for f in SYS_FILES[:4]:
                 rd.read_file(os.path.join(src_dir, f))
@@ -103,7 +104,7 @@ def read_case(run_file: str, src_dir: str = None, workers=None):
             if str(rd.env.get("ABS", "")).strip().strip("'\"").upper() == "YES":
                 rd.read_file(os.path.join(src_dir if os.path.isfile(os.path.join(src_dir, "initmty.abs")) else BUNDLED_SRC, "initmty.abs"))
         elif low in ("maindrv.mod", os.environ.get("TIMESPP_DRIVER", "").lower()):
-            pass                                # the executable code of TIMES, ported in the stage modules
+            rd.driver_seen = True               # the executable code of TIMES, ported in the stage modules
         elif _own_code(name, case_dir, src_dir) and not m.group(2).strip():
             p = _find(name, [case_dir])
             before = set(rd.sym)
@@ -114,9 +115,18 @@ def read_case(run_file: str, src_dir: str = None, workers=None):
             dd_names.update(n for n in ddpar.dd_names(read_source(p)) if n in before)
         else:
             there = any(os.path.isfile(os.path.join(d, name)) for d in (case_dir, src_dir))
-            rd.dd_unsupported.append((src_name, raw.strip(), "an include this implementation does not read"
-                                      + ("" if there else "; the file does not exist, and GAMS would stop")))
-    flush()
+            rd._refuse(src_name, raw.strip(), "an include this implementation does not read"
+                       + ("" if there else "; the file does not exist, and GAMS would stop"))
+        if not cm0[6]:                              # $ONGLOBAL off in the run file
+            rd.cm.load(cm0)
+            rd.oneps = eps0
+
+    rd.on_include = include
+    try:
+        rd.read_text(text, src=src_name)
+    finally:
+        rd.on_include = None
+    rd.run_statements()                         # GAMS: the assignments run after all data is entered, in order
     if pool is not None:
         pool.close()
     rd.dd_workers = nw if pool is not None else 1
