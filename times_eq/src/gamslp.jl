@@ -13,6 +13,7 @@ Keywords: `gams` the GAMS executable; `solver` GAMS's LP= (e.g. "cplex"); `optfi
 (used as it is) and `options` lines added after it ("name value"; "name=value" is written so), both written to
 <solver>.opt in `workdir` (none of either: no option file); `threads`, `time_limit` (seconds) for GAMS's threads= and
 reslim=; `python` the Python with gams.transfer; `log` a file for GAMS's log; `console` the log to stdout as well;
+`solvelink` GAMS's solvelink= (0, the default: GAMS leaves memory while the solver runs; 2: it stays beside it);
 `keep` the work folder stays after the read-back.
 
 Names (`names`, a folder of `write_matrix`'s files, with `name_rows` the constraint of each of its rows, as
@@ -56,6 +57,7 @@ Base.@kwdef mutable struct Optimizer <: MOI.AbstractOptimizer
     keep::Bool = false
     threads::Int = 0
     time_limit::Float64 = 0.0
+    solvelink::Int = 0                        # GAMS's solvelink: 0 GAMS leaves memory while the solver runs, 2 it stays
     direct::String = ""                       # a script that solves the arrays itself (solvers/gurobilp.py): no GDX, no GAMS
     names::String = ""                        # write_matrix's folder: GAMS gets the model by TIMES's names (lp_names.gms)
     name_rows::Vector{MOI.ConstraintIndex} = MOI.ConstraintIndex[]   # with names: the constraint of each row there
@@ -178,7 +180,7 @@ end
 infeasibility(o) = (maximum(max.(o.rowlo .- o.act, o.act .- o.rowup); init = 0.0), maximum(max.(o.collo .- o.x, o.x .- o.colup); init = 0.0))
 
 writef(dir, name, v) = open(io -> write(io, v), joinpath(dir, name), "w")
-readf(dir, name, n) = (v = Vector{Float64}(undef, n); open(io -> read!(io, v), joinpath(dir, name)); v)
+readf(dir, name, n, T = Float64) = (v = Vector{T}(undef, n); open(io -> read!(io, v), joinpath(dir, name)); v)
 
 # GAMS model status and solve status -> MOI termination, primal and dual status
 function statuses(modelstat, solvestat)
@@ -288,6 +290,13 @@ function MOI.optimize!(o::Optimizer)
               "\"constant\": $(repr(o.c0))}")
     end
     info["arrays_seconds"] = time() - t
+    # the matrix and the objective are in the files now: not held while the solver runs (read back from the files after
+    # it, for the row activities); the bounds are kept (infeasibility)
+    t = time()
+    ne = length(o.V)
+    o.I, o.J, o.V, o.c = Int32[], Int32[], Float64[], Float64[]
+    GC.gc(true)
+    info["free_seconds"] = time() - t
     if o.direct != ""
         direct_step(o, dir, info)
         t = time()                            # read_seconds: the reading of the solution arrays below
@@ -316,6 +325,9 @@ function MOI.optimize!(o::Optimizer)
             "lo=$(o.console ? 4 : 2)", "lf=$log"]
     o.threads > 0 && push!(args, "threads=$(o.threads)")
     o.time_limit > 0 && push!(args, "reslim=$(o.time_limit)")
+    # solvelink 0: GAMS saves its state to disk and leaves memory while the solver runs, then restarts to write the
+    # solution (solvelink 2 keeps GAMS in memory beside the solver, GAMS's default)
+    push!(args, "solvelink=$(o.solvelink)")
     t = time()
     p = run(pipeline(ignorestatus(`$(o.gams) $(named ? joinpath(dir, "lp_names.gms") : abspath(GMS)) $args`); stdout = o.console ? stdout : devnull, stderr = stderr))
     info["gams_seconds"] = time() - t
@@ -336,6 +348,8 @@ function MOI.optimize!(o::Optimizer)
     t = time()
     python_step(o, "solution", dir)
     end
+    o.I, o.J, o.V = readf(dir, "a_i.i32", ne, Int32), readf(dir, "a_j.i32", ne, Int32), readf(dir, "a_value.f64", ne)
+    o.c = readf(dir, "c.f64", nc)
     res = Dict{String,Float64}()
     for l in eachline(joinpath(dir, "result.txt"))
         k, v = split(l; limit = 2)

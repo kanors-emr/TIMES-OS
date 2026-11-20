@@ -8,7 +8,7 @@ An open-source implementation of TIMES, the energy system model generator of IEA
 
 TIMES-OS runs TIMES models from their standard input files, the DD and RUN files, to results on open-source software
 alone. It mirrors TIMES v4.9.8, the current official release: it builds the same linear program as TIMES in GAMS,
-verified coefficient by coefficient, solves it with HiGHS (or with CPLEX or Gurobi where you have a licence), and
+verified coefficient by coefficient, solves it with HiGHS (or with CPLEX, Gurobi or MOSEK where you have a licence), and
 writes the Veda result files. A model that needs a feature TIMES-OS does not have stops before anything is solved,
 and the report lists everything the model needs. Same input files, same LP, same output formats.
 
@@ -40,6 +40,12 @@ python TIMES.py run <run folder>
   winget or the Microsoft Store; on any system as a portable copy from julialang.org, no administrator rights
   needed), installs the Python and Julia packages into this folder, compiles the Julia code and runs the example
   model. Allow ten to fifteen minutes the first time.
+- **Julia's packages and their compiled code stay in this folder** (`.julia_depot`, a few GB), beside the rest of
+  TIMES-OS; Julia's usual store in your home folder (`~/.julia`, on Windows on drive C:) is not used, so a full C:
+  drive does not stop a TIMES-OS installed on another drive, and deleting the folder removes all of it. If you use
+  Julia for other work too and would rather keep one store for all of it, `setup --julia-depot <folder>` puts it
+  there (your existing depot, or a shared one); setup keeps that choice for the runs and for the next setup. A
+  `JULIA_DEPOT_PATH` already set when setup first runs is taken the same way.
 - Stochastic models (`$SET STAGES YES` or `$SET SPINES YES`): their equations compiled ahead are a package of their
   own, which `setup` compiles with the rest. Where it is missing or out of date, the first run of such a model
   compiles it (a few minutes, once; the run says so).
@@ -92,7 +98,7 @@ times-os run demo
   `times-os clean` (it lists what TIMES-OS keeps in its data folder and asks before removing it), then
   `pip uninstall times-os`.
 - For the comparison with TIMES in GAMS (`--check`), `--lp` and `--jacobian`: `pip install "times-os[gdx]"`; for
-  `--gurobi`: `pip install "times-os[gurobi]"`.
+  `--gurobi`: `pip install "times-os[gurobi]"`; for `--mosek` (MOSEK through Julia): `times-os setup --mosek`.
 - **Where it has run:** this release's package has been installed and run, first run and second, on Windows and
   Linux on GitHub's runners and on a Windows workstation of KanORS-EMR; on macOS, an earlier version of it has.
 - **Tell us what you find**, whatever it is: in the repository's [Issues](https://github.com/kanors-emr/TIMES-OS/issues),

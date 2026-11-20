@@ -105,6 +105,7 @@ def main(argv):
     cons = m.addMConstr(A, x, sns, rhs)
     m.update()
     del A                                             # Gurobi holds its own copy now
+    del rlo, rup, xlo, xup, c, eq, ge, le, sns, rhs     # and of the bounds and the objective
     gentime = time.time() - t0
 
     if threads > 0:

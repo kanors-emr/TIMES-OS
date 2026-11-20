@@ -239,6 +239,11 @@ function reset_capacity!(R::Relax, m::Model)
     return R
 end
 
+# The periods of a step's window, as text. A function of its own, given the labels and the periods only: written in
+# solve_steps as a generator over the model, it captured the model, whose type names every variable family, and
+# compiling that generator took 110 s of every myopic run (DemoS_012 in steps of 10 years).
+window_text(L, T, sub) = join((label(L, t) for t in T if t in sub), " ")
+
 """
     solve_steps(d, optimizer; configure, progress, reference, check) -> (solution, last model)
 
@@ -293,7 +298,7 @@ function solve_steps(d::Data, optimizer; configure = jm -> nothing, progress = (
         ok = accept(m.jump)
         say("step $k: solver finished: $status ($(round(time() - t1; digits = 1)) s)" *
             (ok ? (status == JuMP.OPTIMAL ? "" : "; a feasible point, taken as the solution of the step") : "; no solution, the run stops here"))
-        info = Dict{String,Any}("step" => k, "year" => yr, "window" => join((label(m.L, t) for t in m.T if t in m.sub), " "),
+        info = Dict{String,Any}("step" => k, "year" => yr, "window" => window_text(m.L, m.T, m.sub),
             "rows" => sum(values(row_counts(m)); init = 0), "columns" => JuMP.num_variables(m.jump), "nonzeros" => nonzeros(m),
             "status" => string(status), "objective" => ok ? JuMP.objective_value(m.jump) : nothing, "seconds" => round(time() - t0; digits = 1),
             "build_seconds" => round(t1 - t0; digits = 1), "solve_seconds" => round(time() - t1; digits = 1))

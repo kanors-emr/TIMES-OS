@@ -3,7 +3,7 @@
 """TIMES: run a TIMES model through the open chain: DD files -> Python preprocessor -> Julia/JuMP -> HiGHS -> Veda
 result files; and, where TIMES in GAMS is at hand, compare the model with the one it builds.
 
-    python TIMES.py setup [--julia <julia executable>] [--gams <gams executable>] [--times <TIMES source folder>] [--no-times-source] [--gdx] [--dev] [--no-segheap] [--no-julia-install] [--install-julia winget|store|portable] [--gurobi <version>]
+    python TIMES.py setup [--julia <julia executable>] [--gams <gams executable>] [--times <TIMES source folder>] [--no-times-source] [--gdx] [--dev] [--no-segheap] [--no-julia-install] [--install-julia winget|store|portable] [--julia-depot <folder>] [--gurobi <version>] [--mosek]
     python TIMES.py check
     python TIMES.py run <run folder> [<run folder> ...] [--cases <list file>] [options]
     python TIMES.py verify <result folder> [...] [--keep] [--quiet]
@@ -30,9 +30,15 @@ setup   creates .venv and installs the Python packages there, installs the Julia
         (both Windows, through winget), and a portable copy of the latest stable release from julialang.org in .julia_bin
         (checked against its published SHA-256; no administrator rights).  --no-julia-install: do not.
         --install-julia <way>: install Julia that one way even if one is found (winget, store or portable).
+        The Julia packages and their compiled code go into .julia_depot, in this folder, and every Julia that times-os
+        starts uses it (JULIA_DEPOT_PATH, for those Julias only); Julia's default depot (~/.julia) is not used.
+        --julia-depot <folder>: that folder instead (kept for the next setups and runs), for example a depot that
+        you share with your other Julia work. When JULIA_DEPOT_PATH is set, setup takes the first folder it names.
         When Gurobi is installed (GUROBI_HOME, gurobi_cl on the PATH, or the default folder gurobi<version>), setup
         also installs the Python packages of --gurobi: gurobipy of that version (a Gurobi licence is for one version)
         and scipy.  --gurobi <version>: that version of gurobipy, for a licence without a local installation.
+        When a MOSEK licence is found (MOSEKLM_LICENSE_FILE, or mosek.lic in the folder mosek of the home folder),
+        setup also installs the Julia packages of --mosek (Mosek and MosekTools).  --mosek: install them anyway.
         For the comparison with TIMES in GAMS (optional): --gams <gams executable> and --times <TIMES source folder> are
         kept in settings.json (found by themselves when GAMS is on the PATH or in C:\\GAMS, and when the source is a
         folder beside this one or Veda's GAMS_SrcTIMES folder).  The TIMES source is not part of this repository: it is
@@ -134,6 +140,13 @@ options of run:
                             finds Gurobi (or setup --gurobi <version>);
                             options: gurobi.opt in the run folder, --solver-option name=value, as Gurobi parameters
                             (--lp gurobi is Gurobi through your GAMS)
+    --mosek                 MOSEK through its Julia interface (the Julia packages Mosek and MosekTools), without GAMS and
+                            without a file between them: needs a MOSEK licence and those packages, which setup installs when
+                            it finds the licence (or setup --mosek); options: mosek.opt in the run folder (a parameter a line,
+                            name value) and --solver-option name=value, as MOSEK parameters (MSK_IPAR_..., MSK_DPAR_...);
+                            --threads and --time-limit apply (--lp mosek is MOSEK through your GAMS); the model is
+                            handed to MOSEK directly, without JuMP's copy of it beside MOSEK's (TIMES_MOSEK_DIRECT=0: MOSEK
+                            is given JuMP's copy)
     --solver-option <name=value>  a line added to the solver's option file (after the run folder's), repeated as needed
     --gams-exe <file>       the GAMS executable for --lp (default: TIMES_GAMS, settings.json "gams", the PATH, C:\\GAMS)
     --time-limit <seconds>  limit of each solve (default: the run file's OPTION RESLIM, else GAMS's default; 0: no limit)
@@ -197,6 +210,7 @@ PROG = "python TIMES.py"                        # how the user starts this progr
 SETTINGS = os.path.join(STATE, "settings.json")
 JULIA_ENV = os.path.join(STATE, ".julia_env")
 VENV = os.path.join(STATE, ".venv")
+JULIA_DEPOT = os.path.join(STATE, ".julia_depot")   # Julia's depot of times-os: its Julia packages and their compiled code (setup --julia-depot puts it elsewhere)
 JULIA_BIN = os.path.join(STATE, ".julia_bin")   # Julia as setup installs it, the last way it tries (a portable copy, no administrator rights)
 JULIA_VERSIONS = "https://julialang-s3.julialang.org/bin/versions.json"
 PORT_VERSION = "4.9.8"                         # the TIMES version this implementation follows
@@ -219,7 +233,7 @@ def launched(prog, version, state=None):
     installed by pip, the data folder, which becomes the state root. Also for a clone installed with pip install -e .:
     the clone's own code runs, as it is edited, and its state goes to the data folder, as for any installed package;
     `python TIMES.py` in the same clone (no state given) keeps its state in the clone."""
-    global PROG, INSTALLED, STATE, PART, SETTINGS, JULIA_ENV, VENV, JULIA_BIN, SEGHEAP, WORKLOAD_DIR, WORKLOAD_TXT, WORKLOAD_JSON
+    global PROG, INSTALLED, STATE, PART, SETTINGS, JULIA_ENV, VENV, JULIA_BIN, JULIA_DEPOT, SEGHEAP, WORKLOAD_DIR, WORKLOAD_TXT, WORKLOAD_JSON
     PROG = prog
     if not state:
         return
@@ -234,6 +248,7 @@ def launched(prog, version, state=None):
     JULIA_ENV = os.path.join(PART, ".julia_env")
     VENV = os.path.join(PART, ".venv")             # never made when installed: the Python that runs times-os is used
     JULIA_BIN = os.path.join(STATE, ".julia_bin")
+    JULIA_DEPOT = os.path.join(STATE, ".julia_depot")   # shared by the environments, as Julia's depot is made to be
     SEGHEAP = os.path.join(PART, "segheap")
     WORKLOAD_DIR = os.path.join(PART, "precompile")
     WORKLOAD_TXT = os.path.join(WORKLOAD_DIR, "WORKLOAD.txt")
@@ -600,6 +615,26 @@ def settings():
         except ValueError:
             pass
     return s
+
+
+def saved_julia_depot():
+    """The Julia depot that setup chose (settings.json "julia_depot"), or None: a setup made before times-os kept its
+    own depot, whose Julia packages are in Julia's default depot (~/.julia)."""
+    d = settings().get("julia_depot")
+    return locate(d) if d else None
+
+
+def use_julia_depot(depot):
+    """Every Julia started from here on (the model build, the preprocessor's kernels, setup's package steps) uses
+    `depot`, and after it the depot that comes with Julia (its standard libraries, compiled): JULIA_DEPOT_PATH is
+    `depot;`, the trailing separator adding Julia's own. Julia's default depot (~/.julia) is then not read."""
+    if not depot:
+        return
+    cur = os.environ.get("JULIA_DEPOT_PATH") or ""
+    first = cur.split(os.pathsep)[0]
+    if first and os.path.normcase(os.path.abspath(first)) == os.path.normcase(os.path.abspath(depot)):
+        return                                      # the user's own setting names this depot: left as it is
+    os.environ["JULIA_DEPOT_PATH"] = depot + os.pathsep
 
 
 def locate(path):
@@ -1101,6 +1136,22 @@ def gurobi_folder_version(path):
     return f"{int(m.group(1))}.{m.group(2)}.{m.group(3)}" if m else None
 
 
+def mosek_licence():
+    """The MOSEK licence file MOSEK would read (MOSEKLM_LICENSE_FILE, else mosek/mosek.lic in the home folder), or None.
+    MOSEKLM_LICENSE_FILE may also name a licence server (port@host): taken as found."""
+    env = os.environ.get("MOSEKLM_LICENSE_FILE")
+    if env:
+        return env
+    f = os.path.join(os.path.expanduser("~"), "mosek", "mosek.lic")
+    return f if os.path.isfile(f) else None
+
+
+def mosek_julia_installed():
+    """Whether the Julia packages of --mosek (Mosek, MosekTools) are in the Julia environment of the runner."""
+    man = os.path.join(JULIA_ENV, "Manifest.toml")
+    return os.path.isfile(man) and re.search(r'(?m)^\[\[deps\.MosekTools\]\]', read(man)) is not None
+
+
 def find_gurobi():
     """(version, folder) of the Gurobi installed here (GUROBI_HOME, gurobi_cl on the PATH, else the newest default
     folder), or (None, None). The version is gurobi_cl's own, else the one in the folder's name."""
@@ -1242,12 +1293,15 @@ def check(verbose=True):
     if julia:
         _, out, _ = call([julia, "--version"], timeout=120)
         ready, why = julia_ready(julia)
+        depot = saved_julia_depot()
+        if not ready and depot and not os.path.isdir(os.path.join(depot, "packages")):
+            why = f"the Julia depot {depot} has no packages yet"
         m = re.search(r"julia version (\d+)\.(\d+)", out or "")
         old = bool(m) and (int(m.group(1)), int(m.group(2))) < (1, 11)
         chain &= ready and not old
         lines.append(("MISSING", "Julia",f"{out.strip()} ({julia}): times-os needs Julia 1.11 or newer  -> run: {PROG} setup "
                       "(it takes a newer Julia, or installs one beside this one)") if old else ("ok", "Julia", f"{out.strip()} ({julia})"))
-        lines.append(("ok" if ready else "MISSING", "Julia packages (TimesEq, JuMP, HiGHS)", "installed in .julia_env" if ready else f"{why}  -> run: {PROG} setup"))
+        lines.append(("ok" if ready else "MISSING", "Julia packages (TimesEq, JuMP, HiGHS)", f"installed in .julia_env; compiled in {saved_julia_depot() or 'Julia' + chr(39) + 's default depot (~/.julia); setup puts them in .julia_depot'}" if ready else f"{why}  -> run: {PROG} setup"))
         man = os.path.join(JULIA_ENV, "Manifest.toml")
         kern = os.path.isfile(man) and "TimesPPKernels" in read(man) and bool(s.get("julia_bindir"))
         lines.append(("ok" if kern else "NOTE", "Julia kernels of the preprocessor", "TimesPPKernels in .julia_env (on by default; TIMESPP_KERNELS=none turns them off)"
@@ -1256,6 +1310,11 @@ def check(verbose=True):
         ipopt = os.path.isfile(man) and re.search(r'(?m)^\[\[deps\.Ipopt\]\]', read(man)) is not None
         lines.append(("ok" if ipopt else "NOTE", "Ipopt (the calibration of TIMES-MACRO MLF)", "installed in .julia_env" if ipopt
                       else f"not installed: a run with MACRO MLF cannot calibrate  -> run: {PROG} setup"))
+        # Mosek and MosekTools: --mosek only; setup installs them when it finds a MOSEK licence
+        if mosek_julia_installed() or mosek_licence():
+            lines.append(("ok" if mosek_julia_installed() else "NOTE", "Mosek and MosekTools (--mosek)", "installed in .julia_env"
+                          + ("" if mosek_licence() else "; no MOSEK licence found") if mosek_julia_installed()
+                          else f"not installed: a MOSEK licence is found ({mosek_licence()})  -> run: {PROG} setup"))
         # stochastic TIMES: its equations compiled ahead are an add-on, compiled by setup or by the first such run
         if ready and stochastic_installed():
             julia_compiled(julia)
@@ -1733,6 +1792,25 @@ def setup(args):
         src = other if other and times_version(other) == PORT_VERSION else (fetch_times_source(src) or src)
     if src and times_version(src) != PORT_VERSION:
         print(f"   TIMES source is v{times_version(src)}; this implementation follows v{PORT_VERSION}")
+    # the Julia depot: --julia-depot, else the one kept by an earlier setup, else the user's JULIA_DEPOT_PATH, else
+    # .julia_depot here. Set before the first Julia that setup starts.
+    user_depot = (os.environ.get("JULIA_DEPOT_PATH") or "").split(os.pathsep)[0]
+    depot, why = next((os.path.abspath(d), w) for d, w in ((opt("--julia-depot"), "  (--julia-depot)"),
+                                                          (saved_julia_depot(), "  (kept from the last setup)"),
+                                                          (user_depot, "  (JULIA_DEPOT_PATH)"), (JULIA_DEPOT, "")) if d)
+    if os.path.normcase(depot) == os.path.normcase(os.path.abspath(JULIA_DEPOT)):
+        why = ""
+    s["julia_depot"] = for_settings(depot)
+    use_julia_depot(depot)
+    print(f"   Julia's packages and their compiled code: {depot}{why}")
+    home_depot = os.path.join(os.path.expanduser("~"), ".julia")
+    if not why and os.path.isdir(os.path.join(home_depot, "packages")) and os.listdir(os.path.join(home_depot, "packages")):
+        # the user has Julia packages of their own: the choice is theirs to make, knowing it
+        print(f"   (Julia's own depot {home_depot}, {folder_size(home_depot) / 2**30:.1f} GB, is left as it is: TIMES-OS keeps its few GB in\n"
+              f"    its own folder rather than adding them there. To share that depot instead: {PROG} setup --julia-depot {home_depot})")
+    if WIN and len(depot) > 100:
+        print(f"   NOTE: the path of the Julia depot is long ({len(depot)} characters); some Julia files lie deep inside it, and "
+              "Windows refuses paths over 260 characters. A shorter folder (--julia-depot) avoids that.")
     julia = find_julia(opt("--julia"), check=True)
     for exe, old in JULIA_OLD:
         print(f"   Julia: {exe} is {old}; times-os needs Julia 1.11 or newer"
@@ -1775,6 +1853,18 @@ def setup(args):
                 code = 1
             installed = julia_packages_installed()
             print("   " + julia_step_line(code, out, installed) + f"  ({t:.0f} s)")
+            if julia_step_ok(code, installed) and (mosek_licence() or "--mosek" in args):
+                # --mosek: the Julia packages Mosek and MosekTools, when a MOSEK licence is found (or setup --mosek); the
+                # versions of the packages already installed stay as they are (PRESERVE_ALL)
+                if mosek_julia_installed():
+                    print("   Mosek and MosekTools (Julia), for --mosek: installed")
+                else:
+                    print("   Mosek and MosekTools (Julia), for --mosek" + (f" (MOSEK licence: {mosek_licence()})" if mosek_licence() else "") + " ...")
+                    mc, mout, mt = call([julia, "--startup-file=no", f"--project={JULIA_ENV}", "-e",
+                                         'using Pkg; Pkg.add(["Mosek", "MosekTools"]; preserve = Pkg.PRESERVE_ALL); Pkg.precompile()'],
+                                        env={"JULIA_PKG_PRECOMPILE_AUTO": "0"}, timeout=3600)
+                    ok = mc == 0 and not julia_error(mout) and mosek_julia_installed()
+                    print("   " + ("done" if ok else "not installed (needed only for --mosek):\n" + mout[-2000:]) + f"  ({mt:.0f} s)")
             if julia_step_ok(code, installed):     # also stopped at its limit with the packages installed
                 pin_timeseq_path()
                 # where libjulia is, for the kernels the preprocessor runs in its own process (timespp/kernels.py)
@@ -2404,10 +2494,10 @@ def one_case(folder, out_root, o, case=None):
         R["input"] = {"run_file": run_file, "missing_dd_files": lost}
         return finish("ERROR: DD files named in the run file are not in the run folder or its parent: " + ", ".join(lost))
     # TIMES-MACRO MLF: its Negishi iterations (rpt_ext.mlf) solve the LP again after each update of the weights; that loop
-    # runs with HiGHS only so far, so a run with another solver would stop after the first LP: refused until it is there
-    if (switch(run_text, "MACRO") or "").upper() == "MLF" and o["solve"] and o.get("lp", "highs") != "highs":
-        return finish("ERROR: MACRO MLF is solved with HiGHS only so far (its Negishi iterations solve the LP again with "
-                      f"the same solver); run it without {'--gurobi' if o['lp'] == 'gurobipy' else '--lp'}")
+    # runs with HiGHS and MOSEK (--mosek) so far, so a run with another solver would stop after the first LP: refused until it is there
+    if (switch(run_text, "MACRO") or "").upper() == "MLF" and o["solve"] and o.get("lp", "highs") not in ("highs", "mosekjl"):
+        return finish("ERROR: MACRO MLF is solved with HiGHS or --mosek only so far (its Negishi iterations solve the LP again "
+                      f"with the same solver); run it without {'--gurobi' if o['lp'] == 'gurobipy' else '--lp'}")
     R["input"] = {"run_file": run_file, "dd_files": [{"name": os.path.basename(p), "bytes": os.path.getsize(p), "sha256_16": sha(p),
                                                        "from_parent_folder": os.path.dirname(p) != folder} for _, p in dds],
                   "run_file_sha256_16": sha(run_file),
@@ -2790,7 +2880,8 @@ def one_case(folder, out_root, o, case=None):
         if not julia:
             notes.append(f"Julia was not found ({PROG} setup)")
         else:
-            print(f"[{case}] " + (f"building the model in Julia and solving it with {o['lp'].upper()} {'through Python (gurobipy)' if o['lp'] == 'gurobipy' else 'through GAMS'} ..." if o["solve"] and o["lp"] != "highs"
+            print(f"[{case}] " + ("building the model in Julia and solving it with MOSEK (Julia's MosekTools) ..." if o["solve"] and o["lp"] == "mosekjl"
+                                   else f"building the model in Julia and solving it with {o['lp'].upper()} {'through Python (gurobipy)' if o['lp'] == 'gurobipy' else 'through GAMS'} ..." if o["solve"] and o["lp"] != "highs"
                                    else "building and solving the model in Julia (HiGHS) ..." if o["solve"]
                                    else "building the model in Julia (--no-solve: HiGHS is not run) ..."), flush=True)
             jj = os.path.join(out, "julia.json")
@@ -2808,14 +2899,20 @@ def one_case(folder, out_root, o, case=None):
                 cmd += ["--threads", str(o["threads"])]
             if o["lp"] != "highs":
                 # an LP solver of the user's GAMS: the run folder's <solver>.opt as it is (Veda writes cplex.opt beside the run file)
-                optf = os.path.join(os.path.dirname(run_file), ("gurobi" if o["lp"] == "gurobipy" else o["lp"]) + ".opt")
+                optf = os.path.join(os.path.dirname(run_file), {"gurobipy": "gurobi", "mosekjl": "mosek"}.get(o["lp"], o["lp"]) + ".opt")
                 cmd += ["--lp", o["lp"], "--gams-exe", o["gams_exe"], "--python", sys.executable,
                         "--lp-work", os.path.join(out, "gamslp"), "--lp-log", os.path.join(out, "gamslp.log")]
                 cmd += ["--lp-optfile", optf] if os.path.isfile(optf) else []
                 for kv in o["solver_options"]:
                     cmd += ["--solver-option", kv]
                 cmd += ["--keep"] if o["keep"] else []
+                # TIMES_LP_DIRECT=0: JuMP keeps its copy of the model through the solve; TIMES_GAMS_SOLVELINK: GAMS's
+                # solvelink (0, the default: GAMS leaves memory while the solver runs; 2: it stays, GAMS's own default)
+                cmd += ["--lp-direct", setting("LP_DIRECT")] if setting("LP_DIRECT") else []
+                cmd += ["--gams-solvelink", setting("GAMS_SOLVELINK")] if setting("GAMS_SOLVELINK") else []
                 cmd += ["--lp-names"] if o["lp_names"] else []
+                if o["lp"] == "mosekjl" and (setting("MOSEK_DIRECT", "1") or "1").strip() == "0":
+                    cmd += ["--no-mosek-direct"]                # TIMES_MOSEK_DIRECT=0: MOSEK is given JuMP's copy of the model
             for kv in o["highs_options"]:
                 cmd += ["--highs-option", kv]
             if G and G.get("solution_file"):
@@ -2864,7 +2961,7 @@ def one_case(folder, out_root, o, case=None):
                 R["timings"]["to_highs"] = round(J["solve_started_unix"] - t_start, 1)
                 if (J.get("gamslp") or {}).get("gams_to_solver_seconds") is not None:   # --lp: to the solver's start in GAMS
                     H = lp_hand_over(J["gamslp"])
-                    R["timings"]["to_highs"] = round(J["solve_started_unix"] - t_start + H["copy"] + H["gdx"] + H["to_solver"], 1)
+                    R["timings"]["to_highs"] = round(J["solve_started_unix"] - t_start + H["after_start"], 1)
             elif os.path.exists(os.path.join(out, "highs.log")):    # a Julia before solve_started_unix: the creation of HiGHS's log
                 st = os.stat(os.path.join(out, "highs.log"))
                 born = st.st_ctime if WIN else getattr(st, "st_birthtime", None)
@@ -3336,13 +3433,17 @@ def lp_hand_over(X):
     """--lp: the seconds of the hand-over to the solver of the user's GAMS and back, from julia.json's "gamslp" (X):
     copy (the LP taken from JuMP), gdx (arrays and the GDX written), to_solver (the GAMS process to its solver's
     start: loading the GDX and generating the LP), after_solver (the GAMS process after its solver: the solution
-    written), read (the solution read back), total (all of them: everything of the solve but the solver's own time)."""
+    written), read (the solution read back), free (the matrix released before the solver starts), total (all of
+    them: everything of the solve but the solver's own time); after_start: the part of it from the solve's start
+    (julia.json's solve_started_unix) to the solver's: the copy is in it when JuMP hands the model over at the solve
+    (hand_over "JuMP"), not when the model is handed over directly (in the phase "solver setup", before the start)."""
     g = lambda k: X.get(k) or 0.0
     to = X.get("gams_to_solver_seconds")
     to = g("gams_seconds") - g("solver_seconds") if to is None else to
     h = {"copy": g("copy_seconds"), "gdx": g("arrays_seconds") + g("gdx_seconds"), "to_solver": to,
-         "after_solver": max(0.0, g("gams_seconds") - to - g("solver_seconds")), "read": g("read_seconds")}
+         "after_solver": max(0.0, g("gams_seconds") - to - g("solver_seconds")), "read": g("read_seconds"), "free": g("free_seconds")}
     h["total"] = sum(h.values())
+    h["after_start"] = (0.0 if X.get("hand_over") == "direct" else h["copy"]) + h["free"] + h["gdx"] + h["to_solver"]
     return {k: round(v, 2) for k, v in h.items()}
 
 
@@ -3363,7 +3464,7 @@ def port_phases(R):
            "copy_to_highs": round(sec("solver setup") + sec("copy to HiGHS"), 1), "to_solver": T["to_highs"]}
     if (J.get("gamslp") or {}).get("gams_to_solver_seconds") is not None:     # --lp: the hand-over to GAMS's solver
         H = lp_hand_over(J["gamslp"])
-        out["copy_to_highs"] = round(sec("solver setup") + H["copy"] + H["gdx"] + H["to_solver"], 1)
+        out["copy_to_highs"] = round(sec("solver setup") + sec("free JuMP's copy") + H["after_start"], 1)
     out["rest"] = round(out["to_solver"] - sum(v for k, v in out.items() if k != "to_solver"), 1)
     return out
 
@@ -4071,7 +4172,7 @@ def report_text(R):
                         "so prices and reduced costs are missing from the results")
             else:
               H = lp_hand_over(X)
-              add(f"          through GAMS: the LP taken from JuMP {H['copy']:.1f} s, to a GDX {H['gdx']:.1f} s, GAMS {X.get('gams_seconds', 0):.1f} s "
+              add(f"          through GAMS: the LP taken from JuMP {H['copy']:.1f} s ({X.get('hand_over', 'JuMP')}), to a GDX {H['gdx']:.1f} s, released {H['free']:.1f} s, GAMS {X.get('gams_seconds', 0):.1f} s "
                   f"(to the solver's start {H['to_solver']:.1f} s, of it generation {X.get('generation_seconds', 0):.1f} s; solver {X.get('solver_seconds', 0):.1f} s, "
                   f"{X.get('iterations', 0):,} iterations; after it {H['after_solver']:.1f} s), read back {X.get('read_seconds', 0):.1f} s: "
                   f"the hand-over {H['total']:.1f} s; " + ("GAMS's log: gamslp_step1.log" if X.get("steps") == 1 else
@@ -4079,6 +4180,11 @@ def report_text(R):
                                                             if X.get("steps") else "GAMS's log: gamslp.log"))
             if X.get("infeasibility"):
                 add(f"          optimal, with infeasibilities after unscaling: {X['infeasibility']}")
+        K = J.get("mosek")
+        if K:
+            how = {"direct": ", the model handed over directly", "JuMP": ", through JuMP's copy"}.get(K.get("hand_over"), "")
+            add(f"          through Julia (MosekTools{how}): MOSEK {K.get('solver_version', '')}, solver {K.get('solver_seconds', 0):.1f} s, "
+                f"{K.get('barrier_iterations', 0):,} interior point and {K.get('simplex_iterations', 0):,} simplex iterations; MOSEK's log: julia.log")
         if J.get("highs_options"):
             add("          HiGHS options: " + ", ".join(f"{k}={v}" for k, v in sorted(J["highs_options"].items())))
         L.extend(julia_time_lines(J, R["timings"].get("julia")))
@@ -4195,7 +4301,7 @@ RUN_OPTIONS = {
     "solver": ("text", "auto"), "threads": ("int", "0 (as many as useful)"), "time-limit": ("number", "the run file's RESLIM"),
     "tolerance": ("number", "1e-06"), "check": ("switch-or-text", "false"), "no-solve": ("switch", "false"),
     "solve": ("switch", "false"), "max-solve-rows": ("number", "2000000"), "highs-option": ("texts", "none"),
-    "lp": ("text", "highs"), "cplex": ("switch", "false"), "gurobi": ("switch", "false"),
+    "lp": ("text", "highs"), "cplex": ("switch", "false"), "gurobi": ("switch", "false"), "mosek": ("switch", "false"),
     "solver-option": ("texts", "none"), "gams-exe": ("path", "TIMES_GAMS, settings.json, the PATH"),
     "lp-names": ("switch", "false"), "points": ("paths", "none"), "cases": ("paths", "none"),
     "jacobian": ("switch-or-text", "false"), "db3": ("switch", "false"), "bundle": ("switch", "false"),
@@ -4424,6 +4530,8 @@ def run(args, settings_files=True):
             o["lp_names"] = True
         elif a == "--gurobi":
             o["lp"] = "gurobipy"
+        elif a == "--mosek":
+            o["lp"] = "mosekjl"
         elif a == "--solver-option":
             o["solver_options"].append(args[i + 1]); i += 1
         elif a == "--gams-exe":
@@ -4506,6 +4614,18 @@ def run(args, settings_files=True):
                      f"  {PROG} setup --gurobi <the version of your Gurobi licence>\n"
                      f"  or: {sys.executable} -m pip install gurobipy==<the version of your Gurobi licence> scipy"))
             return 2
+    elif o["lp"] == "mosekjl":
+        o["gams_exe"] = ""
+        # checked before the model is built: setup installs Mosek and MosekTools only when it finds a MOSEK licence
+        if not mosek_julia_installed():
+            print("--mosek needs the Julia packages Mosek and MosekTools (not in " + JULIA_ENV + "):\n"
+                  f"  {PROG} setup --mosek")
+            return 2
+        if not mosek_licence():
+            print("note: --mosek: no MOSEK licence found (MOSEKLM_LICENSE_FILE, or mosek.lic in the folder mosek of the home folder); "
+                  "MOSEK will say whether it finds one")
+        if o["solver"] != "auto" or o["highs_options"]:
+            print("note: --mosek: --solver and --highs-option are for HiGHS and are not used")
     elif o["lp"] != "highs":
         o["gams_exe"] = gams_for_lp(o["gams_exe"])
         if not o["gams_exe"]:
@@ -4552,7 +4672,7 @@ def run(args, settings_files=True):
                 return 2
     # the GDX reader is needed only when GAMS is run or a GAMS result read, which a run does only when asked (a listing
     # in the folder is not read without --gams reuse); a published reference needs no GAMS at all
-    needs_gdx = o["gams"] in ("run", "reuse") or bool(o["check"]) or bool(o.get("jacobian")) or o["lp"] not in ("highs", "gurobipy")
+    needs_gdx = o["gams"] in ("run", "reuse") or bool(o["check"]) or bool(o.get("jacobian")) or o["lp"] not in ("highs", "gurobipy", "mosekjl")
     if needs_gdx:                                           # without the GDX reader no GAMS result can be compared: settle it before the long steps
         missing = [m for m in python_packages()[1] if m[0] in ("gams.transfer", "gamspy_base")]
         if missing and INSTALLED:       # installed by pip: the package's extra brings them
@@ -5085,7 +5205,7 @@ def clean(args):
     """clean [--yes]: removes the data folder of the installed package, after listing what is in it and asking."""
     if not INSTALLED:
         print(f"clean removes what times-os, installed by pip, keeps in its data folder. This is a checkout ({STATE}): "
-              "its settings.json, .venv, .julia_env and runs/ are in the checkout itself; delete them there if you wish.")
+              "its settings.json, .venv, .julia_env, .julia_depot and runs/ are in the checkout itself; delete them there if you wish.")
         return 2
     if not os.path.isdir(STATE) or not os.listdir(STATE):
         print(f"The data folder {STATE} is empty or not there: nothing to remove.")
@@ -5094,7 +5214,7 @@ def clean(args):
         print(f"{STATE} is not a data folder that times-os made (it has no {DATA_MARKER}): nothing was removed.")
         return 2
     julia = locate(settings().get("julia")) or find_julia()
-    depot = (os.environ.get("JULIA_DEPOT_PATH") or "").split(os.pathsep)[0] or os.path.join(os.path.expanduser("~"), ".julia")
+    depot = saved_julia_depot() or (os.environ.get("JULIA_DEPOT_PATH") or "").split(os.pathsep)[0] or os.path.join(os.path.expanduser("~"), ".julia")
     print(f"The data folder of times-os: {STATE}\n")
     total = 0
     for name in sorted(os.listdir(STATE)):
@@ -5106,8 +5226,9 @@ def clean(args):
     inside = julia and within(julia, STATE)
     print(("Julia installed by times-os is in it (.julia_bin) and goes with it. " if inside else
            f"Julia itself ({julia}) is left. " if julia else "") +
-          f"Julia's own package store ({depot}: the packages and their compiled code, used by every Julia program) is left; "
-          "remove it yourself if nothing else uses it. Your model folders and results are not touched.")
+          ("Julia's packages and their compiled code (.julia_depot) go with it. " if within(depot, STATE) else
+           f"The Julia depot ({depot}: the packages and their compiled code) is left; remove it yourself if nothing else "
+           "uses it. ") + "Your model folders and results are not touched.")
     if "--yes" not in args:
         try:
             ok = input("\nRemove the data folder? [y/N] ").strip().lower() in ("y", "yes")
@@ -5188,6 +5309,8 @@ def main(argv):
     if argv[0] in ("--version", "version"):
         print(version_text())
         return 0
+    if argv[0] != "setup":
+        use_julia_depot(saved_julia_depot())        # setup chooses it (and sets it) itself
     if argv[0] == "example":
         return example(argv[1:])
     if argv[0] == "clean":

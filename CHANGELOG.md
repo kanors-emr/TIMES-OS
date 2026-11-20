@@ -1,5 +1,51 @@
 # Changelog
 
+## 1.4.0 (November 2026): MOSEK through Julia, less memory with the solvers of GAMS and Gurobi, Julia's packages in the TIMES-OS folder
+
+After updating, run `python TIMES.py setup` once: it installs and compiles Julia's packages again, in the TIMES-OS
+folder (about 0.5 GB and ten minutes; see Setup below). The models are built as before, the same linear program as
+TIMES in GAMS.
+
+#### Solvers
+
+- **`--mosek`: the model solved by MOSEK through its Julia interface** (the Julia packages `Mosek` and `MosekTools`),
+  without GAMS and without a file between them: JuMP hands the model to MOSEK as it hands it to HiGHS, and the
+  results are written as after a HiGHS solve. Options: `mosek.opt` in the run folder and `--solver-option
+  name=value`, as MOSEK parameters; `--threads` and `--time-limit` apply. Myopic runs, SENSIS runs and the Negishi
+  iterations of TIMES-MACRO MLF solve each LP with MOSEK. `setup` installs the two packages when it finds a MOSEK
+  licence, or with `setup --mosek`; `check` names them. `--lp mosek` is still MOSEK through your GAMS.
+- **The model is handed to MOSEK directly**, without JuMP's copy of it kept beside MOSEK's, so that a large model
+  needs less memory while MOSEK solves it; `TIMES_MOSEK_DIRECT=0` turns that off (MOSEK is then given JuMP's copy, as
+  in a run of TIMES-MACRO MLF, whose Negishi iterations use it).
+- **MOSEK option values by name**: an integer parameter takes a number or the name of one of MOSEK's values, as in
+  `MSK_IPAR_INTPNT_BASIS=MSK_BI_NEVER`.
+- **`--lp <solver>` (`--cplex`, ...) and `--gurobi` keep fewer copies of the model in memory while the solver runs.**
+  The model is handed to the solver once and Julia's own copy of it is emptied before the solve; the matrix written
+  for the solver is not held by Julia while it runs (it is read back from the work folder afterwards); GAMS runs the
+  solver with `solvelink=0`, so it saves its state and leaves memory until the solver is done. The solution is the
+  same, value for value. On a model of 1.2 million rows solved with CPLEX, the processes of the run held 12.2 GB
+  while CPLEX ran instead of 16.4 GB (with Gurobi, Julia
+  0.9 GB less). `TIMES_GAMS_SOLVELINK=2` keeps GAMS in memory beside the solver (GAMS's
+  default, a few seconds quicker); `TIMES_LP_DIRECT=0` keeps Julia's copy of the model.
+
+#### Setup
+
+- **`setup` puts Julia's packages and their compiled code in `.julia_depot`**, in the TIMES-OS folder (installed by
+  pip: in its data folder), and every Julia that TIMES-OS starts uses it. Before, they went to Julia's default store
+  in the home folder (`~/.julia`, drive C: on Windows), so a full C: drive stopped the build of the model with
+  "No space left on device" even when TIMES-OS was on another drive. `setup --julia-depot <folder>` puts them
+  elsewhere, for example in a store shared with other Julia work; a `JULIA_DEPOT_PATH` set before setup is taken the
+  same way. A setup made before this keeps using `~/.julia` until `setup` is run again, which installs and compiles
+  the packages once more, in the new place. When Julia's own depot holds packages, setup says so and how to use
+  it instead. `clean` removes `.julia_depot` with the data folder.
+
+#### Runs
+
+- **Myopic runs (TIMESTEP) start faster, with every solver**: a step's window and the step functions no longer take
+  a long compile at the start of the run. With HiGHS, the steps of a DemoS_012 copy in steps of 10 years take
+  about 3 s of Julia instead of about 2 minutes. With `--mosek`, myopic and SENSIS runs still compile MOSEK's Julia
+  interface at every run, about two minutes (half the time they took before).
+
 ## 1.3.0 (November 2026): DD files kept by hand: comments, assignments, damage costs with DAMAGE NO
 
 What a large model with DD files written and kept by hand needed to be read and built as TIMES in GAMS builds it.

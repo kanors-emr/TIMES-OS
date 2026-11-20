@@ -369,7 +369,18 @@ PrecompileTools.@compile_workload begin
             all(==(0), st) || @warn "TimesEq precompile workload: run_case returned $st; the package is built, less is compiled ahead"
             # the families in threads (build_parallel!): recording variables, the two-stage commit and the look-up of
             # every variable family (with one thread at compile time the tasks run one after another; the code is the same)
-            build(load(db); parallel = true)
+            dd = load(db)
+            mm = build(dd; parallel = true)
+            # the functions a myopic run calls at each step, for the type of a built model (a step's model has the same
+            # type): compiled in every myopic run otherwise (DemoS_012 in steps: fix_window! alone 13 s). Compiled, not
+            # run: this model has no steps.
+            for lev in (Solution(dd.L), Levels())
+                precompile(fix_window!, (typeof(mm), typeof(lev)))
+                precompile(relax!, (Relax, typeof(mm), typeof(lev)))
+            end
+            precompile(apply_relax!, (Relax, typeof(mm)))
+            precompile(reset_capacity!, (Relax, typeof(mm)))
+            precompile(clear_fixed_marginals!, (Solution, typeof(mm)))
         catch e
             @warn "TimesEq precompile workload failed; the package is built, less is compiled ahead" exception = (e, catch_backtrace())
         end

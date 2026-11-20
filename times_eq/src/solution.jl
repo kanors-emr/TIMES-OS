@@ -55,6 +55,95 @@ function record!(sol::Solution, m::Model; info = nothing)
     return sol
 end
 
+"""
+    Handed(m) -> what the solution needs of the JuMP model `m.jump`, kept before its copy is emptied
+
+A solver given the model directly (`solve_mosek_direct!`), without JuMP's copy of it beside the solver's: the bounds of every
+column and row, and which bounds a column has (for its reduced cost), are read from JuMP's copy first. Columns by
+MOI index: `lo`, `up`, `has` (bit 1 lower bound, 2 upper, 4 fixed); rows in the order of `m.rows` and their refs.
+"""
+struct Handed
+    lo::Vector{Float64}
+    up::Vector{Float64}
+    has::Vector{UInt8}
+    rows::Dict{Symbol,Vector{NTuple{2,Float64}}}
+    sense::MOI.OptimizationSense
+end
+
+function Handed(m::Model)
+    jm = m.jump
+    n = JuMP.num_variables(jm)
+    lo, up, has = fill(-Inf, n), fill(Inf, n), zeros(UInt8, n)
+    for x in JuMP.all_variables(jm)
+        i = JuMP.index(x).value
+        if JuMP.is_fixed(x)
+            lo[i] = up[i] = JuMP.fix_value(x); has[i] = 0x04
+        else
+            JuMP.has_lower_bound(x) && (lo[i] = JuMP.lower_bound(x); has[i] |= 0x01)
+            JuMP.has_upper_bound(x) && (up[i] = JuMP.upper_bound(x); has[i] |= 0x02)
+        end
+    end
+    b = JuMP.backend(jm)
+    rows = Dict{Symbol,Vector{NTuple{2,Float64}}}()
+    for (name, r) in m.rows
+        rows[name] = [set_bounds(MOI.get(b, MOI.ConstraintSet(), JuMP.index(ref))) for ref in r.refs]
+    end
+    return Handed(lo, up, has, rows, MOI.get(b, MOI.ObjectiveSense()))
+end
+
+"""The bounds of a row from its set, as `row_bounds`."""
+set_bounds(s::MOI.EqualTo) = (s.value, s.value)
+set_bounds(s::MOI.LessThan) = (-Inf, s.upper)
+set_bounds(s::MOI.Interval) = (s.lower, s.upper)
+set_bounds(s::MOI.GreaterThan) = (s.lower, Inf)
+
+"""
+    record_direct!(sol, m, h, o, map) -> sol
+
+`record!` for a model handed to the solver `o` directly (`h`: `Handed(m)`, kept before JuMP's copy was emptied; `map`:
+the index map of the copy). The same values as `record!`: levels and marginals from the solver, the reduced cost of a
+column as JuMP's `reduced_cost` makes it (the duals of its bounds, the sign of a maximisation turned), a row's
+marginal with that sign too, the bounds as they were given.
+"""
+function record_direct!(sol::Solution, m::Model, h::Handed, o, map; info = nothing)
+    duals = MOI.get(o, MOI.DualStatus()) != MOI.NO_SOLUTION
+    sgn = h.sense == MOI.MAX_SENSE ? -1.0 : 1.0
+    F = MOI.VariableIndex
+    for var in m.v
+        isempty(var.x) && continue
+        d = get!(Dict{Tuple,NTuple{4,Float64}}, sol.vars, var.name)
+        ks = collect(keys(var.x))
+        src = [JuMP.index(var.x[k]) for k in ks]
+        vals = MOI.get(o, MOI.VariablePrimal(), [map[v] for v in src])
+        for (j, k) in enumerate(ks)
+            i = src[j].value
+            rc = NaN
+            if duals
+                f = h.has[i]
+                rc = if f & 0x04 != 0
+                    MOI.get(o, MOI.ConstraintDual(), map[MOI.ConstraintIndex{F,MOI.EqualTo{Float64}}(i)])
+                else
+                    (f & 0x02 != 0 ? MOI.get(o, MOI.ConstraintDual(), map[MOI.ConstraintIndex{F,MOI.LessThan{Float64}}(i)]) : 0.0) +
+                    (f & 0x01 != 0 ? MOI.get(o, MOI.ConstraintDual(), map[MOI.ConstraintIndex{F,MOI.GreaterThan{Float64}}(i)]) : 0.0)
+                end
+                rc *= sgn
+            end
+            d[k] = (vals[j], rc, h.lo[i], h.up[i])
+        end
+    end
+    for (name, r) in m.rows
+        d = get!(Dict{Tuple,NTuple{4,Float64}}, sol.eqs, name)
+        bds = h.rows[name]
+        for (i, k) in enumerate(r.keys)
+            c = map[JuMP.index(r.refs[i])]
+            lo, up = bds[i]
+            d[k] = (MOI.get(o, MOI.ConstraintPrimal(), c), duals ? sgn * MOI.get(o, MOI.ConstraintDual(), c) : NaN, lo, up)
+        end
+    end
+    info === nothing || push!(sol.steps, info)
+    return sol
+end
+
 """Levels of all columns in `sol` (to fix the periods before the window of the next step)."""
 function levels(sol::Solution)
     out = Levels()

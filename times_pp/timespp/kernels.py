@@ -20,7 +20,8 @@ integers and the result comes back as codes, turned into labels by DuckDB when i
 columns).
 
 Where Julia is: TIMESPP_JULIA_BINDIR, else settings.json's julia_bindir (written by setup), else the `julia` program
-is asked once. Its project: TIMESPP_KERNELS_PROJECT, else the repository's .julia_env. Julia's threads:
+is asked once. Its project: TIMESPP_KERNELS_PROJECT, else the repository's .julia_env. Its depot: JULIA_DEPOT_PATH,
+else settings.json's julia_depot (written by setup). Julia's threads:
 TIMESPP_KERNELS_THREADS (default 1: the kernels are serial; DuckDB has the processors).
 """
 from __future__ import annotations
@@ -181,6 +182,9 @@ class _Julia:
         if sys.platform == "win32":
             os.add_dll_directory(bindir)
             os.environ["PATH"] = bindir + os.pathsep + os.environ.get("PATH", "")    # Julia's own libraries
+        depot = _settings().get("julia_depot")    # setup's Julia depot (TIMES.py sets JULIA_DEPOT_PATH; this is for a run without it)
+        if depot and not os.environ.get("JULIA_DEPOT_PATH"):
+            os.environ["JULIA_DEPOT_PATH"] = (depot if os.path.isabs(depot) else os.path.join(ROOT, depot)) + os.pathsep
         lib = ctypes.CDLL(os.path.join(libdir, lib_name), mode=ctypes.RTLD_GLOBAL)
         project = os.environ.get("TIMESPP_KERNELS_PROJECT") or os.path.join(ROOT, ".julia_env")
         threads = os.environ.get("TIMESPP_KERNELS_THREADS", "1")

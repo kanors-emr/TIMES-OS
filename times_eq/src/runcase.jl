@@ -238,6 +238,9 @@ function sensis_run(d, res, opt, args, save)
                 limit > 0 && set_time_limit_sec(m.jump, limit)
                 TimesEq.attach_highs!(m.jump)
                 res["solver"] = "HiGHS " * s
+            elseif lp == "mosekjl"
+                applied = use_mosek!(m.jump, opt, args)
+                res["solver"] = "MOSEK " * mosek_version() * " (" * (isempty(applied) ? "default options" : join((k * "=" * v for (k, v) in applied), ", ")) * ")"
             else
                 kw = gamslp_options(lp, opt, args)
                 workdir = joinpath(opt("--lp-work", joinpath(dirname(abspath(args[2])), "gamslp")), "sow_" * lab)
@@ -351,7 +354,14 @@ function myopic(d, res, opt, args, save)
     # --lp <solver>: each step solved by the LP solver of the user's GAMS (GamsLP.Optimizer), in its own work folder
     # (gamslp/step<k>) with its own GAMS log (gamslp_step<k>.log); what each solve did goes into the step's info
     optimizer, lps, kwlp = HiGHS.Optimizer, TimesEq.GamsLP.Optimizer[], ""
-    if lp != "highs"
+    mosek_applied = Pair{String,String}[]
+    if lp == "mosekjl"
+        # --mosek: each step solved by MOSEK (MosekTools), with the options of the run
+        kwlp = lp
+        optimizer = mosektools().Optimizer
+        mosek_applied = mosek_options(opt, args)
+        println("solving each step with MOSEK ", mosek_version(), " (Julia's MosekTools)"); flush(stdout)
+    elseif lp != "highs"
         kwlp = lp
         kw = gamslp_options(lp, opt, args)
         base = opt("--lp-work", joinpath(dirname(abspath(args[2])), "gamslp"))
@@ -378,7 +388,7 @@ function myopic(d, res, opt, args, save)
     accept(jm) = termination_status(jm) == OPTIMAL ||
         (termination_status(jm) in (OTHER_ERROR, ALMOST_OPTIMAL) && primal_status(jm) in (FEASIBLE_POINT, NEARLY_FEASIBLE_POINT))
     (sol, m), t = timed(() -> TimesEq.solve_steps(d, optimizer; progress, say, accept,
-        configure = isempty(kwlp) ? configure : jm -> nothing, retry = isempty(kwlp) ? retry : jm -> false,
+        configure = kwlp == "mosekjl" ? (jm -> configure_mosek!(jm, opt, args)) : isempty(kwlp) ? configure : jm -> nothing, retry = isempty(kwlp) ? retry : jm -> false,
         make = (ds; progress) -> prof(() -> TimesEq.build(ds; progress))), "steps")
     note_profile(res)
     res["steps"] = sol.steps
@@ -386,6 +396,8 @@ function myopic(d, res, opt, args, save)
     res["rows"], res["columns"], res["nonzeros"] = last["rows"], last["columns"], last["nonzeros"]
     res["row_counts"] = Dict(String(k) => v for (k, v) in TimesEq.row_counts(m))
     res["solver"] = "HiGHS " * (used[] == "" ? solver : used[])
+    kwlp == "mosekjl" && (res["solver"] = "MOSEK " * mosek_version() * " (" *
+        (isempty(mosek_applied) ? "default options" : join((k * "=" * v for (k, v) in mosek_applied), ", ")) * ")")
     isempty(lps) || gamslp_steps!(res, lps)
     res["build_seconds"] = round(sum(s["build_seconds"] for s in sol.steps); digits = 1)
     res["solve_seconds"] = round(sum(s["solve_seconds"] for s in sol.steps); digits = 1)
@@ -417,14 +429,204 @@ function myopic(d, res, opt, args, save)
     say("done")
 end
 
+"""
+--lp mosekjl (the runner's --mosek): MOSEK through its Julia interface (the packages Mosek and MosekTools), without GAMS
+and without a file between them: JuMP hands the model to MOSEK as it hands it to HiGHS. The packages are optional; they
+are loaded when a run asks for MOSEK (`load_mosek`), and the run then goes on in the newest world, where their methods are
+seen. MOSEK[] holds the module MosekTools, or the error of loading it.
+"""
+const MOSEKTOOLS = Base.PkgId(Base.UUID("1ec41992-ff65-5c91-ac43-2df89e9693a4"), "MosekTools")
+const MOSEK = Ref{Any}(nothing)
+
+load_mosek() = MOSEK[] = try
+        Base.require(MOSEKTOOLS)
+    catch e
+        e
+    end
+
+"""MosekTools, or an error that says how to install it."""
+function mosektools()
+    MOSEK[] === nothing && load_mosek()
+    MOSEK[] isa Module && return MOSEK[]
+    error("--mosek needs the Julia packages Mosek and MosekTools in this Julia environment (python TIMES.py setup --mosek " *
+          "installs them): " * sprint(showerror, MOSEK[]))
+end
+
+"""The MOSEK parameters of a run, in order: the threads (--threads), the lines of the option file (--lp-optfile: the run
+folder's mosek.opt; one parameter a line, `name value` or `name=value`, `*` or `#` starts a comment), then the
+--solver-option lines, which come last and win. Names are MOSEK's (MSK_IPAR_..., MSK_DPAR_..., MSK_SPAR_...)."""
+function mosek_options(opt, args)
+    out = Pair{String,String}[]
+    threads = parse(Int, opt("--threads", "0"))
+    threads > 0 && push!(out, "MSK_IPAR_NUM_THREADS" => string(threads))
+    lines = String[]
+    f = opt("--lp-optfile", "")
+    f == "" || append!(lines, readlines(f))
+    append!(lines, [args[i+1] for i in 1:length(args)-1 if args[i] == "--solver-option"])
+    for l in lines
+        s = strip(l)
+        (isempty(s) || s[1] in ('*', '#')) && continue
+        kv = split(s, r"\s*=\s*|\s+"; limit = 2)
+        length(kv) == 2 || error("a MOSEK option needs a name and a value, got \"$s\"")
+        push!(out, String(kv[1]) => String(strip(kv[2])))
+    end
+    return out
+end
+
+"""MOSEK as the optimizer of `jm`, with the options of the run and --time-limit; the options applied, as name => value.
+With JuMP's bridge layer: MOSEK takes no objective that is a single variable (OBJZ), which the bridge makes affine."""
+function use_mosek!(jm, opt, args)
+    JuMP.set_optimizer(jm, mosektools().Optimizer)
+    return configure_mosek!(jm, opt, args)
+end
+
+"""The options of the run and --time-limit set on `jm`, whose optimizer is MOSEK; the options, as name => value."""
+function configure_mosek!(jm, opt, args)
+    applied = mosek_options(opt, args)
+    for (k, v) in applied
+        set_attribute(jm, k, occursin("_IPAR_", k) ? mosek_int(v) : occursin("_DPAR_", k) ? parse(Float64, v) : v)
+    end
+    limit = parse(Float64, opt("--time-limit", "0"))
+    limit > 0 && set_time_limit_sec(jm, limit)
+    return applied
+end
+
+"""The value of an integer MOSEK parameter: a number, or the name of one of MOSEK's values (MSK_BI_NEVER, MSK_ON,
+MSK_OPTIMIZER_INTPNT, ...), which MOSEK takes only as its number."""
+function mosek_int(v::AbstractString)
+    n = tryparse(Int, v)
+    n === nothing || return n
+    M = mosektools().Mosek
+    s = Symbol(startswith(v, "MSK_") ? v : "MSK_" * v)
+    isdefined(M, s) || error("MOSEK has no value \"$v\" (an integer parameter takes a number or a name such as MSK_BI_NEVER)")
+    c = getfield(M, s)
+    return Int(hasproperty(c, :value) ? c.value : c)
+end
+
+"""The version of MOSEK that MosekTools runs, as "11.0.27"."""
+mosek_version() = join(Int.(collect(mosektools().Mosek.getversion())), ".")
+
+"""What MOSEK did in the solve of `jm`, for the result: its iterations (interior point and simplex), its own seconds."""
+function mosek_info(jm, applied)
+    its(f) = try Int(f(jm)) catch; 0 end
+    Dict{String,Any}("solver_version" => mosek_version(), "barrier_iterations" => its(barrier_iterations),
+        "simplex_iterations" => its(simplex_iterations), "solver_seconds" => round(try solve_time(jm) catch; 0.0 end; digits = 2),
+        "options" => [k * "=" * v for (k, v) in applied])
+end
+
+"""
+--mosek, one solve: the model handed to MOSEK directly. JuMP keeps a copy of the model beside the solver's; here the
+model is copied into MOSEK once (through MOI's bridge layer, which copies nothing: MOSEK takes no objective that is a
+single variable), what the solution needs of JuMP's copy is kept (`Handed`: bounds, about 40 bytes a column), and
+JuMP's copy is emptied before MOSEK starts. The solution is read from MOSEK (`record_direct!`). Not for a run that
+uses the JuMP model after the solve (the Negishi iterations of MLF, --matrix-out): those go through `solve_mosek!`.
+"""
+function solve_mosek_direct!(m, d, res, opt, args)
+    MT = mosektools()
+    (o, b, map, h, applied), _ = timed("solver setup") do
+        h = TimesEq.Handed(m)
+        o = MT.Optimizer()
+        applied = mosek_options(opt, args)
+        for (k, v) in applied
+            MOI.set(o, MOI.RawOptimizerAttribute(k), occursin("_IPAR_", k) ? mosek_int(v) : occursin("_DPAR_", k) ? parse(Float64, v) : v)
+        end
+        limit = parse(Float64, opt("--time-limit", "0"))
+        limit > 0 && MOI.set(o, MOI.TimeLimitSec(), limit)
+        b = MOI.Bridges.full_bridge_optimizer(o, Float64)
+        map = MOI.copy_to(b, JuMP.backend(m.jump))
+        (o, b, map, h, applied)
+    end
+    # JuMP's copy of the model, no longer needed: emptied, and the memory given back before MOSEK starts
+    timed("free JuMP's copy") do
+        MOI.empty!(JuMP.backend(m.jump))
+        GC.gc(true)
+    end
+    println("solving with MOSEK ", mosek_version(), " (Julia's MosekTools, the model handed over directly), ", res["rows"], " rows ..."); flush(stdout)
+    TimesEq.release_db3()
+    res["solve_started_unix"] = time()
+    _, t = timed(() -> MOI.optimize!(b), "solve")
+    its(a) = try Int(MOI.get(b, a)) catch; 0 end
+    info = Dict{String,Any}("solver_version" => mosek_version(), "barrier_iterations" => its(MOI.BarrierIterations()),
+        "simplex_iterations" => its(MOI.SimplexIterations()), "solver_seconds" => round(try MOI.get(b, MOI.SolveTimeSec()) catch; 0.0 end; digits = 2),
+        "options" => [k * "=" * v for (k, v) in applied], "hand_over" => "direct")
+    res["mosek"] = info
+    res["solver"] = "MOSEK " * info["solver_version"] * " (" * (isempty(applied) ? "default options" : join(info["options"], ", ")) * ")"
+    res["iterations"] = info["barrier_iterations"] + info["simplex_iterations"]
+    res["solve_seconds"] = round(t; digits = 1)
+    st = MOI.get(b, MOI.TerminationStatus())
+    res["termination"] = string(st)
+    res["raw_status"] = MOI.get(b, MOI.RawStatusString())
+    point = MOI.get(b, MOI.PrimalStatus()) == MOI.FEASIBLE_POINT
+    res["objective"] = point ? MOI.get(b, MOI.ObjectiveValue()) : nothing
+    res["optimal_proved"] = st == MOI.OPTIMAL
+    sfile = opt("--solution", "")
+    if point && sfile != ""
+        sol, _ = timed(() -> TimesEq.record_direct!(TimesEq.Solution(d.L), m, h, b, map; info = Dict{String,Any}("step" => 0, "year" => 0,
+            "window" => "", "rows" => res["rows"], "columns" => res["columns"], "nonzeros" => res["nonzeros"], "status" => res["termination"],
+            "objective" => res["objective"], "seconds" => res["solve_seconds"])), "solution")
+        timed(() -> TimesEq.write_solution(sfile, sol), "solution file")
+        res["solution_file"] = sfile
+    end
+    println("\nsolve: ", res["termination"], "  objective ", res["objective"], "  (", res["solve_seconds"], " s; ", res["solver"], ")")
+end
+
+"""--mosek: the model solved by MOSEK through JuMP (JuMP's copy kept: MLF, --matrix-out); then as after a HiGHS solve."""
+function solve_mosek!(m, d, res, opt, args)
+    applied, _ = timed(() -> use_mosek!(m.jump, opt, args), "solver setup")
+    println("solving with MOSEK ", mosek_version(), " (Julia's MosekTools), ", res["rows"], " rows ..."); flush(stdout)
+    TimesEq.release_db3()
+    res["solve_started_unix"] = time()
+    _, t = timed(() -> optimize!(m.jump), "solve")
+    # TIMES-MACRO MLF: the Negishi iterations, each further LP solved by MOSEK in the same way
+    if !isempty(d.tables.MLF) && termination_status(m.jump) == OPTIMAL
+        function again!(mm)
+            use_mosek!(mm.jump, opt, args)
+            optimize!(mm.jump)
+            termination_status(mm.jump) == OPTIMAL ||
+                error("a Negishi iteration ended with " * string(termination_status(mm.jump)) * ": the iterations stop here")
+        end
+        (m, its), tn = timed(() -> TimesEq.negishi!(d, m, again!), "negishi")
+        t += tn
+        res["negishi"] = [Dict(String(k) => v for (k, v) in pairs(it)) for it in its]
+        res["negishi_converged"] = isempty(its) || !its[end].solve_again
+        isempty(its) || (res["negishi_last"] = Dict("iterations" => its[end].iteration, "gap" => its[end].gap, "tolerance" => its[end].tolerance))
+        for it in its
+            println("Negishi iteration ", it.iteration, ": gap ", it.gap, ", tolerance ", it.tolerance,
+                    it.solve_again ? ": solved again" : ": done")
+        end
+    end
+    info = mosek_info(m.jump, applied)
+    info["hand_over"] = "JuMP"
+    res["mosek"] = info
+    res["solver"] = "MOSEK " * info["solver_version"] * " (" * (isempty(applied) ? "default options" : join(info["options"], ", ")) * ")"
+    res["iterations"] = info["barrier_iterations"] + info["simplex_iterations"]
+    res["solve_seconds"] = round(t; digits = 1)
+    res["termination"] = string(termination_status(m.jump))
+    res["raw_status"] = JuMP.raw_status(m.jump)
+    proved = termination_status(m.jump) == OPTIMAL
+    point = primal_status(m.jump) == FEASIBLE_POINT
+    res["objective"] = point ? objective_value(m.jump) : nothing
+    res["optimal_proved"] = proved
+    sfile = opt("--solution", "")
+    if point && sfile != ""
+        sol, _ = timed(() -> TimesEq.record!(TimesEq.Solution(d.L), m; info = Dict{String,Any}("step" => 0, "year" => 0, "window" => "",
+            "rows" => res["rows"], "columns" => res["columns"], "nonzeros" => res["nonzeros"], "status" => res["termination"],
+            "objective" => res["objective"], "seconds" => res["solve_seconds"])), "solution")
+        timed(() -> TimesEq.write_solution(sfile, sol), "solution file")
+        res["solution_file"] = sfile
+    end
+    println("\nsolve: ", res["termination"], "  objective ", res["objective"], "  (", res["solve_seconds"], " s; ", res["solver"], ")")
+end
+
 """The keywords of GamsLP.Optimizer from the runner's options (--gams-exe, --lp-optfile, --solver-option, --python,
---lp-log, --keep, --threads, --time-limit); `lp` is GAMS's LP= ("gurobipy": Gurobi through Python, without GAMS)."""
+--lp-log, --keep, --threads, --time-limit, --gams-solvelink); `lp` is GAMS's LP= ("gurobipy": Gurobi through Python, without GAMS)."""
 function gamslp_options(lp, opt, args)
     direct = lp == "gurobipy" ? joinpath(@__DIR__, "..", "solvers", "gurobilp.py") : ""
     return (; direct, gams = opt("--gams-exe", "gams"), solver = lp == "gurobipy" ? "gurobi" : lp, optfile = opt("--lp-optfile", ""),
             options = [args[i+1] for i in 1:length(args)-1 if args[i] == "--solver-option"],
             python = opt("--python", get(ENV, "TIMES_PYTHON", "python")), log = opt("--lp-log", ""), keep = "--keep" in args,
-            threads = parse(Int, opt("--threads", "0")), time_limit = parse(Float64, opt("--time-limit", "0")))
+            threads = parse(Int, opt("--threads", "0")), time_limit = parse(Float64, opt("--time-limit", "0")),
+            solvelink = parse(Int, opt("--gams-solvelink", "0")))
 end
 
 """The solver line and the hand-over of a myopic run with --lp, from the optimizer of each step: res["solver"] as for one
@@ -455,6 +657,10 @@ with the --solver-option lines after it; the GAMS log goes to --lp-log and to th
 write_matrix writes it (into --matrix-out when given, which is then not written again after the solve; else into a
 folder beside the work folder, removed after the solve); without --keep it is ignored (the work folder, and so the
 listing, is removed after the solve).
+The model is handed to the optimizer directly, as for --mosek: copied into it once, what the solution needs of JuMP's
+copy kept (`Handed`), JuMP's copy emptied before the solver starts, the solution read from the optimizer
+(`record_direct!`); not when the JuMP model is used after the solve (--matrix-out written after it) or with
+--lp-direct 0 (the runner's TIMES_LP_DIRECT=0), where JuMP solves it through the optimizer as before.
 """
 function solve_gams!(m, d, res, lp, opt, args)
     kw = gamslp_options(lp, opt, args)
@@ -478,15 +684,22 @@ function solve_gams!(m, d, res, lp, opt, args)
         end
     end
     o = TimesEq.GamsLP.Optimizer(; kw..., workdir, names, name_rows = names == "" ? MOI.ConstraintIndex[] : TimesEq.matrix_rows(m))
-    timed("solver setup") do
+    handed = (opt("--matrix-out", "") == "" || haskey(res, "matrix_out")) && opt("--lp-direct", "1") != "0"
+    (h, imap), _ = timed("solver setup") do
         TimesEq.discrete_for_solve!(m.jump)          # the variable types of the DSC extension: GamsLP stops on them
-        JuMP.set_optimizer(m.jump, () -> o; add_bridges = false)
+        handed || (JuMP.set_optimizer(m.jump, () -> o; add_bridges = false); return (nothing, nothing))
+        h = TimesEq.Handed(m)
+        (h, MOI.copy_to(o, JuMP.backend(m.jump)))
     end
+    # JuMP's copy of the model, no longer needed: emptied (its memory is given back in optimize!, with the optimizer's
+    # matrix, before the solver starts)
+    handed && timed(() -> MOI.empty!(JuMP.backend(m.jump)), "free JuMP's copy")
     println("solving with ", uppercase(lp), o.direct == "" ? " through GAMS (" * o.gams * "), " : " through Python (gurobipy), ", res["rows"], " rows ..."); flush(stdout)
     TimesEq.release_db3()
     res["solve_started_unix"] = time()
-    _, t = timed(() -> optimize!(m.jump), "solve")
+    _, t = timed(() -> handed ? MOI.optimize!(o) : optimize!(m.jump), "solve")
     info = o.info
+    info["hand_over"] = handed ? "direct" : "JuMP"
     opts = isempty(info["option_lines"]) ? "no option file" :
         (o.optfile == "" ? "options" : basename(o.optfile)) * ": " * join(info["option_lines"], ", ")
     res["solver"] = uppercase(lp) * (haskey(info, "solver_version") ? " " * info["solver_version"] : "") * (o.direct == "" ? " through GAMS" : " through Python") *
@@ -501,17 +714,19 @@ function solve_gams!(m, d, res, lp, opt, args)
     end
     res["solve_seconds"] = round(t; digits = 1)
     res["iterations"] = info["iterations"]
-    res["termination"] = string(termination_status(m.jump))
-    res["raw_status"] = JuMP.raw_status(m.jump)
-    proved = termination_status(m.jump) == OPTIMAL
-    point = primal_status(m.jump) == FEASIBLE_POINT
-    res["objective"] = point ? objective_value(m.jump) : nothing
+    st = handed ? MOI.get(o, MOI.TerminationStatus()) : termination_status(m.jump)
+    res["termination"] = string(st)
+    res["raw_status"] = handed ? MOI.get(o, MOI.RawStatusString()) : JuMP.raw_status(m.jump)
+    proved = st == OPTIMAL
+    point = (handed ? MOI.get(o, MOI.PrimalStatus()) : primal_status(m.jump)) == FEASIBLE_POINT
+    res["objective"] = point ? (handed ? MOI.get(o, MOI.ObjectiveValue()) : objective_value(m.jump)) : nothing
     res["optimal_proved"] = proved
     sfile = opt("--solution", "")
     if point && sfile != ""
-        sol, _ = timed(() -> TimesEq.record!(TimesEq.Solution(d.L), m; info = Dict{String,Any}("step" => 0, "year" => 0, "window" => "",
-            "rows" => res["rows"], "columns" => res["columns"], "nonzeros" => res["nonzeros"], "status" => res["termination"],
-            "objective" => res["objective"], "seconds" => res["solve_seconds"])), "solution")
+        step = Dict{String,Any}("step" => 0, "year" => 0, "window" => "", "rows" => res["rows"], "columns" => res["columns"],
+            "nonzeros" => res["nonzeros"], "status" => res["termination"], "objective" => res["objective"], "seconds" => res["solve_seconds"])
+        sol, _ = timed(() -> handed ? TimesEq.record_direct!(TimesEq.Solution(d.L), m, h, o, imap; info = step) :
+            TimesEq.record!(TimesEq.Solution(d.L), m; info = step), "solution")
         timed(() -> TimesEq.write_solution(sfile, sol), "solution file")
         res["solution_file"] = sfile
     end
@@ -542,14 +757,18 @@ function run_case(args; t_script = time(), using_seconds = 0.0, early_seconds = 
         println("tables read  (", res["load_seconds"], " s, ", Libc.strftime("%H:%M:%S", time()), ")"); flush(stdout)
         res["unsupported"], _ = timed(() -> [(what = w, tables = String.(n)) for (w, n) in TimesEq.unsupported(d)], "checks")
         stepwise, _ = timed(() -> !isempty(TimesEq.steps(file)), "checks")
+        # --mosek with steps or SOWs: builds and solves alternate, so MosekTools is loaded before the first build and the
+        # run made in the world that knows its methods (the builds are then compiled in the run)
+        mosek_first = lowercase(opt("--lp", "highs")) == "mosekjl" && !("--no-solve" in args) && (stepwise || TimesEq.sensis(d))
+        mosek_first && timed(load_mosek, "load MosekTools")
         if stepwise
-            myopic(d, res, opt, args, save)
+            mosek_first ? Base.invokelatest(myopic, d, res, opt, args, save) : myopic(d, res, opt, args, save)
             res["stage"] = "done"
             save()
             return 0
         end
         if TimesEq.sensis(d)
-            sensis_run(d, res, opt, args, save)
+            mosek_first ? Base.invokelatest(sensis_run, d, res, opt, args, save) : sensis_run(d, res, opt, args, save)
             res["stage"] = "done"
             save()
             return 0
@@ -597,7 +816,17 @@ function run_case(args; t_script = time(), using_seconds = 0.0, early_seconds = 
         # GAMS by its matrix (check 4); solving a model that size is for a commercial solver
         limit = parse(Float64, opt("--max-solve-rows", "2000000"))
         lp = lowercase(opt("--lp", "highs"))
-        if !("--no-solve" in args) && lp != "highs"
+        if !("--no-solve" in args) && lp == "mosekjl"
+            res["stage"] = "solve"
+            save()
+            # MosekTools loaded only now, after the build: loaded before it, it made Julia compile the build again
+            # (DemoS_012: 103 s instead of about 1); the solve runs in the world that knows its methods
+            timed(load_mosek, "load MosekTools")
+            # handed over directly unless the JuMP model is needed after the solve (MLF's Negishi iterations, --matrix-out)
+            # or the run asks for JuMP's copy (--no-mosek-direct: TIMES_MOSEK_DIRECT=0)
+            direct = isempty(d.tables.MLF) && opt("--matrix-out", "") == "" && !("--no-mosek-direct" in args)
+            Base.invokelatest(direct ? solve_mosek_direct! : solve_mosek!, m, d, res, opt, args)
+        elseif !("--no-solve" in args) && lp != "highs"
             res["stage"] = "solve"
             save()
             solve_gams!(m, d, res, lp, opt, args)
