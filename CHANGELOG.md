@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.4.1 (November 2026): the automated checks use the Julia depot that setup chose
+
+Nothing changes in how a model is read, built or solved, and no setup is needed after updating: the code that runs a
+model is that of 1.4.0. This release repairs the automated checks run on every change to this repository.
+
+#### Checks
+
+- **The check of the serial, parallel and `--wait` builds uses the Julia depot that setup chose**
+  (`.github/scripts/check_parallel.py`). It starts Julia itself, and since 1.4.0 put Julia's packages in
+  `.julia_depot`, its Julia still read Julia's default depot (`~/.julia`) and stopped with "Package OpenBLAS32_jll is
+  required but does not seem to be installed". It now sets the depot as TIMES.py sets it for every Julia it starts
+  (from `settings.json`), and names that depot on its first line.
+- **The automated checks keep `.julia_depot` between their runs** (`.github/workflows/ci.yml`), in place of
+  Julia's default depot, which setup no longer uses: keyed by the operating system, the Julia version and the
+  Julia project files. The checks still find the depot as a user's setup places it.
+
 ## 1.4.0 (November 2026): MOSEK through Julia, less memory with the solvers of GAMS and Gurobi, Julia's packages in the TIMES-OS folder
 
 After updating, run `python TIMES.py setup` once: it installs and compiles Julia's packages again, in the TIMES-OS

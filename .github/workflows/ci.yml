@@ -29,9 +29,17 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - uses: julia-actions/setup-julia@v2
+        id: julia
         with:
           version: ${{ matrix.julia }}
-      - uses: julia-actions/cache@v2
+      # Julia's packages and their compiled code where setup puts them, .julia_depot in the checkout (Julia's default
+      # depot, ~/.julia, is not used by times-os). JULIA_DEPOT_PATH is not set for the job: the runs find the depot
+      # through settings.json, as a user's do. A depot restored from an older key is brought up to date by setup.
+      - uses: actions/cache@v4
+        with:
+          path: .julia_depot
+          key: julia-depot-${{ runner.os }}-${{ steps.julia.outputs.julia-version }}-${{ hashFiles('times_eq/Project.toml', 'times_eq/addons/*/Project.toml', 'times_pp/jlkernels/Project.toml') }}
+          restore-keys: julia-depot-${{ runner.os }}-${{ steps.julia.outputs.julia-version }}-
       - name: setup (installs the Python and Julia environments and the TIMES source; no GAMS)
         run: python TIMES.py setup
       - name: the Python tests (the DD reader, the refusals, the runner's safety)
