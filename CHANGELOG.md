@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.4.2 (November 2026): the README and the commitments: a mirror of TIMES, open use
+
+Documentation only: the code is that of 1.4.1, and no setup is needed after updating.
+
+#### Documentation
+
+- **The README's opening** (`README.md`): the mirror of TIMES is the `main` branch. It follows the official TIMES,
+  which goes on being developed in GAMS under IEA-ETSAP, takes in each of its official releases (today v4.9.8) and adds
+  nothing of its own; what it promises is open use. That discipline is `main`'s alone: the repository is a complete
+  TIMES in Python and Julia under the GPL, and a fork of it is a sound start for independent work.
+- **What open use covers** (`docs/scope-and-commitments.md`, a new section "Open use"): the same model as TIMES in
+  GAMS, and nothing asked of the user in installing and running TIMES-OS beyond what TIMES itself asks; a commitment
+  about the software, not a service. Forks are welcomed there as a start for independent work.
+
 ## 1.4.1 (November 2026): the automated checks use the Julia depot that setup chose
 
 Nothing changes in how a model is read, built or solved, and no setup is needed after updating: the code that runs a

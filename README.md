@@ -2,15 +2,24 @@
 
 [![licence: GPL-3.0-or-later](https://img.shields.io/badge/licence-GPL--3.0--or--later-blue.svg)](https://github.com/kanors-emr/TIMES-OS/blob/main/LICENSE)
 
-An open-source implementation of TIMES, the energy system model generator of IEA-ETSAP.
+An open-source MIRROR of TIMES, the energy system model generator of IEA-ETSAP. The mirror is the `main` branch. It
+follows the official TIMES and adds nothing of its own, and its promise is open use: the model TIMES in GAMS gives,
+running on your machine with no surprises in getting it there.
+
+TIMES itself goes on being developed where it always has been, in GAMS, under IEA-ETSAP, and that is expected to
+continue. This mirror is alive. `main` follows that work, and each official release of TIMES is taken into it. Today
+that is v4.9.8.
+
+That discipline belongs to `main` alone. The repository is also a complete TIMES in Python and Julia, open under the
+GPL, and a fork of it is a sound place to begin independent work, wherever that work leads and however far from TIMES.
 
 ## What it is
 
 TIMES-OS runs TIMES models from their standard input files, the DD and RUN files, to results on open-source software
-alone. It mirrors TIMES v4.9.8, the current official release: it builds the same linear program as TIMES in GAMS,
-verified coefficient by coefficient, solves it with HiGHS (or with CPLEX, Gurobi or MOSEK where you have a licence), and
-writes the Veda result files. A model that needs a feature TIMES-OS does not have stops before anything is solved,
-and the report lists everything the model needs. Same input files, same LP, same output formats.
+alone. It builds the same linear program as TIMES in GAMS, verified coefficient by coefficient, solves it with HiGHS (or
+with CPLEX, Gurobi or MOSEK where you have a licence), and writes the Veda result files. A model that needs a feature
+TIMES-OS does not have stops before anything is solved, and the report lists everything the model needs. Same input
+files, same LP, same output formats.
 
 It covers core TIMES and its main extensions, 381 of the 452 input attributes TIMES uses
 ([`FEATURES.md`](https://github.com/kanors-emr/TIMES-OS/blob/main/FEATURES.md)). Not yet supported: endogenous technology learning (ETL), the IER extension, damage

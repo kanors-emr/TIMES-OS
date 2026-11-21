@@ -10,4 +10,4 @@ the precompile workload, a Julia it installs) goes to the data folder, data_fold
 repository installed with `pip install -e .` there is no _tree: the clone's own code runs, as it is edited, and its
 state goes to the data folder, as for any installed package; `python TIMES.py` in the same clone keeps its state in
 the clone."""
-__version__ = "1.4.1"          # the release's version: written here by the export (scripts/publish_clone.ps1 -Version)
+__version__ = "1.4.2"          # the release's version: written here by the export (scripts/publish_clone.ps1 -Version)

@@ -36,10 +36,25 @@ IEA-ETSAP. Everything on `main` follows TIMES v4.9.8; features TIMES does not ha
 two differ, TIMES is right. When ETSAP releases a new version, `main` moves to it. New ideas belong in TIMES first, and in
 the mirror after; a pull request that departs from official TIMES, however slightly, is declined.
 
-Experiments are welcome on forks. Forks, branches and other work built on this code are their authors' own; the
-licence allows them and KanORS-EMR is not responsible for them. Reports of models that do not run or do not agree are
+Independent work is welcome on forks, and this code is meant to be a sound start for it. Forks, branches and other
+work built on this code are their authors' own; the licence allows them and KanORS-EMR is not responsible for them. Reports of models that do not run or do not agree are
 welcome, and the features real models need weigh in what is done next. How to bring a report, a model or a change:
 [`CONTRIBUTING.md`](../CONTRIBUTING.md).
+
+## Open use
+
+Publishing the code makes TIMES-OS open source. What `main` commits to is more than that. It is open use, and it has
+two parts.
+
+**The same model.** `main` builds the model that TIMES in GAMS builds. Where it does not yet support a feature a model
+needs, it says so before anything is solved.
+
+**No burden beyond the model.** Installing and running TIMES-OS should ask nothing of you that TIMES itself does not:
+no environment to assemble by hand, no hidden use of your disk, no step that works on our machines and fails on yours.
+Where a release still surprises a user in this way, that is a defect, and `main` is corrected.
+
+Open use is a commitment about the software, not a service. It does not cover help with building or formulating a
+model.
 
 ## Commitments for models submitted by 31 December 2026
 
