@@ -57,7 +57,12 @@ def prep_ext(db: DB, interp):
     if not on(db):
         return
     require_empty(db, ["S_DAM_COST"], "damage costs by SOW with STAGES=YES (DAMAGE is not supported)")
-    require_empty(db, ["S_UCOBJ"], "the tradeoff analysis of stochastic TIMES (S_UCOBJ, SW_LAMBDA)")
+    tradeoff = bool(db.card("S_UCOBJ"))
+    if tradeoff and not tagged(db):
+        # (SENSIS and S_UCOBJ: the solves of solve.stc with the deterministic names, SPAR_UCSL; not ported)
+        unsupported(db, "the tradeoff analysis with SENSIS (S_UCOBJ: the phases of solve.stc with SPAR_UCSL)", ["S_UCOBJ"])
+    if tradeoff and db.ctl.get("SPINES"):
+        unsupported(db, "the tradeoff analysis with SPINES (S_UCOBJ)", ["S_UCOBJ"])
     if db.ctl.get("SENSIS"):
         # SENSIS: the demand projections and taxes of the SOW of each solve (eqcombal.mod 109, eqpeak.mod 81,
         # eqobjvar.mod 48: $IFI %STAGES%); the others reset by sensis.stc or read through the MX macros, not yet
@@ -67,10 +72,17 @@ def prep_ext(db: DB, interp):
                       "with SENSIS (sensis.stc, the MX macros of recurrin.stc)")
     if db.card("S_FLO_FUNC") and db.q1("select count(*) from S_FLO_FUNC f where in_RP_IRE(f.r, f.p)"):
         unsupported(db, "S_FLO_FUNC of a trade process with STAGES=YES (IRE_FLOSUM by SOW: cal_ire.mod 16, eqobjvar.mod 83)", ["S_FLO_FUNC"])
-    if db.s.get("SW_LAMBDA"):
-        unsupported(db, "SW_LAMBDA with STAGES=YES (the tradeoff analysis)", ["SW_LAMBDA"])
-    if db.q1("select count(*) from S_UC_RHS where uc='OBJ1'"):
-        unsupported(db, "S_UC_RHS of OBJ1 (the minimax regret of the tradeoff analysis)", ["S_UC_RHS"])
+    # SW_LAMBDA: the weight of the upside deviations in the expected objective (eqobj.mod 114-122, EQ_UPDEV); with
+    # S_UCOBJ stages.stc 55 sets it to 0
+    if db.s.get("SW_LAMBDA") and not tradeoff:
+        unsupported(db, "SW_LAMBDA with STAGES=YES (the expected objective with a weight on the upside deviations, EQ_UPDEV)", ["SW_LAMBDA"])
+    # S_UC_RHS of OBJ1: with S_UCOBJ, bound type N is the deviation allowed from the objective of a SOW's own solve
+    # (solve.stc 44-46); without it, FX is the minimax regret (stages.stc 83: SW_LAMBDA = -1), which is not ported
+    if tradeoff:
+        if db.q1("select count(*) from S_UC_RHS where uc='OBJ1' and l<>'N'"):
+            unsupported(db, "S_UC_RHS of OBJ1 with a bound type other than N in a tradeoff analysis (S_UCOBJ)", ["S_UC_RHS"])
+    elif db.q1("select count(*) from S_UC_RHS where uc='OBJ1'"):
+        unsupported(db, "S_UC_RHS of OBJ1 without S_UCOBJ (the minimax regret of stochastic TIMES)", ["S_UC_RHS"])
     F, P = interp.fillparm, interp.prepparm
     # --- $ BATINCLUDE fillparm S_COM_PROJ 'R' 'C,J,WW' ",'0','0','0'" MILESTONYR 1 'GE 0'
     F(db, "S_COM_PROJ", "T", None)
@@ -123,7 +135,9 @@ def prep_ext(db: DB, interp):
     db.add("UC_R_SUM", "select r, 'OBJ1' as uc from REG")
     db.add("UC_T_SUM", "select r, 'OBJZ' as uc, y from REG, MILESTONYR")
     db.add("UC_T_SUM", "select r, 'OBJ1' as uc, y from REG, MIYR_1")
-    # --- LOOP((UC_N,WW)$S_UCOBJ(UC_N,WW),UC_RHS(UC_N,'N')$(NOT UC_RHS(UC_N,'N')) = -1);   (S_UCOBJ refused)
+    # --- LOOP((UC_N,WW)$S_UCOBJ(UC_N,WW),UC_RHS(UC_N,'N')$(NOT UC_RHS(UC_N,'N')) = -1);
+    db.put("UC_RHS", """select distinct s.uc, 'N' as l, -1.0 as value from S_UCOBJ s
+                        where not exists(select 1 from UC_RHS u where u.uc=s.uc and u.l='N')""")
     # --- SW_PARM = CARD(S_COM_PROJ) + CARD(S_CAP_BND) + CARD(S_COM_CUMPRD) + CARD(S_COM_CUMNET);
     #     SW_PARM = SW_PARM + CARD(S_CM_CONST) + CARD(S_CM_MAXC);   (the two CUM ones are cleared above)
     db.s["SW_PARM"] = float(db.card("S_COM_PROJ") + db.card("S_CAP_BND") + db.card("S_CM_CONST") + db.card("S_CM_MAXC"))
@@ -225,7 +239,84 @@ def stages(db: DB):
     s["SW_PHASE"] = 0.0
     db.remove("UC_TS_SUM", where="uc='OBJZ'")
     db.remove("UC_TS_EACH", where="uc='OBJZ'")
-    # IF(SUM((UC_N,SOW)$S_UCOBJ(UC_N,SOW),1), ... ELSEIF SUM((J,SOW)$S_UC_RHS('OBJ1','FX',J,SOW),1), ...): both refused
+    # --- IF(SUM((UC_N,SOW)$S_UCOBJ(UC_N,SOW),1),          (the tradeoff analysis: stages.stc 53-81)
+    ucobj = {(uc, w): v for uc, w, v in _rows(db, "S_UCOBJ")}
+    if tagged(db) and any(w in sowset for (_, w) in ucobj):
+        # ---   SW_START('1') = 9999;  SW_LAMBDA = 0;  SW_PHASE = -9;
+        start["1"] = 9999.0
+        s["SW_LAMBDA"] = 0.0
+        s["SW_PHASE"] = -9.0
+        # ---   * Make sure OBJ1 will not be generated
+        #       UC_TS_SUM(R,'OBJ1',S) = NO;  UC_TS_EACH(R,'OBJ1',S) = NO;  UC_T_SUM(R,'OBJ1',T) = NO;
+        db.remove("UC_TS_SUM", where="uc='OBJ1'")
+        db.remove("UC_TS_EACH", where="uc='OBJ1'")
+        db.remove("UC_T_SUM", where="uc='OBJ1' and in_REG(r) and in_MILESTONYR(y)")
+        # ---   * Complete checking for uncertain parameters
+        #       CNT = SW_PARM;
+        #       CNT$(NOT CNT) = SUM((UC_N,BD,J,W)$S_UC_RHS(UC_N,BD,J,W),1);          (BD: LO, UP, FX; W: the SOWs)
+        #       CNT$(NOT CNT) = SUM((R,UC_N,BD,J,W)$S_UC_RHSR(R,UC_N,BD,J,W),1);     (and S_UC_RHST, S_UC_RHSRT,
+        #       S_UC_RHSTS, S_UC_RHSRTS over the periods T)
+        cnt_u = s.get("SW_PARM", 0.0)
+        sows_sql = ", ".join(f"'{w}'" for w in sow)             # (SOW is written to the database below)
+        for n in ("S_UC_RHS", "S_UC_RHSR", "S_UC_RHST", "S_UC_RHSRT", "S_UC_RHSTS", "S_UC_RHSRTS"):
+            if cnt_u:
+                break
+            c = db.cols(n)
+            cond = ("in_REG(r) and " if "r" in c else "") + ("in_MILESTONYR(y) and " if "y" in c else "")
+            cnt_u = db.q1(f"""select count(*) from "{n}" where {cond}l in ('LO','UP','FX') and w in ({sows_sql})""")
+        # ---   * Reset UCOBJ(OBJ1) flags to either 1 or 2:
+        #       FIRST_VAL = S_UCOBJ('OBJ1','1');
+        #       S_UCOBJ('OBJ1',SOW) = 1+1$(S_UCOBJ('OBJ1',SOW) GE 0);
+        first_given = ("OBJ1", "1") in ucobj
+        first_val = ucobj.get(("OBJ1", "1"), 0.0)
+        if first_given and first_val == 0:
+            unsupported(db, "S_UCOBJ('OBJ1','1') given as EPS (the tradeoff analysis)", ["S_UCOBJ"])
+        for w in sow:
+            ucobj[("OBJ1", w)] = 1.0 + (1.0 if ucobj.get(("OBJ1", w), 0.0) >= 0 else 0.0)
+        # ---   * Copy UCOBJ from previous if missing and uncertain parameters defined
+        #       LOOP((SOW(WW),W(WW-1)),
+        #         IF(SUM(UC_N$S_UCOBJ(UC_N,SOW),1) EQ 1,
+        #           S_UCOBJ(UC_N,SOW) $= S_UCOBJ(UC_N,W);
+        #           S_UCOBJ('OBJ1',SOW) = 4+2$CNT;));
+        for w in sow:
+            prev = WW[wo[w] - 2] if wo[w] > 1 else None
+            if prev not in sowset:
+                continue
+            if sum(1 for (_, x) in ucobj if x == w) == 1:
+                for (uc, x), v in list(ucobj.items()):
+                    if x == prev:
+                        ucobj[(uc, w)] = v
+                ucobj[("OBJ1", w)] = 4.0 + (2.0 if cnt_u else 0.0)
+        # ---   * Check setups with single terminal SOW:
+        #       IF(FIRST_VAL,
+        #   $IF %STAGES%==YES IF((FIRST_VAL EQ 0)$(NOT SW_PARM), SW_PARM = 1;
+        #   $IF %STAGES%==YES ELSE S_UCOBJ('OBJ1',SOW)=S_UCOBJ('OBJ1',SOW)-ABS(S_UCOBJ('OBJ1',SOW)-4); SW_PARM = -1);
+        #       ELSE SW_PARM = 0); S_UCOBJ('OBJ1',SOW(WW))$(ORD(WW) EQ CARD(SOW)) = MAX(0,S_UCOBJ('OBJ1',WW));
+        if first_val:
+            for w in sow:
+                v = ucobj[("OBJ1", w)]
+                ucobj[("OBJ1", w)] = v - abs(v - 4)
+            s["SW_PARM"] = -1.0
+        else:
+            s["SW_PARM"] = 0.0
+        if len(sow) <= len(WW) and WW[len(sow) - 1] in sowset:
+            wl = WW[len(sow) - 1]
+            ucobj[("OBJ1", wl)] = max(0.0, ucobj[("OBJ1", wl)])
+        ucobj = {k: v for k, v in ucobj.items() if not (k[0] == "OBJ1" and k[1] in sowset and v == 0)}
+        _write(db, "S_UCOBJ", [(uc, w, v) for (uc, w), v in ucobj.items()])
+        # solve.stc 26-29: IF(S_UCOBJ('OBJ1','1') GT 0, SW_PHASE=1 ("Phase 1 deterministic scenarios", then phase 2 with
+        # the deviation bounds of bnd_ucv.mod); ELSE SW_PHASE=-1 ("Multiphase tradeoff scenarios")). The multiphase
+        # analysis is ported (S_UCOBJ('OBJ1','1') given: every SOW solved once, in order); the two phases are not
+        if ucobj.get(("OBJ1", "1"), 0.0) > 0:
+            unsupported(db, "the tradeoff analysis in two phases (S_UCOBJ without S_UCOBJ('OBJ1','1'): every SOW solved for its own "
+                            "objective, then again with deviation bounds, solve.stc 76-102)", ["S_UCOBJ"])
+        # solve.stc 37-39: a SOW whose objective was copied from the SOW before it (flag 4) is not solved in the loop
+        # of the phases but in phase 2
+        if any(v == 4 for (uc, w), v in ucobj.items() if uc == "OBJ1" and w in sowset):
+            unsupported(db, "the tradeoff analysis with a SOW that has no objective of its own in S_UCOBJ (it takes that of the "
+                            "SOW before it and is solved in a second phase, solve.stc 37, 80)", ["S_UCOBJ"])
+    # --- ELSEIF SUM((J,SOW)$S_UC_RHS('OBJ1','FX',J,SOW),1), UC_T_SUM(R,'OBJ1',T) = NO; SW_LAMBDA = -1
+    #     (the minimax regret: refused in prep_ext)
     # --- $IF NOT %STAGES%==YES SW_START('1') = 9999; SW_LAMBDA = 0; SW_PARM = 0;
     #     (SENSIS: MY_FYEAR 9999 below puts the start of every stage at the first milestone, a SOW per solve)
     if not tagged(db):
@@ -420,7 +511,9 @@ def stages(db: DB):
     # solve.stc 18: DOITER = (SUM(SW_T(MIYR_1,WW),1) GT 1) OR ..: with several SOWs in the first period TIMES solves each
     # SOW on its own ("Decomposed deterministic scenarios"), not one stochastic model; not with SPINES:
     #   solve.stc 19  $IFI %SPINES%==YES DOITER = 0;
-    if sum(1 for (t, w) in swt if t == T[0]) > 1 and not db.ctl.get("SPINES") and tagged(db):
+    #   solve.stc 18  DOITER = (SUM(SW_T(MIYR_1,WW),1) GT 1) OR SW_PHASE OR ..: the tradeoff analysis (SW_PHASE) is such
+    #   a run by design, its solves are built one by one (TimesEq tradeoff_sows)
+    if sum(1 for (t, w) in swt if t == T[0]) > 1 and not db.ctl.get("SPINES") and tagged(db) and not s["SW_PHASE"]:
         unsupported(db, "STAGES with several states of the world in the first period (TIMES solves each SOW on its own)", ["SW_START"])
     # --- SW_MAP(SW_T(T,WW),J,SOW)$(SW_TSTG(T,J)*SW_TREE(J,SOW,WW)) = YES;
     swmap = {(t, w, j, a) for (t, w) in swt for (j, a, x) in tree if x == w and (t, j) in tstg}
@@ -900,6 +993,9 @@ def bounds(db: DB):
         if var not in PERIOD:
             unsupported(db, f"bounds of {var} with STAGES=YES")
             continue
+        if var not in ("VAR_RCAP", "VAR_SCAP", "VAR_DRCAP", "VAR_SOUT"):
+            sow_bounds(db, var)
+            continue
         n = len(db.q(f'describe "B_{var}"')) - 2
         ks = ", ".join(f"b.d{i}" for i in range(n))
         cols = ", ".join(f"d{i} VARCHAR" for i in range(n + 1))
@@ -914,27 +1010,6 @@ def bounds(db: DB):
             free = "b.d4='ACT' and b.lower = '-inf'::double"
             db.x(f'insert into "B_{vas(var)}" select {ks}, s.w, b.lower, b.upper from "B_{var}" b, ALLSOW s where {free}')
             db.x(f'insert into "B_{vas(var)}" select {ks}, s.w, b.lower, b.upper from "B_{var}" b join SW_T s on s.y=b.d{k} where not ({free})')
-        elif var in UC_SLACK and db.card("SUC_L"):
-            # bnd_ucw.mod 12: $IF %STAGES%==YES $SET TMP (T-SUC_L(R,UC_N)); bnd_ucv.mod:
-            #   %1.LO(UC_N,R,TT(T-SUC_L(R,UC_N)),SOW)$(UC_ON(R,UC_N)*UC_T_EACH(R,UC_N,TT)$SW_T(T,SOW)) $= UC_RHSRT(R,UC_N,TT,'LO')
-            # a constraint dynamic on its left-hand side (SUC_L) has the bound of period TT for the SOWs of the period
-            # after it (none for the last period); the others by SW_T of their own period
-            rc = UC_SLACK[var]
-            on_r = f"l.r=b.d{rc} and " if rc is not None else ""
-            lead = "(select y, lead(y) over (order by yv(y)) as y1 from MILESTONYR)"
-            db.x(f"""create or replace temp table t_dyn as select distinct b.* from "B_{var}" b
-                     join SUC_L l on {on_r}l.uc=b.d0 where l.value > 0""")
-            db.x(f"""insert into "B_{vas(var)}" select distinct {ks}, s.w, b.lower, b.upper from t_dyn b
-                     join {lead} n on n.y=b.d{k} join SW_T s on s.y=n.y1""")
-            nd = " and ".join(f"d.d{i}=b.d{i}" for i in range(n))
-            db.x(f"""insert into "B_{vas(var)}" select {ks}, s.w, b.lower, b.upper from "B_{var}" b join SW_T s on s.y=b.d{k}
-                     where not exists(select 1 from t_dyn d where {nd})""")
-        elif k is None:
-            db.x(f'insert into "B_{vas(var)}" select {ks}, s.w, b.lower, b.upper from "B_{var}" b, SOW s')
-        else:
-            db.x(f'insert into "B_{vas(var)}" select {ks}, s.w, b.lower, b.upper from "B_{var}" b join SW_T s on s.y=b.d{k}')
-            db.x(f"""insert into "B_{vas(var)}" select {ks}, s.w, b.lower, b.upper from "B_{var}" b, SOW s
-                     where not in_MILESTONYR(b.d{k})""")
         db.x(f'drop table "B_{var}"')
         db.bounds.discard(var)
         db.bounds.add(vas(var))
@@ -953,6 +1028,70 @@ def bounds(db: DB):
         db.x("""update "B_VAS_CAP" b set lower = coalesce(s.fx, s.lo, b.lower), upper = coalesce(s.fx, s.up, b.upper)
                 from t_scap s where b.d0=s.r and b.d1=s.y and b.d2=s.p and b.d3=s.w""")
     uc_bounds(db)
+    tradeoff_phase(db)
+
+
+def sow_bounds(db: DB, var):
+    """B_<var> (a bound table of the deterministic model, B_VAR_<X>) written by SOW as B_VAS_<X>, as `bounds` does:
+    for a variable of the user constraints, set again in a run with FIXBOH (bnd_ucw.mod in solve.stp)."""
+    n = len(db.q(f'describe "B_{var}"')) - 2
+    ks = ", ".join(f"b.d{i}" for i in range(n))
+    cols = ", ".join(f"d{i} VARCHAR" for i in range(n + 1))
+    db.x(f'create or replace table "B_{vas(var)}" ({cols}, lower DOUBLE, upper DOUBLE)')
+    k = PERIOD[var]
+    if var in UC_SLACK and db.card("SUC_L"):
+        # bnd_ucw.mod 12: $IF %STAGES%==YES $SET TMP (T-SUC_L(R,UC_N)); bnd_ucv.mod:
+        #   %1.LO(UC_N,R,TT(T-SUC_L(R,UC_N)),SOW)$(UC_ON(R,UC_N)*UC_T_EACH(R,UC_N,TT)$SW_T(T,SOW)) $= UC_RHSRT(R,UC_N,TT,'LO')
+        # a constraint dynamic on its left-hand side (SUC_L) has the bound of period TT for the SOWs of the period
+        # after it (none for the last period); the others by SW_T of their own period
+        rc = UC_SLACK[var]
+        on_r = f"l.r=b.d{rc} and " if rc is not None else ""
+        lead = "(select y, lead(y) over (order by yv(y)) as y1 from MILESTONYR)"
+        db.x(f"""create or replace temp table t_dyn as select distinct b.* from "B_{var}" b
+                 join SUC_L l on {on_r}l.uc=b.d0 where l.value > 0""")
+        db.x(f"""insert into "B_{vas(var)}" select distinct {ks}, s.w, b.lower, b.upper from t_dyn b
+                 join {lead} n on n.y=b.d{k} join SW_T s on s.y=n.y1""")
+        nd = " and ".join(f"d.d{i}=b.d{i}" for i in range(n))
+        db.x(f"""insert into "B_{vas(var)}" select {ks}, s.w, b.lower, b.upper from "B_{var}" b join SW_T s on s.y=b.d{k}
+                 where not exists(select 1 from t_dyn d where {nd})""")
+    elif k is None:
+        db.x(f'insert into "B_{vas(var)}" select {ks}, s.w, b.lower, b.upper from "B_{var}" b, SOW s')
+    else:
+        db.x(f'insert into "B_{vas(var)}" select {ks}, s.w, b.lower, b.upper from "B_{var}" b join SW_T s on s.y=b.d{k}')
+        db.x(f"""insert into "B_{vas(var)}" select {ks}, s.w, b.lower, b.upper from "B_{var}" b, SOW s
+                 where not in_MILESTONYR(b.d{k})""")
+    db.x(f'drop table "B_{var}"')
+    db.bounds.discard(var)
+    db.bounds.add(vas(var))
+
+
+def tradeoff_phase(db: DB):
+    """The tradeoff analysis (SW_PHASE -9, set by stages.stc with S_UCOBJ): whether deviation bounds are given, which
+    decides what follows the solves of the SOWs.
+
+      bnd_ucv.mod 40-43 (for each family of slack variables)
+        IF(SW_PHASE EQ -9,
+          CNT=CNT+SUM((%3%2UC_N%4%9)$((%5(%3%2UC_N%4%9,'N') GE 0)$%5(%3%2UC_N%4%9,'N')),1);
+          CNT=CNT+SUM((%3%2UC_N%4%9,W)$((S_%5(%3%2UC_N%4%9,'N','1',W) GE 0)$S_%5(%3%2UC_N%4%9,'N','1',W)),1););
+      bnd_ucw.mod 23-25
+        IF(SW_PHASE EQ -9, CNT$((SW_PARM GT 0)$CNT) = EPS;  SW_PHASE=-1; SW_PARM = (-2+4$(CNT GT 0))$CNT;);
+
+    SW_PARM is -1 here (stages.stc 80), so CNT stays a count: SW_PARM 2 with deviation bounds, else 0; with 2,
+    solve.stc 78-92 runs phase 2 for the SOWs with S_UCOBJ('OBJ1') above 0, of which a multiphase analysis has none.
+    The deviation bounds of the multiphase analysis ported are those of OBJ1 (solve.stc 44-46); those of other user
+    constraints (bnd_ucv.mod 77-96, MULTIPHASE) are refused."""
+    s = db.s
+    if s.get("SW_PHASE") != -9:
+        return
+    cnt = 0
+    for _, par, _, _ in UC_VARS:
+        cnt += db.q1(f"""select count(*) from "{par}" where l='N' and value >= 0""")
+        cnt += db.q1(f"""select count(*) from "S_{par}" where l='N' and j='1' and in_SOW(w) and value >= 0""")
+        if db.q1(f"""select count(*) from "S_{par}" where l='N' and j='1' and in_SOW(w) and value >= 0 and uc <> 'OBJ1'"""):
+            unsupported(db, f"deviation bounds of a user constraint other than OBJ1 in a multiphase tradeoff analysis "
+                            f"(S_{par} or {par} with bound type N, bnd_ucv.mod 77-96)", [f"S_{par}"])
+    s["SW_PHASE"] = -1.0
+    s["SW_PARM"] = 2.0 if cnt else 0.0
 
 
 # the slack variables of the user constraints: (variable, RHS attribute, the key of the variable as columns of the

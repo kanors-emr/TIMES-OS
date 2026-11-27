@@ -18,11 +18,19 @@ function sow_context(d::Data)
     t = d.tables
     isempty(t.SW_TSW) && return nothing
     iszero(plain(t.SW_SENSIS())) || return sensis_context(d)
+    phase = tradeoff(d) ? -1 : 0
     tsw = Dict{NTuple{2,Id},Id}()
     for (w, y, w2) in t.SW_TSW.rows
         tsw[(w, y)] = w2
     end
     sows = sort([w for w in t.SOW.rows]; by = w -> parse(Int, label(d.L, w)))
+    # the tradeoff analysis: the model of one solve is that of its SOW alone (solve.stc 49: SOW(WW) = SW_TSW(WW,T,ALLSOW))
+    aux = Id[]
+    if phase != 0
+        TRADE_W[] == Id(0) && error("the tradeoff analysis: the SOW of the solve is not set (tradeoff_sows, TRADE_W)")
+        sows = [TRADE_W[]]
+        aux = copy(TRADE_AUX)
+    end
     DEAD[] = id!(d.L, "*")                               # (no label of a TIMES set)
     empty!(SOW_PERIODS)
     foreach(((y, w),) -> push!(SOW_PERIODS, y), t.SW_T.rows)
@@ -41,7 +49,74 @@ function sow_context(d::Data)
     spines && !isempty(t.PRC_DYNUC) &&
         error("TIMES feature not supported yet with SPINES: the dynamic process bounds by SOW (PRC_DYNUC, UCRTPSW1)")
     return SowCtx(w, sows, Set{NTuple{2,Id}}(t.SW_T.rows), tsw, reps, reps[w], maps, maps[w], Set{Int64}(), Id(0),
-                  spines, scum, id!(d.L, "1"), false, 1.0, Id[])
+                  spines, scum, id!(d.L, "1"), false, 1.0, Id[], phase, aux)
+end
+
+"""
+The tradeoff analysis of stochastic TIMES (`S_UCOBJ`; stages.stc 53-81 sets SW_PHASE): TIMES solves one model for each
+SOW of the first period, in order (solve.stc 20-69, "Multiphase tradeoff scenarios", SW_PHASE -1). The model of the
+solve of SOW w is that of w alone, under the stochastic names (`ES_*`, `VAS_*` with w as their SOW):
+
+    LOOP(MIYR_1(T),SOW(WW) = SW_TSW(WW,T,ALLSOW); SW_NORM = SW_TPROB(T,ALLSOW));
+
+Its objective is that of w, `S_UCOBJ(UC_N,w)` over the cumulative user constraints UC_N (OBJZ: the total cost), and the
+objectives of the SOWs solved before it are rows of it too, written for the variables of w (`sow_objective!`):
+
+    AUXSOW(ALLSOW) = YES;                                  (solve.stc 47, for every solve after the first)
+
+each with its variable `VAS_UC('OBJ1',WW)` bounded around the level it had in the solve of WW (`tradeoff_bounds!`).
+TRADE_W[] is the SOW of the build and TRADE_AUX the SOWs of AUXSOW, set by the caller for each solve (`tradeoff_sows`).
+"""
+const TRADE_W = Ref{Id}(Id(0))
+const TRADE_AUX = Id[]
+
+"""A tradeoff analysis: SW_PHASE is -1 (the preprocessor sets it from S_UCOBJ; only the multiphase analysis is in)."""
+tradeoff(d::Data) = !isempty(d.tables.SW_TSW) && plain(d.tables.SW_PHASE()) == -1
+
+"""
+The SOWs of the solves of a tradeoff analysis, in order: those distinct in the first milestone year (solve.stc 35:
+LOOP(ALLSOW\$(SUM(SW_T(MIYR_1,ALLSOW),1)\$DOITER), ..)).
+"""
+tradeoff_sows(d::Data) = sensis_sows(d)
+
+"""Set the SOW of the next build of a tradeoff analysis: solve k of `sows` (AUXSOW: SOW '1' and the SOWs up to it)."""
+function tradeoff_solve!(d::Data, sows::Vector{Id}, k::Int)
+    TRADE_W[] = sows[k]
+    empty!(TRADE_AUX)
+    one = id!(d.L, "1")
+    one in sows[1:k] || push!(TRADE_AUX, one)             # SET AUXSOW(ALLSOW) / 1 /;   (stages.stc 17)
+    append!(TRADE_AUX, sows[1:k])
+    return sows[k]
+end
+tradeoff_done!() = (TRADE_W[] = Id(0); empty!(TRADE_AUX); nothing)
+
+"""
+The deviation bounds of a solve of a multiphase tradeoff analysis (solve.stc 44-46, before every solve after the first,
+SOW still the SOW of the solve before):
+
+    LOOP(SOW, Z = S_UC_RHS('OBJ1','N','1',SOW);
+      %VAR%_UC.LO(UC_N('OBJ1')%SOW%)\$((Z GE 0)\$Z) = %VAR%_UC.L(UC_N%SOW%)-ABS(%VAR%_UC.L(UC_N%SOW%)*Z);
+      %VAR%_UC.UP(UC_N('OBJ1')%SOW%)\$((Z GE 0)\$Z) = %VAR%_UC.L(UC_N%SOW%)+ABS(%VAR%_UC.L(UC_N%SOW%)*Z));
+
+`levels`: SOW => the level of VAS_UC('OBJ1',SOW) in its own solve (its objective), for the SOWs solved so far. A bound
+once set stays for the solves after it. Z given as 0 is EPS: the level itself, the variable fixed. Returns the bounds
+set, SOW label => (lower, upper).
+"""
+function tradeoff_bounds!(m::Model, levels::Dict{Id,Float64})
+    obj1, n, one = id!(m.L, "OBJ1"), id!(m.L, "N"), id!(m.L, "1")
+    out = Dict{String,NTuple{2,Float64}}()
+    for (ww, l) in levels
+        ww == m.sw.w && continue
+        has(m.d.S_UC_RHS, obj1, n, one, ww) || continue
+        z = plain(m.d.S_UC_RHS(obj1, n, one, ww))
+        z >= 0 || continue
+        x = get(m.v.VAR_UC.x, (obj1, ww), nothing)
+        x === nothing && continue
+        lo, up = l - abs(l * z), l + abs(l * z)
+        set_bounds!(x, lo, up)
+        out[label(m.L, ww)] = (lo, up)
+    end
+    return out
 end
 
 """
@@ -84,12 +159,12 @@ function sensis_context(d::Data)
     foreach(y -> push!(SOW_PERIODS, y), ms)
     DEAD[] = id!(d.L, "*")
     return SowCtx(w, [w], Set{NTuple{2,Id}}((y, w) for y in ms), Dict{NTuple{2,Id},Id}(), Dict(w => rep), rep,
-                  Dict(w => map), map, Set{Int64}(), Id(0), false, false, id!(d.L, "1"), true, norm, members)
+                  Dict(w => map), map, Set{Int64}(), Id(0), false, false, id!(d.L, "1"), true, norm, members, 0, Id[])
 end
 
 """The labels the families of a stochastic run name (sow_objective!, eqobjvar.mod 48), added before the build: a
 family built in a thread only looks labels up."""
-sow_labels!(m::Model) = foreach(n -> id!(m.L, n), ("OBJZ", "N", "1", "NET"))
+sow_labels!(m::Model) = foreach(n -> id!(m.L, n), ("OBJZ", "N", "1", "NET", "OBJ1"))
 
 """The SOW context set to build the rows of SOW w."""
 sow!(c::SowCtx, w::Id) = (c.w = w; c.rep = c.reps[w]; c.map = c.maps[w]; c)
@@ -97,7 +172,7 @@ sow!(c::SowCtx, w::Id) = (c.w = w; c.rep = c.reps[w]; c.map = c.maps[w]; c)
 """A context of its own for the rows of SOW w built in a thread (build_parallel!): the maps shared, its own DEAD
 columns (numbered as the thread's variables) and ROW_T."""
 sow_copy(c::SowCtx, w::Id) = sow!(SowCtx(w, c.sows, c.swt, c.tsw, c.reps, c.rep, c.maps, c.map, Set{Int64}(), Id(0),
-                                         c.spines, c.scum, c.w1, c.sensis, c.norm, c.members), w)
+                                         c.spines, c.scum, c.w1, c.sensis, c.norm, c.members, c.phase, c.aux), w)
 
 # SPINES (recurrin.stc 147-171): the capacity variables are those of SOW '1' in every SOW (Z_CAP(r,t,p,sow) is
 # VAS_CAP(r,t,p,'1'), ...), and with %SCUM% the cumulative ones (Z_CUMCOM(r,c,cv,y1,y2,w) is VAS_CUMCOM(..,'1'), ...).
@@ -277,6 +352,14 @@ and after the last SOW
 
     EQ_EXPOBJ('1')  SUM(w, SW_PROB(w) * VAS_UC('OBJZ',w))  =  VAS_EXPOBJ     (SW_NORM = 1)
     EQ_OBJ          OBJZ        =  VAS_EXPOBJ
+
+In a solve of a multiphase tradeoff analysis (SW_PHASE -1, the model of one SOW w; eqobj.mod 105-125), for each SOW ww
+of AUXSOW (w and the SOWs solved before it) the objective of ww on the variables of w, and the objective of the solve:
+
+    EQ_EXPOBJ(ww)   SUM(uc, S_UCOBJ(uc,ww) * VAS_UC(uc,w))  =  VAS_UC('OBJ1',ww)
+    EQ_OBJ          OBJZ        =  VAS_UC('OBJ1',w)
+
+over the user constraints uc summed over regions and periods (UC_T_SUM(UC_R_SUM(R,UC_N),T)); OBJZ is one of them.
 """
 function sow_objective!(m::Model, regional::Dict{Id,AE})
     objz, n = id!(m.L, "OBJZ"), id!(m.L, "N")
@@ -309,6 +392,36 @@ function sow_objective!(m::Model, regional::Dict{Id,AE})
         end
     end
     m.sw.w == last(m.sw.sows) || return
+    if c.phase != 0
+        # EQ_EXPOBJ(AUXSOW(WW))..
+        #    (SUM(SOW, SW_PROB(SOW) * %VAR%_UC('OBJZ'%SOW%))/SW_NORM - VAS_EXPOBJ)$(NOT SW_PHASE) +
+        #    SUM(SOW,SUM(UC_N$(SUM(UC_T_SUM(UC_R_SUM(R,UC_N),T),1)$S_UCOBJ(UC_N,SOW)),
+        #              S_UCOBJ(UC_N,SOW)*%VAR%_UC(UC_N%SOW%)) - %VAR%_UC('OBJ1'%SOW%))$(SW_PHASE GT 0) +
+        #    SUM(SOW,SUM(UC_N$(SUM(UC_T_SUM(UC_R_SUM(R,UC_N),T),1)$S_UCOBJ(UC_N,WW)),
+        #              S_UCOBJ(UC_N,WW)*%VAR%_UC(UC_N%SOW%)) - %VAR%_UC('OBJ1'%SWD%))$(SW_PHASE LT 0)
+        #   =E=  0;
+        # (SW_PHASE -1; SOW is the SOW of the solve; %SWD% is ',WW')
+        c.phase == -1 || error("TIMES feature not supported yet: the tradeoff analysis with SW_PHASE $(c.phase)")
+        obj1 = id!(m.L, "OBJ1")
+        summed = Set{Id}()
+        for (r, uc, t) in m.d.UC_T_SUM.rows
+            (r, uc) in m.d.UC_R_SUM && push!(summed, uc)
+        end
+        for ww in c.aux
+            e = AE()
+            for (uc, w2) in m.d.S_UCOBJ.keys
+                (w2 == ww && uc in summed) || continue
+                add!(e, m.d.S_UCOBJ(uc, ww), VAR_UC(uc, c.w))
+            end
+            row!(m, :EQ_EXPOBJ, (ww,), e, ==, VAR_UC(obj1, ww))
+        end
+        # EQ_OBJ..
+        #    ((VAS_EXPOBJ + ..)$(SW_LAMBDA GE 0) - MIN(0,SW_LAMBDA)*VAS_UPDEV('1'))$(NOT SW_PHASE) +
+        #    SUM(SOW,%VAR%_UC('OBJ1'%SOW%)$(ABS(SW_PHASE) EQ 1) + %VAR%_UC('OBJZ'%SOW%)$(ABS(SW_PHASE) EQ 2))
+        #   =E=  objZ;
+        row!(m, :EQ_OBJ, (), VAR_UC(obj1, c.w), ==, m.v.OBJZ())
+        return
+    end
     expected = AE()
     for w in m.sw.sows
         p = m.d.SW_PROB(w)

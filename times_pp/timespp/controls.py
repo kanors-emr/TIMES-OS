@@ -257,10 +257,18 @@ def derive(db):
         # stages.stc 9: $IF %MACRO%==YES $ABORT Stochastic MACRO Not Implemented - aborted.
         if macro_run(env):
             unsupported(db, "MACRO with STAGES=YES (TIMES aborts: Stochastic MACRO Not Implemented)")
-        # the stepped run (solve.stp) with STAGES: not ported
-        for k in ("TIMESTEP", "FIXBOH"):
-            if given(env, k):
-                unsupported(db, f"run-file switch {k} with STAGES=YES (a stochastic myopic run)")
+        # the stepped run (solve.stp) with STAGES:
+        #   solve.stp 9-13  $SET STEPPED YES
+        #                   $IFI NOT %SPINES%==YES
+        #                   $IFI %STAGES%==YES $SET STEPPED NO
+        #                   $IF %STEPPED%==NO
+        #                   $IF SET TIMESTEP $ABORT Stepped TIMES Not available with STAGES/SENSIS!
+        # FIXBOH with STAGES YES is one pass of solve.stp over the model of every SOW (prep/fixboh.py); with SENSIS
+        # or SPINES it is not ported
+        if given(env, "TIMESTEP"):
+            unsupported(db, "run-file switch TIMESTEP with STAGES=YES (a stochastic myopic run)")
+        if given(env, "FIXBOH") and (db.ctl["SENSIS"] or db.ctl["SPINES"]):
+            unsupported(db, "run-file switch FIXBOH with SENSIS or SPINES (periods fixed at a loaded solution, solve.stp)")
     if macro_run(env) and (switch(env, "MACRO") != "MLF" or "MLF" in MACRO_IN_PART):
         unsupported(db, "run-file switch MACRO=" + switch(env, "MACRO"))
     # MLF opens only through readbprice.mod 20 (maindrv.mod 28-29: TIMESED not NO and not 0); without it GAMS stops
@@ -277,9 +285,11 @@ def derive(db):
     #   maindrv.mod 25  $   IFI %MICRO%%TIMESED%==YES0 $SET TIMESED YES     (MICRO: refused above)
     from .prep.elastic import readbprice
     readbprice(db)
-    # bnd_ire.vda: trade flows fixed (GDX_IREBND) or priced (GDX_IPRIC) from an earlier run's GDX, when that GDX exists
+    # bnd_ire.vda: trade flows fixed (GDX_IREBND) or priced (GDX_IPRIC) from an earlier run's GDX, when that GDX exists.
+    # The prices are in (prep/tradeprice.py); the bounds are not
     for k in getattr(db, "trade_gdx", ()):
-        unsupported(db, f"run-file switch {k} (trade bounds or prices from an earlier run's GDX, bnd_ire.vda)")
+        if k != "GDX_IPRIC":
+            unsupported(db, f"run-file switch {k} (trade bounds from an earlier run's GDX, bnd_ire.vda)")
     # TIMESTEP (myopic run, solve.stp): the steps are prepared by prep/myopic.py; STEPPED implies VAR_UC (initmty.mod)
     db.ctl["TIMESTEP"] = None
     if "TIMESTEP" in env:

@@ -686,11 +686,13 @@ end
     # The currencies of these costs, and their sums, in loops: a second `curs` (the one of the flows above) captured by
     # a closure made both a box of unknown type, and the generators over it were compiled in every run that has them.
     # The order of the terms is that of the generators.
+    # The costs are summed as they are, EPS included: a cost on record as zero (an NCAP_ISPCT of 0 times the investment
+    # cost: an EPS subsidy) makes the coefficient EPS, which TIMES keeps in the row.
     ncurs = costs ? Id[cur for (rr, cur) in m.d.RDCUR if rr == r] : Id[]
     function uci(tt, p, name)
         f = 0.0
         for cur in ncurs
-            has(m.d.UC_ICOST, r, tt, p, name, cur) && (f += plain(m.d.UC_ICOST(r, tt, p, name, cur)))
+            has(m.d.UC_ICOST, r, tt, p, name, cur) && (f += m.d.UC_ICOST(r, tt, p, name, cur))
         end
         return f
     end
@@ -709,12 +711,12 @@ end
             if costs
                 f = 0.0
                 for n in annuls, cur in ncurs
-                    has(m.d.CST_ANNC, r, tt, p, tc, n, cur) && (f += plain(m.d.CST_ANNC(r, tt, p, tc, n, cur)))
+                    has(m.d.CST_ANNC, r, tt, p, tc, n, cur) && (f += m.d.CST_ANNC(r, tt, p, tc, n, cur))
                 end
                 icost && (f += uci(tt, p, m.K.COST))
                 itax && (f += uci(tt, p, m.K.TAX))
                 isub && (f -= uci(tt, p, m.K.SUB))
-                k *= f
+                k = emul(k, f)
             end
             iszero(k) && continue
             (r, tt, p) in RTP_OFF || add!(e, k, VAR_NCAP(r, tt, p))

@@ -95,13 +95,14 @@ def myopic_steps(db: DB, hook=None):
         s.update(scal)
 
 
-def _take(db, step, more=()):
-    """The tables of the step as they are now (more: other tables the step changed)."""
+def _take(db, step, more=(), bounds=True):
+    """The tables of the step as they are now (more: other tables the step changed; bounds False: the caller takes
+    the bound tables itself)."""
     out = {}
     for n in TABLES + OBJ_TABLES + list(more):
         if n in db.sym:
             out[n] = db.q(f'select * from "{n}"')
-    bnds = {v: db.q(f'select * from "B_{v}"') for v in BOUNDS}
+    bnds = {v: db.q(f'select * from "B_{v}"') for v in BOUNDS} if bounds else {}
     step.update(tables=out, bounds=bnds, scalars={"MIYR_VL": db.s["MIYR_VL"]})
 
 

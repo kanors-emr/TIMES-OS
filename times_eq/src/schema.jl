@@ -533,6 +533,9 @@ const PARS = (
     SW_SCUM    = (),                        # port-only, SPINES with SOLVEDA 1 (%SCUM%): the cumulative rows once, as expected values
     SW_SENSIS  = (),                        # port-only, SENSIS: one deterministic model per SOW of the first period (sensis_sows)
     S_FLO_CUM  = (:r, :p, :c, :y1, :y2, :bd, :j, :w), # cumulative flow bound by SOW (j = 1: merged, stages.stc)
+    SW_PHASE   = (),                        # the tradeoff analysis (S_UCOBJ): -1, one solve for each SOW in turn (solve.stc 26-29)
+    S_UCOBJ    = (:uc, :w),                 # weight of user constraint uc in the objective of SOW w (OBJ1: how w is solved)
+    S_UC_RHS   = (:uc, :bd, :j, :w),        # RHS of a cumulative user constraint by SOW (j = 1: merged); N of OBJ1: deviation allowed
     S_CM_MAXC  = (:y, :i, :j, :w),          # bound on a climate quantity by SOW (j = 1: merged, coef_ext.cli)
 )
 

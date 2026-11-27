@@ -286,6 +286,137 @@ function sensis_run(d, res, opt, args, save)
 end
 
 """
+A tradeoff analysis of stochastic TIMES (`S_UCOBJ`, the multiphase analysis): one model for each SOW of the first
+period, built and solved one after the other as TIMES does (solve.stc 20-69, `TimesEq.tradeoff_sows`). The model of a
+SOW is that of the SOW alone under the stochastic names, with its own objective; the objectives of the SOWs solved
+before it are rows of it, each bounded around the level of its own solve (`TimesEq.tradeoff_bounds!`). Each solve is a
+"step" of the result (its size, and with a solve its objective), compared with the solves of the GAMS listing in order.
+In a run with FIXBOH every model has its fixed periods at the loaded point (the one step of the run, steps.jl).
+--matrix-out <folder>: the matrix of the first solve (GAMS's run with CONVERT stops after its first solve: the matrix
+check is of that one). --no-solve: the models are built without the deviation bounds, which need the levels of the
+solves. Solved with HiGHS, or with --lp <solver> by that LP solver of the user's GAMS, each in its own work folder
+(gamslp/sow_<w>). The run stops at a solve without a solution: the solves after it need its level.
+"""
+function tradeoff_run(d, res, opt, args, save)
+    res["stage"] = "tradeoff"
+    save()
+    lp = lowercase(opt("--lp", "highs"))
+    lp == "gurobipy" && (lp = "gurobi")
+    res["steps"] = Any[]
+    mout = opt("--matrix-out", "")
+    solve = !("--no-solve" in args)
+    fixed = !isempty(TimesEq.steps(d.source))               # FIXBOH: the one step of the run (solve.stp, one pass)
+    ds = fixed ? TimesEq.load_step(d, 1) : d
+    pt = fixed ? TimesEq.load_point(d, 1) : nothing
+    R = fixed ? TimesEq.Relax(ds) : nothing
+    sows = TimesEq.tradeoff_sows(d)
+    levels = Dict{TimesEq.Id,Float64}()
+    # TIMESEQ_TRADEOFF_LEVELS="<w>:<level>,..": the level of the objective of SOW w to bound it around in the solves
+    # after it, in place of the one its solve found here (a check: with the levels of GAMS's solves, the models of the
+    # later solves have GAMS's bounds to the last digit, whatever the two solvers made of a solve)
+    given = Dict{String,Float64}()
+    for kv in split(get(ENV, "TIMESEQ_TRADEOFF_LEVELS", ""), ','; keepempty = false)
+        a, b = split(kv, ':')
+        given[String(strip(a))] = parse(Float64, b)
+    end
+    isempty(given) || (res["tradeoff_levels_given"] = given)
+    try
+        for (k, w) in enumerate(sows)
+            lab = TimesEq.label(d.L, w)
+            TimesEq.tradeoff_solve!(d, sows, k)
+            m, tb = timed(() -> prof(() -> TimesEq.build(ds)), "build")
+            if fixed
+                _, tf = timed(() -> (TimesEq.fix_window!(m, pt); TimesEq.apply_relax!(R, m)), "fixed periods")
+                tb += tf
+            end
+            dev = TimesEq.tradeoff_bounds!(m, levels)
+            e = Dict{String,Any}("step" => k, "year" => 0, "window" => "SOW " * lab, "sow" => lab, "tradeoff" => true,
+                "rows" => sum(values(TimesEq.row_counts(m)); init = 0), "columns" => num_variables(m.jump),
+                "nonzeros" => TimesEq.nonzeros(m), "build_seconds" => round(tb; digits = 1),
+                "deviation_bounds" => Dict{String,Any}(s => [b[1], b[2]] for (s, b) in dev))
+            ok = true
+            if solve
+                if lp == "highs"
+                    TimesEq.use_highs!(m.jump)                 # HiGHS without the bridge layer, as a run of one solve
+                    s, applied = configure_highs!(m.jump, opt("--solver", "auto"), parse(Int, opt("--threads", "0")), highs_options(args); rows = e["rows"])
+                    res["highs_options"] = Dict(applied)
+                    limit = parse(Float64, opt("--time-limit", "0"))
+                    limit > 0 && set_time_limit_sec(m.jump, limit)
+                    TimesEq.attach_highs!(m.jump)
+                    res["solver"] = "HiGHS " * s
+                elseif lp == "mosekjl"
+                    applied = use_mosek!(m.jump, opt, args)
+                    res["solver"] = "MOSEK " * mosek_version() * " (" * (isempty(applied) ? "default options" : join((k * "=" * v for (k, v) in applied), ", ")) * ")"
+                else
+                    kw = gamslp_options(lp, opt, args)
+                    workdir = joinpath(opt("--lp-work", joinpath(dirname(abspath(args[2])), "gamslp")), "sow_" * lab)
+                    o = TimesEq.GamsLP.Optimizer(; kw..., workdir, names = "", name_rows = MOI.ConstraintIndex[])
+                    TimesEq.discrete_for_solve!(m.jump)
+                    JuMP.set_optimizer(m.jump, () -> o; add_bridges = false)
+                    res["solver"] = uppercase(lp) * (o.direct == "" ? " through GAMS" : " through Python")
+                end
+                _, ts = timed(() -> optimize!(m.jump), "solve")
+                st = termination_status(m.jump)
+                if lp == "highs" && st != OPTIMAL && !(st in (INFEASIBLE, DUAL_INFEASIBLE, TIME_LIMIT)) &&
+                   !(primal_status(m.jump) in (FEASIBLE_POINT, NEARLY_FEASIBLE_POINT))
+                    # a model with columns fixed at the optimum of an earlier solve is feasible only on a face of that
+                    # optimum: HiGHS's simplex can end there without a solution; its interior point code (ipx) with
+                    # crossover is tried once
+                    e["first_attempt"] = "HiGHS " * s * " ended with " * string(st) * " after " * string(round(ts; digits = 1)) * " s; solved again with ipx and crossover"
+                    println("SOW ", lab, ": ", e["first_attempt"]); flush(stdout)
+                    set_attribute(m.jump, "solver", "ipx"); set_attribute(m.jump, "run_crossover", "on")
+                    res["solver"] = "HiGHS " * s * " (ipx with crossover for SOW " * lab * ")"
+                    ts += timed(() -> optimize!(m.jump), "solve")[2]
+                    st = termination_status(m.jump)
+                end
+                # as for a run of one solve: a solve that ends without a proved optimum but with a feasible point (HiGHS
+                # after its postsolve, on a model with columns fixed at the optimum of an earlier solve) gives its
+                # point; the status says so
+                ok = st == OPTIMAL || (st in (OTHER_ERROR, ALMOST_OPTIMAL) && primal_status(m.jump) in (FEASIBLE_POINT, NEARLY_FEASIBLE_POINT))
+                e["status"] = string(st)
+                e["objective"] = ok ? objective_value(m.jump) : nothing
+                e["solve_seconds"] = round(ts; digits = 1)
+                e["iterations"] = try Int(MOI.get(m.jump, MOI.SimplexIterations())) catch; nothing end
+                # %VAR%_UC.L('OBJ1',SOW) of this solve, for the deviation bounds of the solves after it (EQ_OBJ: the objective)
+                ok && (levels[w] = get(given, lab, objective_value(m.jump)))
+                # --solution <file>: the solution of each solve in <file without extension>~<w><extension>
+                sfile = opt("--solution", "")
+                if sfile != "" && ok
+                    b, x = splitext(sfile)
+                    sol = TimesEq.record!(TimesEq.Solution(d.L), m; info = Dict{String,Any}("step" => k, "year" => 0, "window" => "SOW " * lab,
+                        "rows" => e["rows"], "columns" => e["columns"], "nonzeros" => e["nonzeros"], "status" => e["status"],
+                        "objective" => e["objective"], "seconds" => e["solve_seconds"]))
+                    TimesEq.write_solution(b * "~" * lab * x, sol)
+                    e["solution_file"] = b * "~" * lab * x
+                end
+            end
+            (mout == "" || k > 1) || (res["matrix_out"] = e["matrix_out"] = TimesEq.write_matrix(m, mout))
+            # TIMESEQ_TRADEOFF_MATRIX=<folder>: the matrix of every solve, in <folder>/sow_<w> (to compare a later solve
+            # with the matrix GAMS wrote of it; a solved run only: the bounds need the levels)
+            every = get(ENV, "TIMESEQ_TRADEOFF_MATRIX", "")
+            (every == "" || !solve) || (e["matrix_out_sow"] = TimesEq.write_matrix(m, joinpath(every, "sow_" * lab)))
+            push!(res["steps"], e)
+            println("SOW ", lab, ": rows ", e["rows"], "  columns ", e["columns"], "  nonzeros ", e["nonzeros"],
+                    solve ? string("  ", e["status"], "  objective ", e["objective"]) : "", "  (", e["build_seconds"], " s)"); flush(stdout)
+            save()
+            ok || break
+        end
+    finally
+        TimesEq.tradeoff_done!()
+    end
+    last = res["steps"][end]
+    res["rows"], res["columns"], res["nonzeros"] = last["rows"], last["columns"], last["nonzeros"]
+    res["build_seconds"] = round(sum(s["build_seconds"] for s in res["steps"]); digits = 1)
+    if solve
+        res["solve_seconds"] = round(sum(s["solve_seconds"] for s in res["steps"]); digits = 1)
+        res["objective"] = last["objective"]
+        res["optimal_proved"] = length(res["steps"]) == length(sows) && all(s["status"] == "OPTIMAL" for s in res["steps"])
+        res["termination"] = last["status"]
+    end
+    note_profile(res)
+end
+
+"""
 A myopic run (TIMESTEP): the steps one after the other, each fixed outside its window at the solution of the
 steps before; the merged solution is written with --solution, and compared with the GAMS solution (--gams). With
 --lp <solver>, each step is solved by that LP solver of the user's GAMS (GamsLP.Optimizer, as one solve is).
@@ -759,8 +890,14 @@ function run_case(args; t_script = time(), using_seconds = 0.0, early_seconds = 
         stepwise, _ = timed(() -> !isempty(TimesEq.steps(file)), "checks")
         # --mosek with steps or SOWs: builds and solves alternate, so MosekTools is loaded before the first build and the
         # run made in the world that knows its methods (the builds are then compiled in the run)
-        mosek_first = lowercase(opt("--lp", "highs")) == "mosekjl" && !("--no-solve" in args) && (stepwise || TimesEq.sensis(d))
+        mosek_first = lowercase(opt("--lp", "highs")) == "mosekjl" && !("--no-solve" in args) && (stepwise || TimesEq.sensis(d) || TimesEq.tradeoff(d))
         mosek_first && timed(load_mosek, "load MosekTools")
+        if TimesEq.tradeoff(d)                               # (before the steps: with FIXBOH each of its solves is the step)
+            mosek_first ? Base.invokelatest(tradeoff_run, d, res, opt, args, save) : tradeoff_run(d, res, opt, args, save)
+            res["stage"] = "done"
+            save()
+            return 0
+        end
         if stepwise
             mosek_first ? Base.invokelatest(myopic, d, res, opt, args, save) : myopic(d, res, opt, args, save)
             res["stage"] = "done"

@@ -24,7 +24,7 @@ import math
 from ..engine import DB
 from ..controls import given
 from .common import require_empty
-from . import costs, spoint
+from . import costs, spoint, stochastic, bounds
 from .myopic import (TABLES, BOUNDS, INF, _snapshot, _restore, _take, _set, _bnd_ucw, _bnd_cum)
 
 # solve.stp 153-154: relaxation tolerances (relative, absolute; %TOLX% for trade)
@@ -48,10 +48,24 @@ def loaded_point(db: DB):
     return {n: {k: v[0] for k, v in d.items()} for n, d in pt.items()}, path
 
 
+def _b(db, var):
+    """The bound table of a variable family: B_VAR_<X>, with STAGES YES B_VAS_<X> (the SOW its last column)."""
+    return "B_" + (stochastic.vas(var) if stochastic.tagged(db) else var)
+
+
 def fixboh_step(db: DB, hook=None):
-    """The step of a run with FIXBOH (db.steps: one step); nothing without FIXBOH."""
+    """The step of a run with FIXBOH (db.steps: one step); nothing without FIXBOH.
+
+    With STAGES YES (solve.stp 9-13: STEPPED NO, one pass; %VAR% is VAS, %SOW% the SOW): the same step for the model
+    of every SOW.  The columns of the fixed periods are those of each SOW, fixed at the levels of the loaded point,
+    which is a deterministic one (VAR_<X>.L); the bounds of the step are by SOW; the cumulative and capacity bounds
+    relaxed are the uncertain ones, %SW1%..(..%SW2%) = S_..(..,'1',SOW) (solve.stp 35-36, 69, 186-191)."""
     s, q = db.s, db.q
+    st = stochastic.tagged(db)
     require_empty(db, ["REG_CUMCST", "BLE_OPR"], "cumulative cost bounds or blending in a run with FIXBOH (solve.stp)")
+    if st:
+        # solve.stp 69, 190-191 relax S_CAP_BND(R,T,P,BD,'1',SOW), while 218-219 read CAP_BND: not ported
+        require_empty(db, ["S_CAP_BND"], "uncertain capacity bounds (S_CAP_BND) in a run with FIXBOH and STAGES (solve.stp 69, 190)")
     lev, path = loaded_point(db)
     db.fixboh_point = path
     for n, dom in (("UC_RN", ["UC_N", "ALL_R"]), ("FIXB_RT", ["R", "T"]), ("FIXB_NORT", ["R", "T"]), ("FIXB_RTPX", ["R", "T", "P"]),
@@ -60,23 +74,28 @@ def fixboh_step(db: DB, hook=None):
             db.declare(n, "set", dom)
     db.declare("MIYR_VL", "par", [])
     tabs = set(t for (t,) in q("select table_name from information_schema.tables"))
-    names = sorted(set(TABLES + MORE) | {"B_" + v for v in BOUNDS if f"B_{v}" in tabs}
-                   | {"FLO_CUM", "UC_RHSRT", "UC_RHSRTS", "UC_RHSR", "UC_RHST", "UC_RHSTS", "CAP_BND", "RTP_VARP"})
+    bvars = BOUNDS + (["VAR_UC"] if st else [])
+    names = sorted(set(TABLES + MORE) | {_b(db, v) for v in bvars if _b(db, v) in tabs}
+                   | {"FLO_CUM", "UC_RHSRT", "UC_RHSRTS", "UC_RHSR", "UC_RHST", "UC_RHSTS", "CAP_BND", "RTP_VARP"}
+                   | ({"S_FLO_CUM", "S_COM_CUM"} if st else set()))
     if db.card("PRC_DYNUC"):
         names.append("PRC_DYNUC")
     names = [n for n in names if n.startswith("B_") or n in db.sym]
-    for v in BOUNDS:
-        if f"B_{v}" not in names:
-            ncol = {"VAR_NCAP": 3, "VAR_CAP": 3, "VAR_COMNET": 4, "VAR_COMPRD": 4, "VAR_UCR": 2, "VAR_UCT": 2, "VAR_UCRT": 3,
-                    "VAR_UCTS": 3, "VAR_UCRTS": 4, "VAR_CUMFLO": 5, "VAR_CUMCOM": 5}[v]
+    for v in bvars:
+        if _b(db, v) not in names:
+            ncol = {"VAR_NCAP": 3, "VAR_CAP": 3, "VAR_COMNET": 4, "VAR_COMPRD": 4, "VAR_UC": 1, "VAR_UCR": 2, "VAR_UCT": 2, "VAR_UCRT": 3,
+                    "VAR_UCTS": 3, "VAR_UCRTS": 4, "VAR_CUMFLO": 5, "VAR_CUMCOM": 5}[v] + (1 if st else 0)
             cols = ", ".join(f"d{i} VARCHAR" for i in range(ncol))
-            db.x(f'create table "B_{v}" ({cols}, lower DOUBLE, upper DOUBLE)')
-            names.append(f"B_{v}")
+            db.x(f'create table "{_b(db, v)}" ({cols}, lower DOUBLE, upper DOUBLE)')
+            names.append(_b(db, v))
     scal = {k: s.get(k, 0.0) for k in ("MIYR_VL",)}
     _snapshot(db, names)
     try:
         step = _step(db, lev, hook)
-        _take(db, step, more=[n for n in MORE if n in db.sym] + (["PRC_DYNUC"] if "PRC_DYNUC" in names else []))
+        _take(db, step, more=[n for n in MORE if n in db.sym] + (["PRC_DYNUC"] if "PRC_DYNUC" in names else []), bounds=not st)
+        if st:
+            # (the bounds of the step by SOW, under the names of the stochastic model)
+            step["bounds"] = {stochastic.vas(v): q(f'select * from "{_b(db, v)}"') for v in bvars}
         db.steps.append(step)
     finally:
         _restore(db, names)
@@ -89,6 +108,7 @@ def _rows(db, name):
 
 def _step(db: DB, lev, hook):
     s, q, x = db.s, db.q, db.x
+    st = stochastic.tagged(db)
     U = str.upper
     T = [y for (y,) in q("select y from MILESTONYR order by yv(y)")]
     M = {t: v for t, v in q("select y, value from M")}
@@ -150,7 +170,8 @@ def _step(db: DB, lev, hook):
     db.assign("RTC_NET", "select distinct r, y, c from RHS_COMBAL")
     db.assign("RTC_PRD", "select distinct r, y, c from RHS_COMPRD")
     # --- Copy FX UC RHS and CAP_BND to UP/LO:  UC_RHS(UC_N,BD)$UC_RHS(UC_N,'FX') = UC_RHS(UC_N,'FX')$BDNEQ(BD); (and the others)
-    for n in ("UC_RHS", "UC_RHSR", "UC_RHSRT", "UC_RHSRTS", "UC_RHST", "UC_RHSTS", "CAP_BND"):
+    #     (with STAGES the first statement is of S_CAP_BND(R,T,P,BD,'1',SOW), %SW1%CAP_BND(..%SW2%): CAP_BND stays)
+    for n in ("UC_RHS", "UC_RHSR", "UC_RHSRT", "UC_RHSRTS", "UC_RHST", "UC_RHSTS") + (() if st else ("CAP_BND",)):
         c = [k for k in db.cols(n) if k != "l"]
         cs = ", ".join(c)
         # (over the model periods T only: an FX record of another year stays as it is)
@@ -182,7 +203,7 @@ def _step(db: DB, lev, hook):
     # --- RTP_CAPYR(RTP_CPTYR(R,V,T,P))$(VAR_NCAP.L(R,V,P)+NCAP_PASTI(R,V,P)) = YES;
     #     VAR_CAP.L(RTP_VARP(RT_PP(R,T),P)) = SUM(RTP_CAPYR(R,V,T,P),COEF_CPT(R,V,T,P)*(VAR_NCAP.L(R,V,P)$TT(V)+NCAP_PASTI(R,V,P)));
     capl = dict(L("VAR_CAP"))
-    if db.card("CAP_BND"):
+    if db.card("CAP_BND") and not st:
         Tu = {U(t) for t in T}
         pasti = {(U(r), U(v), U(p)): val for r, v, p, val in q("select * from NCAP_PASTI")}
         cptyr = {}          # (in the order of the table: the sums below keep it)
@@ -324,34 +345,38 @@ def _step(db: DB, lev, hook):
     #     FLO_CUM(R,P,C,YEAR,LL,'LO')$REG_FIXT(R)       $= FLO_CUM(R,P,C,YEAR,LL,'LO')*(1-%TOLR%);
     cuc, cuf = float(db.env.get("CUCSCAL", 1000)), float(db.env.get("CUFSCAL", 10))
     cumcom, cumflo = L("VAR_CUMCOM"), L("VAR_CUMFLO")
+    #     (with STAGES: %SW1%COM_CUM(..%SW2%) is S_COM_CUM(..,'1',SOW), %SW1%FLO_CUM(..%SW2%) is S_FLO_CUM(..,'1',SOW),
+    #      the bounds of each SOW as fillsow.stc and bnd_cum.mod left them; the levels are those of the loaded point)
     for name, lv, sc, lkey in (("COM_CUM", cumcom, cuc, lambda r: (r[0], r[4], r[1], r[2], r[3])),
                                ("FLO_CUM", cumflo, cuf, lambda r: (r[0], r[1], r[2], r[3], r[4]))):
         new = []
-        for r in q(f'select * from "{name}" where l in (\'UP\', \'LO\')'):
+        tab, sel = (f"S_{name}", "l in ('UP', 'LO') and j = '1' and in_SOW(w)") if st else (name, "l in ('UP', 'LO')")
+        for r in q(f'select * from "{tab}" where {sel}'):
             if U(r[0]) not in fixed_u:
                 continue
-            if r[-2] == "UP":
+            if r[5] == "UP":                                   # (the bound type: the sixth column of all four tables)
                 v = max(r[-1], min(r[-1], lv.get(tuple(U(z) for z in lkey(r)), 0.0) * sc) * (1 + tolr))
             else:
                 v = r[-1] * (1 - tolr)
             new.append(r[:-1] + (v,))
-        _put_rows(db, name, new)
+        _put_rows(db, tab, new)
     # --- CAP_BND(R,T,P,'UP')$CAP_BND(R,T,P,'UP') = MAX(CAP_BND(R,T,P,'UP'),VAR_CAP.L(R,T,P)*(1+%TOLR%));
     #     CAP_BND(R,T,P,'LO')                       $= CAP_BND(R,T,P,'LO')*(1-%TOLR%);
+    #     (with STAGES these are statements of S_CAP_BND, which is empty here: CAP_BND stays as it is)
     new = []
-    for r in q('select * from "CAP_BND" where l in (\'UP\', \'LO\')'):
+    for r in ([] if st else q('select * from "CAP_BND" where l in (\'UP\', \'LO\')')):
         if r[-2] == "UP":          # ($CAP_BND(..,'UP'): an EPS bound too)
             new.append(r[:-1] + (max(r[-1], capl.get((U(r[0]), U(r[1]), U(r[2])), 0.0) * (1 + tolr)),))
         else:
             new.append(r[:-1] + (r[-1] * (1 - tolr),))
     _put_rows(db, "CAP_BND", new)
     # --- $BATINCLUDE bnd_ucw.mod;  OPTION UC_RTSUC < UC_T_SUCC;
-    _bnd_ucw(db)
+    _bnd_ucw_sow(db) if st else _bnd_ucw(db)
     db.assign("UC_RTSUC", "select distinct r, y, uc from UC_T_SUCC")
     # ---- capacities (by region): NO_RVP(RTP_VARP(R,SUBT(T),P))$SUM(RTP_CPTYR(R,BACKWARD(TT),T,P),1) = YES;
     db.assign("NO_RVP", """select distinct v.r, v.y, v.p from RTP_VARP v join RTP_CPTYR c on c.r=v.r and c.y2=v.y and c.p=v.p
                            where in_RT_PP(v.r,v.y) and in_NO_RT(c.r,c.y)""")
-    db.zap("B_VAR_CAP", "in_NO_RT(d0,d1) or in_FORWARD(d1)")
+    db.zap(_b(db, "VAR_CAP"), "in_NO_RT(d0,d1) or in_FORWARD(d1)")
     # ---- cumulative variables: Z = SMAX(T,M(T)); LOOP(REG(R)$(REG_FIXT(R)>=Z), RPC_CUMFLO(R,P,C,YEAR,LL) = NO; RC_CUMCOM(R,COM_VAR,YEAR,LL,C) = NO);
     z = max(M.values())
     gone = [r for r in regs if fixt[r] >= z]
@@ -363,9 +388,15 @@ def _step(db: DB, lev, hook):
     #      VAR_CUMFLO.LO(R,P,C,YEAR,FIL)$(NOT FLO_CUM(R,P,C,YEAR,FIL,'N')) = 0;  VAR_CUMCOM.LO(...) likewise
     z = z > miyr
     db.assign("FIL", f"select y from ALLYEAR where y <> '0' and {'true' if z else 'false'} and yv(y) > {miyr}")
-    _bnd_cum(db)
-    x("""update "B_VAR_CUMFLO" set lower = 0 where in_FIL(d4) and not in_FLO_CUM(d0,d1,d2,d3,d4,'N')""")
-    x("""update "B_VAR_CUMCOM" set lower = 0 where in_FIL(d4) and not in_COM_CUM(d0,d2,d3,d4,d1,'N')""")
+    if st:
+        # $IFI NOT %SENSIS%==YES $BATINCLUDE bnd_cum.mod COM_VAR: the bounds by SOW again, from the relaxed S_FLO_CUM / S_COM_CUM
+        db.zap("B_VAS_CUMFLO")
+        db.zap("B_VAS_CUMCOM")
+        bounds.cum_bounds(db)
+    else:
+        _bnd_cum(db)
+    x(f"""update "{_b(db, 'VAR_CUMFLO')}" set lower = 0 where in_FIL(d4) and not in_FLO_CUM(d0,d1,d2,d3,d4,'N')""")
+    x(f"""update "{_b(db, 'VAR_CUMCOM')}" set lower = 0 where in_FIL(d4) and not in_COM_CUM(d0,d2,d3,d4,d1,'N')""")
     # ---- trade (IF(MY_FYEAR, ...), solve.stp 236-264)
     _trade(db, nort_u)
     step = dict(step=1, year=int(min((M[t] for t in subt), default=0)), subt=list(subt), backward=list(backward), forward=list(forward))
@@ -378,6 +409,21 @@ def _step(db: DB, lev, hook):
     if hook:
         hook(db, step)
     return step
+
+
+def _bnd_ucw_sow(db):
+    """bnd_ucw.mod in solve.stp with STAGES YES: the slack variables of the user constraints take the relaxed RHS as
+    bounds for every SOW (bnd_ucv.mod 22-31), then the uncertain RHS of each SOW (bnd_ucv.mod 48-54:
+    S_UC_RHS(..,'1',SOW), which fillsow.stc filled from the RHS before solve.stp relaxed it), as bndmain.mod does
+    in the main pass (prep/stochastic.py bounds, uc_bounds)."""
+    for v, *_ in stochastic.UC_VARS:
+        db.x(f'drop table if exists "B_{v}"')
+        db.bounds.discard(v)
+    bounds.uc_bounds(db)
+    for v, *_ in stochastic.UC_VARS:
+        stochastic.sow_bounds(db, v)
+    stochastic.uc_bounds(db)
+    db.remove("UC_T_EACH", select="select r, uc, y from UC_T_SUCC")
 
 
 def _values_rt(rows):

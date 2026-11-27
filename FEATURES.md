@@ -263,7 +263,7 @@ By area, as the TIMES declarations group them; each attribute with its domain an
 
 | attribute | kind | status |
 |---|---|---|
-| `SW_LAMBDA`() | parameter | supported, refused in some uses: SW_LAMBDA with STAGES=YES (the tradeoff analysis) |
+| `SW_LAMBDA`() | parameter | supported, refused in some uses: SW_LAMBDA with STAGES=YES (the expected objective with a weight on the upside deviations, EQ_UPDEV); with `S_UCOBJ` TIMES sets it to 0 |
 | `SW_PROB`(ALLSOW) | parameter | supported |
 | `SW_SPROB`(J,ALLSOW) | parameter | supported |
 | `SW_START`(J) | parameter | supported, refused in some uses: STAGES with several states of the world in the first period (TIMES solves each SOW on its own) |
@@ -587,7 +587,7 @@ By area, as the TIMES declarations group them; each attribute with its domain an
 
 | attribute | kind | status |
 |---|---|---|
-| `S_CAP_BND`(REG,ALLYEAR,PRC,BD,J,ALLSOW) Bound on total installed capacity | parameter | supported, refused in some uses: with `SENSIS` (only `S_COM_PROJ` and `S_COM_TAX` are taken with it) |
+| `S_CAP_BND`(REG,ALLYEAR,PRC,BD,J,ALLSOW) Bound on total installed capacity | parameter | supported, refused in some uses: in a run with `FIXBOH` and `STAGES`; with `SENSIS` (only `S_COM_PROJ` and `S_COM_TAX` are taken with it) |
 | `S_CM_CONST`(ITEM,J,ALLSOW) Climate constants | parameter | supported, refused in some uses: the climate module with STAGES: no climate sensitivity CS for SOW {w} (coef_ext.cli 117); with `SENSIS` (only `S_COM_PROJ` and `S_COM_TAX` are taken with it) |
 | `S_CM_MAXC`(ALLYEAR,ITEM,J,ALLSOW) Maximum allowable climatic quantity | parameter | supported, refused in some uses: with `SENSIS` (only `S_COM_PROJ` and `S_COM_TAX` are taken with it) |
 | `S_CM_MAXCO2C`(ALLYEAR,J,ALLSOW) Maximum allowable atmospheric CO2 concentration | parameter | supported, refused in some uses: with `SENSIS` (only `S_COM_PROJ` and `S_COM_TAX` are taken with it) |
@@ -601,8 +601,8 @@ By area, as the TIMES declarations group them; each attribute with its domain an
 | `S_FLO_FUNC`(R,ALLYEAR,P,CG,CG,J,ALLSOW) Uncertain multiplier of process transformation | parameter | supported, refused in some uses: S_FLO_FUNC of a trade process with STAGES=YES (IRE_FLOSUM by SOW: cal_ire.mod 16, eqobjvar.mod 83); with `SENSIS` (only `S_COM_PROJ` and `S_COM_TAX` are taken with it) |
 | `S_NCAP_AFS`(R,ALLYEAR,P,S,J,ALLSOW) Seasonal availability factors | parameter | supported, refused in some uses: with `SENSIS` (only `S_COM_PROJ` and `S_COM_TAX` are taken with it) |
 | `S_NCAP_COST`(R,ALLYEAR,P,J,ALLSOW) Uncertain multiplier of investment cost | parameter | supported, refused in some uses: with `SENSIS` (only `S_COM_PROJ` and `S_COM_TAX` are taken with it) |
-| `S_UCOBJ`(UC_N,ALLSOW) Weight of UC objective component in tradeoff analysis | parameter | refused: the tradeoff analysis of stochastic TIMES (S_UCOBJ, SW_LAMBDA) |
-| `S_UC_RHS`(UC_N,LIM,J,ALLSOW) RHS of user constraint | parameter | supported, refused in some uses: S_UC_RHS of OBJ1 (the minimax regret of the tradeoff analysis); with `SENSIS` (only `S_COM_PROJ` and `S_COM_TAX` are taken with it) |
+| `S_UCOBJ`(UC_N,ALLSOW) Weight of UC objective component in tradeoff analysis | parameter | supported, refused in some uses: the multiphase tradeoff analysis is in (`S_UCOBJ('OBJ1','1')` given: one solve for each SOW in turn); refused: the analysis in two phases (without it, or given as EPS), a SOW without an objective of its own, with `SENSIS` or `SPINES` |
+| `S_UC_RHS`(UC_N,LIM,J,ALLSOW) RHS of user constraint | parameter | supported, refused in some uses: of `OBJ1`, bound type N with `S_UCOBJ` is in (the deviation allowed from the objective of a SOW's own solve); refused: of `OBJ1` without `S_UCOBJ` (the minimax regret) or with another bound type, bound type N of another user constraint in a tradeoff analysis; with `SENSIS` (only `S_COM_PROJ` and `S_COM_TAX` are taken with it) |
 | `S_UC_RHSR`(ALL_REG,UC_N,LIM,J,ALLSOW) RHS of user constraint | parameter | supported, refused in some uses: with `SENSIS` (only `S_COM_PROJ` and `S_COM_TAX` are taken with it) |
 | `S_UC_RHSRT`(ALL_REG,UC_N,ALLYEAR,LIM,J,ALLSOW) RHS of user constraint | parameter | supported, refused in some uses: with `SENSIS` (only `S_COM_PROJ` and `S_COM_TAX` are taken with it) |
 | `S_UC_RHSRTS`(ALL_REG,UC_N,ALLYEAR,TS,LIM,J,ALLSOW) RHS of user constraint | parameter | supported, refused in some uses: with `SENSIS` (only `S_COM_PROJ` and `S_COM_TAX` are taken with it) |

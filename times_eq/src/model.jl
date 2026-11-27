@@ -24,6 +24,8 @@ mutable struct SowCtx
     sensis::Bool                            # SENSIS: one deterministic model of the SOW w (names and variables of TIMES)
     norm::Float64                           # SENSIS: SW_NORM, the probability of w in the first period
     members::Vector{Id}                     # SENSIS: the SOWs w represents in the first period (SOW of the solve)
+    phase::Int                              # the tradeoff analysis: SW_PHASE of the solve (-1: multiphase); 0 otherwise
+    aux::Vector{Id}                         # the tradeoff analysis: AUXSOW, the SOWs whose objectives are rows of the solve
 end
 
 """

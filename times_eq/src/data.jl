@@ -314,6 +314,7 @@ function load_step(d::Data, k::Int)
     db = SQLite.DB(steps_file(d.source))
     try
         sets, pars, bounds = Dict{Symbol,Any}(), Dict{Symbol,Any}(), Dict{Symbol,Any}()
+        sbounds = copy(d.sbounds)
         for row in SQLite.DBInterface.execute(db, "select name, kind, dim from __steps where step = $k")
             name, kind, dim = Symbol(uppercase(String(row[1]))), String(row[2]), Int(row[3])
             sql = "select * from \"__step$(k)_$(row[1])\""
@@ -323,6 +324,10 @@ function load_step(d::Data, k::Int)
                 pars[name] = read_par(db, sql, d.L, name, Val(dim))
             elseif kind == "variable" && haskey(VARS, name)
                 bounds[name] = read_bounds(db, sql, d.L, Val(dim))
+            elseif kind == "variable" && is_vas(name)
+                # stochastic TIMES: the bounds of the step by SOW (a run with FIXBOH and STAGES)
+                check_vas(name, dim)
+                sbounds[name] = read_bounds(db, sql, d.L, Val(dim))
             end
         end
         isempty(sets) && isempty(pars) && error("no step $k in $(d.source)")
@@ -340,7 +345,7 @@ function load_step(d::Data, k::Int)
             haskey(sets, n) ? sets[n] : haskey(pars, n) ? pars[n] : getfield(d.tables, n)
         end)
         bnds = BoundsT(map(n -> get(bounds, n, getfield(d.bounds, n)), keys(VARS)))
-        return Data(d.source, d.L, d.K, tables, bnds, d.other, k, d.sbounds)
+        return Data(d.source, d.L, d.K, tables, bnds, d.other, k, sbounds)
     finally
         SQLite.close(db)   # Windows keeps an open file locked (a run that removes it fails)
     end

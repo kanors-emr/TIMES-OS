@@ -44,11 +44,13 @@ function fix_window!(m::Model, levels)
     isback = fixed_periods(m)
     bd = (K.LO, K.UP, K.FX)
     fixto(x, v) = JuMP.fix(x, v; force = true)
+    # (stochastic TIMES, solve.stp 200-220: %VAR%_ACT.FX(..%SOW%) = VAR_ACT.L(..): the column of each SOW at the level
+    # of the deterministic variable, `det_level`)
     function each(f, var, tpos, cond; forward = true)
         for (k, x) in var.x
             t = k[tpos]
             if isback(k[1], t)
-                cond(k, true) && fixto(x, f(level(levels, var.name, k)))
+                cond(k, true) && fixto(x, f(det_level(m, levels, var, k)))
             elseif forward && t in fwd
                 cond(k, false) && fixto(x, 0.0)
             end
@@ -83,6 +85,16 @@ function fix_window!(m::Model, levels)
     return m
 end
 
+"""
+The level a column of the fixed periods is fixed at: that of the variable in `levels`. In a stochastic run (STAGES)
+the columns are those of the SOWs (VAS_<X>, the SOW their last index) and the levels those of the deterministic
+variable VAR_<X> of the loaded point (solve.stp 200: %VAR%_ACT.FX(..%SOW%) = VAR_ACT.L(..)).
+"""
+function det_level(m::Model, levels, var, k::Tuple)
+    (m.sw === nothing || m.sw.sensis) && return level(levels, var.name, k)
+    return level(levels, vas_var(var.name), Base.front(k))
+end
+
 """The test of a fixed period: (r, t) -> Bool. In a run with FIXBOH by region (NO_RT), else the periods before the window."""
 function fixed_periods(m::Model)
     if m.rt === nothing
@@ -109,7 +121,7 @@ function relax_trade!(m::Model, levels)
     for (k, x) in m.v.VAR_IRE.x
         r, v, t, p, c, s, ie = k
         ((r, t, p, ie) in ire && (r, p, c, s) in d.RPCS_VAR && (r, p, c, ie, K.IN) in d.RPC_IREIO) || continue
-        l = level(levels, :VAR_IRE, k)
+        l = det_level(m, levels, m.v.VAR_IRE, k)
         set_bounds!(x, l * lo(ie), l * up(ie))
     end
     isempty(d.FIXB_IREACT) && return m               # (REDUCE NO)
@@ -119,7 +131,7 @@ function relax_trade!(m::Model, levels)
         ((r, p, s) in d.PRC_TS && (r, p) in d.RP_PGACT) || continue
         for ie in (K.IMP, K.EXP)                       # the order of the loop over IE: the last one stays
             (r, t, p, ie) in act || continue
-            l = level(levels, :VAR_ACT, k)
+            l = det_level(m, levels, m.v.VAR_ACT, k)
             set_bounds!(x, l * lo(ie), l * up(ie))
         end
     end
@@ -210,6 +222,9 @@ function apply_relax!(R::Relax, m::Model)
         end
         set_bounds!(x, lo, up)
     end
+    # (stochastic TIMES: the bounds of the slack variables by SOW are those the preprocessor wrote for the step, the
+    # relaxed RHS and over them the uncertain RHS of each SOW; bnd_ucw.mod in solve.stp)
+    (m.sw === nothing || m.sw.sensis) || return m
     for (var, rhs) in ((m.v.VAR_UCT, R.rhst), (m.v.VAR_UCTS, R.rhsts))
         for (k, x) in var.x
             haskey(var.bounds, k) || continue                      # not bounded by bnd_ucw.mod in this step

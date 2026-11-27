@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from typing import Callable, Optional
 from .prep import (extensions, stochastic, periods, interpolation, sets, timeslices, capacity, flows, defaults, commodities, trade,
                    bounds, storage, userconstraints, veda_attributes, coefficients, veda_coefficients, objective, myopic, mlf, cli,
-                   damage)
+                   damage, tradeprice)
 
 
 @dataclass(frozen=True)
@@ -72,6 +72,7 @@ PHASES = [
     ("objective coefficients", [Step(objective.objective_coefficients, "objective coefficients")]),
     ("eqdamage.mod (damage costs, DAMAGE NO)", [Step(damage.eqdamage, "the balances of the commodities with damage costs")]),
     ("equ_ext.mlf (TIMES-MACRO MLF)", [Step(mlf.equ_ext, "the calibration of MACRO, presolve.mlf, the bounds of MACRO")]),
+    ("bnd_ire.vda (trade prices of an earlier run)", [Step(tradeprice.bnd_ire, "the prices of exogenous trade from an earlier run")]),
     ("recurrin.stc SPINES (eqmain.mod 30)", [Step(stochastic.spines_sets, "the sets of SOW '1' of the spines")]),
     ("bounds, AFS, UC maps", [Step(bounds.variable_bounds, "bounds, AFS, UC maps", "64")]),
     ("pp_qack.mod (final control sets)", [Step(sets.final_control_sets, "final control sets", "99")]),

@@ -1965,7 +1965,7 @@ def raw_switch(text, name):
 
 def gams_base_files(folder, text):
     """The GDX files of earlier runs that TIMES in GAMS reads from the run folder (LPOINT: spoint.mod 10-11;
-    TIMESED: readbprice.mod 13-16), for the run of GAMS made here in a copy of the folder.  The copy has no gamssave
+    TIMESED: readbprice.mod 13-16; GDX_IPRIC: init_ext.vda 147-150), for the run of GAMS made here in a copy of the folder.  The copy has no gamssave
     folder, so its GDXPATH is the copy itself: a file is copied there under the name GAMS looks for, and a name that
     carries a path is given in the copy's run file as the absolute path of the file it names in the run folder.
     -> (copies [(file, name in the copy)], {switch: new value})."""
@@ -1992,6 +1992,9 @@ def gams_base_files(folder, text):
         take(ed, ("_DP", ""), switch_name="TIMESED")
     if ed and ed.upper() not in ("NO", "0"):
         take("com_bprice", ("",), in_gdxpath=False)                    # (readbprice.mod 13: else com_bprice)
+    ip = raw_switch(text, "GDX_IPRIC")
+    if ip:
+        take(ip, ("",), switch_name="GDX_IPRIC")                       # (init_ext.vda 148: %GDXPATH%%GDX_IPRIC%.GDX)
     return copies, values
 
 
@@ -2976,7 +2979,13 @@ def one_case(folder, out_root, o, case=None):
     pp_done()
     sol = os.path.join(out, "solution.db3")
     # (a SENSIS run: the solution of each solve in solution~<w>.db3, which the report reads SOW by SOW)
-    sensis_sols = J and J.get("steps") and J["steps"][0].get("sow") and all(s.get("solution_file") for s in J["steps"])
+    # (a tradeoff analysis, S_UCOBJ: the solution of each solve likewise, under the names of the stochastic model; its
+    # Veda result files are not written yet)
+    tradeoff = bool(J and J.get("steps") and J["steps"][0].get("tradeoff"))
+    sensis_sols = J and J.get("steps") and J["steps"][0].get("sow") and not tradeoff and all(s.get("solution_file") for s in J["steps"])
+    if tradeoff and o["report"] and J.get("objective") is not None:
+        notes.append("the Veda result files (.vd) of a tradeoff analysis are not written yet: the solution of each solve is in "
+                     "solution~<SOW>.db3 (levels, marginals and bounds by GAMS name)")
     # a run with FIXBOH: the levels and marginals of the loaded point that the model of the run does not have (the
     # equations of the fixed periods, the variables in none of its rows) stay as loaded in TIMES, and its reports and
     # its solution point have them. Here they are put under the solution before both are written (loadedpoint.py)
@@ -3122,7 +3131,10 @@ def judge(R, o):
     tol = o.get("tolerance", 1e-6)
     C = (J or {}).get("compare")
     diffs = []
-    if J and J.get("rows") is not None and G and G.get("rows") is not None:
+    # (a tradeoff analysis: its models grow by a row and a column from one solve to the next; GAMS's size is compared
+    # solve by solve below, not with the last model's)
+    phased = bool(((J or {}).get("steps") or [{}])[0].get("tradeoff"))
+    if J and J.get("rows") is not None and G and G.get("rows") is not None and not phased:
         if same_reduce(R, G):
             for key, label in (("rows", "rows"), ("columns", "columns"), ("nonzeros", "non-zeros")):
                 same = J[key] == G[key]
@@ -3193,6 +3205,13 @@ def judge(R, o):
             notes.append(f"HiGHS ended step{'s' if len(imp) > 1 else ''} {', '.join(imp)} with {ST[int(imp[0]) - 1]['status']} (an interior point solve without crossover "
                          "that it calls imprecise) and a feasible point, not a proved optimum; the run took that point as the solution of the step and fixed the steps "
                          "after it there. Its objective cannot be lower than the optimum of the step")
+        later = [x for x in diffs if x.startswith("objective of step") and not x.endswith(" 1")]
+        if ST[0].get("tradeoff") and later and "objective of step 1" not in diffs:
+            notes.append("a tradeoff analysis: each solve after the first holds the objectives of the solves before it near the level "
+                         "they had in their own solve (S_UC_RHS of OBJ1), and the two runs each use the level their own solver found. Where an "
+                         "objective is held at its optimum (a deviation of 0) the later optimum can move far more than the two levels "
+                         "differ, so " + ", ".join(later) + " may differ with the same model in both. The first model is compared entry "
+                         "by entry (check 4), the later ones by size")
         if G and G.get("objective") is not None and len(sizes) != len(ST):
             notes.append(f"the GAMS listing has {len(sizes)} solves, Julia made {len(ST)} steps")
             diffs.append("number of steps")
@@ -3279,6 +3298,16 @@ def judge(R, o):
         else:
             tail = f"; {solver_name(J)} finds the GAMS objective" + ("" if J.get("termination") == "OPTIMAL" else f" (feasible point, status {J.get('termination')})")
         other = [x for x in diffs if x != "objective"]
+        if not other and ST and ST[0].get("tradeoff"):
+            # a tradeoff analysis: GAMS's matrix is that of its first solve (its CONVERT run stops there); the solves of
+            # a solved GAMS run are compared by size and objective (checks 1 and 2 above)
+            nsz = sum(1 for c in R["checks"] if c[0] == "1" and c[1].endswith(": size"))
+            nob = sum(1 for c in R["checks"] if c[0] == "2" and c[1].endswith(": objective"))
+            rest = (f"; all {len(ST)} have the size and the objective of GAMS's" if nsz == len(ST) and nob == len(ST) else
+                    f"; all {len(ST)} have the size of GAMS's" if nsz == len(ST) else
+                    "; the others have no GAMS solve to compare with here (GAMS wrote its matrix, not solved)")
+            return (f"SAME: the first of the {len(ST)} models of the tradeoff analysis is the same linear program as GAMS, every "
+                    "coefficient, right-hand side and bound" + rest + ("" if "termination" in J else "; not solved here (--no-solve)"))
         if not other:
             return "SAME: the same linear program as GAMS, every coefficient, right-hand side and bound" + tail
     unproved = J.get("termination") != "OPTIMAL" and J.get("objective") is not None and gobj is not None and "objective" not in diffs
@@ -3330,6 +3359,8 @@ def judge(R, o):
         if timing and diffs == ["objective"]:
             return f"DIFFERENT OBJECTIVE: relative difference {R.get('objective_relative_difference', 0):.1e}; rows, columns and non-zeros agree" + pending
         return "DIFFERENT: " + ", ".join(diffs)
+    if ST and ST[0].get("tradeoff"):
+        return f"SAME: all {len(ST)} models of the tradeoff analysis agree with GAMS (model size and objective of every solve)"
     if ST and ST[0].get("sow"):
         return f"SAME: all {len(ST)} models of the SENSIS run agree with GAMS (model size and objective of every solve)"
     if ST:
@@ -4189,7 +4220,10 @@ def report_text(R):
             add("          HiGHS options: " + ", ".join(f"{k}={v}" for k, v in sorted(J["highs_options"].items())))
         L.extend(julia_time_lines(J, R["timings"].get("julia")))
         L.extend(solve_lines(J, R.get("highs") or {}))
-        if J.get("steps") and J["steps"][0].get("sow"):
+        if J.get("steps") and J["steps"][0].get("tradeoff"):
+            add(f"          a tradeoff analysis (S_UCOBJ): {len(J['steps'])} models, one for each state of the world in turn, each with its own "
+                "objective and the objectives of those before it held near their optimum")
+        elif J.get("steps") and J["steps"][0].get("sow"):
             add(f"          a SENSIS run: {len(J['steps'])} models, one for each state of the world of the first period, each solved on its own")
         elif J.get("steps") and len(J["steps"]) == 1:
             add("          one model, with its first periods fixed at the solution point the run loads (FIXBOH)" if (R.get("input", {}).get("switches") or {}).get("FIXBOH")

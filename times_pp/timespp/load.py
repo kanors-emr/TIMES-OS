@@ -134,10 +134,13 @@ def read_case(run_file: str, src_dir: str = None, workers=None):
     rd.dd_names = dd_names
     # init_ext.vda 138-152: $IF NOT EXIST %GDXPATH%%GDX_IREBND%.GDX (and GDX_IPRIC): trade bounds or prices loaded from
     # an earlier run's GDX, applied by bnd_ire.vda; GDXPATH is 'gamssave/' when that folder exists (initmty.mod 415-416)
-    gp = os.path.join(case_dir, "gamssave") if os.path.isdir(os.path.join(case_dir, "gamssave")) else case_dir
+    # (looked for in the run folder as its user gave it: a runner that works in a copy names it in TIMESPP_RUN_FOLDER)
+    from . import refpoint
+    def there(name):
+        d, stem = refpoint.locate(os.environ.get("TIMESPP_RUN_FOLDER") or case_dir, name)
+        return refpoint._exists(d, stem + ".gdx") is not None
     rd.trade_gdx = [k for k in ("GDX_IREBND", "GDX_IPRIC")
-                    if str(rd.env.get(k, "")).strip("'\"") and
-                    os.path.isfile(os.path.join(gp, str(rd.env[k]).strip("'\"") + ".gdx"))]
+                    if str(rd.env.get(k, "")).strip("'\"") and there(str(rd.env[k]).strip("'\""))]
     return rd, dd_order
 
 

@@ -389,8 +389,26 @@ TIMES builds it: the capacity and its investment, fixed and salvage costs of the
 `SOLVEDA` 1 the cumulative constraints as expected values; its Veda files hold the expected values, as TIMES reports
 them. Not covered, and named when a run uses them: the other `S_*` inputs, `S_FLO_FUNC` of a trade
 process, the investment costs of `S_NCAP_COST` in the cost results, several SOWs in the first period (other than with
-`SPINES` or `SENSIS`), `SENSIS` with other uncertain inputs than `S_COM_PROJ` and `S_COM_TAX`, `SPINES` with discrete capacity, retirements or `PRC_DYNUC`, and with `SOLVEDA` 1 cost bounds, `UC_TIME` or cumulative user constraints by period or timeslice, the tradeoff analysis (`S_UCOBJ`, `SW_LAMBDA`), and `STAGES` with MACRO, `TIMESTEP` or
-`FIXBOH`. A stochastic model is several times the size of the deterministic one.
+`SPINES` or `SENSIS`), `SENSIS` with other uncertain inputs than `S_COM_PROJ` and `S_COM_TAX`, `SPINES` with discrete capacity, retirements or `PRC_DYNUC`, and with `SOLVEDA` 1 cost bounds, `UC_TIME` or cumulative user constraints by period or timeslice, `SW_LAMBDA`, the minimax regret, and `STAGES` with MACRO or `TIMESTEP`.
+A run with `STAGES` and `FIXBOH` has the fixed periods of every SOW at the loaded solution (not with `SENSIS`, `SPINES` or
+`S_CAP_BND`). A stochastic model is several times the size of the deterministic one.
+
+The tradeoff analysis (`S_UCOBJ`) is covered in its multiphase form (`S_UCOBJ('OBJ1','1')` given): TIMES solves one
+model for each SOW in turn, the model of that SOW alone with the objective `S_UCOBJ` gives it (weights on cumulative
+user constraints; `OBJZ` is the total cost), and holds the objective of each SOW solved before within the share
+`S_UC_RHS('OBJ1','N',2,<SOW>)` of the level it had in its own solve (0: at that level). The run report lists each
+solve with its size and objective, and a run compared with GAMS compares them solve by solve; the matrix compared
+entry by entry is that of the first solve. An objective held at its optimum makes the later solves numerically
+hard: two solvers that agree on one solve to nine digits can differ in the next in the sixth, and HiGHS's simplex
+can end such a solve without a solution (its interior point code with crossover is then tried once; `--lp cplex`
+solves them with CPLEX). Not covered yet: the analysis in two phases (`S_UCOBJ` without `S_UCOBJ('OBJ1','1')`, or
+with it given as EPS), a SOW without an objective of its own, deviation bounds on other user constraints, the
+tradeoff analysis with `SENSIS` or `SPINES`, and the Veda result files of a tradeoff run (the solution of each
+solve is written as `solution~<SOW>.db3`).
+
+`GDX_IPRIC` (the prices of exogenous trade taken from an earlier run's GDX, for a model cut out of a larger one) is
+read in a run compared with TIMES in GAMS (`--check`, `--gams run`), where both read the same file, and when that
+run has the periods of this one; `GDX_IREBND` (trade flows fixed from an earlier run) is not covered.
 
 ## Where things are
 

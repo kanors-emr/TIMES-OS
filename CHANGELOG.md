@@ -1,5 +1,53 @@
 # Changelog
 
+## 1.5.0 (November 2026): the tradeoff analysis of stochastic TIMES, `FIXBOH` with `STAGES`, trade prices from an earlier run
+
+No package is added, so `python TIMES.py setup` is not needed after updating. The equation module changed: the
+first run after updating compiles it again (about 5 minutes, once), and the first stochastic run its add-on.
+
+#### Stochastic TIMES
+
+- **The tradeoff analysis of stochastic TIMES in its multiphase form** (`S_UCOBJ` with `S_UCOBJ('OBJ1','1')` given;
+  stages.stc, solve.stc, eqobj.mod). TIMES solves one model for each state of the world (SOW) in turn: the model of
+  that SOW alone, minimising the objective `S_UCOBJ` gives it (weights on cumulative user constraints, `OBJZ` the
+  total cost), with the objective of each SOW solved before as a row (`EQ_EXPOBJ`) whose variable
+  `VAS_UC('OBJ1',<SOW>)` is held within the share `S_UC_RHS('OBJ1','N',2,<SOW>)` of the level it had in its own
+  solve. Such a run was refused; it is now built and solved the same way, each solve listed in the run report and
+  compared with GAMS's solve of the same number (size and objective; the matrix of the first solve entry by entry).
+  Code: `times_pp/timespp/prep/stochastic.py`, `times_eq/src/stochastic.jl`, `times_eq/src/runcase.jl`
+  (`tradeoff_run`). Still refused, by name: the analysis in two phases (`S_UCOBJ` without `S_UCOBJ('OBJ1','1')`, or
+  given as EPS), a SOW without an objective of its own, deviation bounds on user constraints other than `OBJ1`,
+  the minimax regret, `SW_LAMBDA`, and the tradeoff analysis with `SENSIS` or `SPINES`. The Veda result files of a
+  tradeoff run are not written yet: the solution of each solve is in `solution~<SOW>.db3`.
+- A solve that holds an earlier objective at its optimum is numerically hard. Where HiGHS's simplex ends such a
+  solve without a solution, its interior point code with crossover is tried once, and the report says so. The
+  objective of a later solve can differ between two solvers in the sixth digit while the solves before agree to
+  nine: the verdict then names the solve, with a note that says why.
+- **`FIXBOH` with `STAGES YES`** (solve.stp in one pass): the periods up to the year are fixed for every SOW at the
+  loaded solution, and the bounds relaxed around it are those of each SOW (`times_pp/timespp/prep/fixboh.py`,
+  `times_eq/src/steps.jl`). It was refused. Still refused: with `SENSIS` or `SPINES`, and with `S_CAP_BND`.
+
+#### Trade
+
+- **`GDX_IPRIC`**: the prices of exogenous trade taken from an earlier run (init_ext.vda, bnd_ire.vda), for a model
+  cut out of a larger one: the trade flows that were endogenous in that run and are not in this one are priced at
+  its `PAR_IPRIC` (new: `times_pp/timespp/prep/tradeprice.py`). The file is a GDX written by GAMS, so it is read in a
+  run compared with TIMES in GAMS (`--check`, `--gams run`), like the other results of earlier runs; a run on its
+  own names the switch and stops. The earlier run must have the periods of this one. `GDX_IREBND` stays refused.
+- **A run with `GDX_IPRIC` whose GDX lies in the run folder's `GAMSSAVE` was compared without it**: the run of
+  GAMS made for the comparison works in a copy of the run folder, and the file was not put there, so neither side
+  priced the trade and the two agreed on another model than the one the run file asks for. The file is now given
+  to GAMS's copy, and looked for in the run folder itself (`TIMES.py`, `times_pp/timespp/load.py`).
+
+#### Agreement with TIMES
+
+- **The cost attributes on new capacity in a user constraint (`COST`, `TAX`, `SUB`, `INVCOST`, `INVTAX`, `INVSUB` on
+  `NCAP`) keep a cost that is on record as zero** (`times_eq/src/equations/userco.jl`). A subsidy given as a share of
+  the investment cost (`NCAP_ISPCT`) of 0 in some years makes the subsidy of those years an explicit zero (EPS), and
+  TIMES keeps the coefficient of the new capacity in the constraint, of value zero. Those coefficients were left out,
+  so the matrix had fewer non-zeros than TIMES's (a model of 954,056 rows: 452), with the same optimum. They are now
+  in the matrix, and the model is the same as TIMES's, entry by entry.
+
 ## 1.4.2 (November 2026): the README and the commitments: a mirror of TIMES, open use
 
 Documentation only: the code is that of 1.4.1, and no setup is needed after updating.
